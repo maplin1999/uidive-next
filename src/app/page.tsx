@@ -10,6 +10,7 @@ import {
 import { HeroSearch, ActivityFilter } from "@/components/home/HeroSearch";
 import { TripCard, TopPickCard } from "@/components/home/TripCard";
 import { useToast, Toast } from "@/components/Toast";
+import { useAuth } from "@/components/auth/AuthContext";
 
 type TripTypeFilter = "all" | "shore" | "boat";
 
@@ -25,6 +26,7 @@ export default function HomePage() {
   >({});
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const { message, showToast } = useToast();
+  const { requireAuth } = useAuth();
 
   const [query, setQuery] = useState("");
   const [activity, setActivity] = useState<ActivityFilter>("all");
@@ -83,10 +85,12 @@ export default function HomePage() {
   }
 
   function handleClaimDaily() {
-    // Auth/sign-in hasn't been migrated yet, so this mirrors the old site's
-    // requireAuth() gate: claiming is disabled until there's a signed-in
-    // user to credit Corals to.
-    showToast("Sign in to claim your daily Corals reward.");
+    // Real requireAuth() gate now that auth is migrated: opens the sign-in
+    // modal if nobody's signed in. The actual claim_daily_reward RPC call
+    // (crediting Corals) is still a future update -- this just gets the
+    // gate right first.
+    if (!requireAuth()) return;
+    showToast("Claiming daily Corals is coming in a future update.");
   }
 
   return (

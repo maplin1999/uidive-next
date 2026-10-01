@@ -5,12 +5,15 @@ import { Plus } from "lucide-react";
 import { CommunityPost, PostComment, fetchCommunityPosts } from "@/lib/posts";
 import { PostCard } from "@/components/community/PostCard";
 import { useToast, Toast } from "@/components/Toast";
+import { useAuth } from "@/components/auth/AuthContext";
 
 // The Community tab (#tab-community in the old site): the Diver Feed.
 // Posting, liking, and commenting all require a signed-in user in the old
-// site (requireAuth() gates every one of them) -- auth hasn't been migrated
-// yet, so those actions are stubbed with a toast here, same pattern as the
-// Home page's trip-card stubs. Reading the feed itself needs no sign-in
+// site (requireAuth() gates every one of them) -- now a real gate via
+// useAuth()'s requireAuth(), which opens the actual sign-in modal. The
+// underlying actions themselves (creating a post, liking, commenting) are
+// still stubbed with a toast once signed in, since post creation/likes
+// haven't been wired up yet -- reading the feed needs no sign-in at all
 // (posts/post_comments are both publicly readable), so that part is fully
 // real, live Supabase data.
 export default function CommunityPage() {
@@ -18,6 +21,7 @@ export default function CommunityPage() {
   const [commentsByPost, setCommentsByPost] = useState<Map<string, PostComment[]>>(new Map());
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const { message, showToast } = useToast();
+  const { requireAuth } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +52,10 @@ export default function CommunityPage() {
             </p>
           </div>
           <button
-            onClick={() => showToast("Sign in to post a dive log.")}
+            onClick={() => {
+              if (!requireAuth()) return;
+              showToast("Posting a dive log is coming in a future update.");
+            }}
             className="w-full sm:w-auto shrink-0 whitespace-nowrap bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20"
           >
             <Plus className="w-4 h-4" />
@@ -103,7 +110,10 @@ export default function CommunityPage() {
                 onBookTrip={() =>
                   showToast("🤿 Trip details are coming in a future update.")
                 }
-                onRequireAuth={showToast}
+                onRequireAuth={() => {
+                  if (!requireAuth()) return;
+                  showToast("That's coming in a future update.");
+                }}
               />
             ))}
           </div>

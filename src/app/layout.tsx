@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "UiDive",
@@ -12,11 +15,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // data-theme starts as "dark" to match the old site's default; the real
-  // theme-toggle button (with its localStorage persistence) moves over
-  // when we migrate the shared nav/header component.
+  // theme-toggle button (with its localStorage persistence) comes back once
+  // the light theme is ported (see Header.tsx's comment on this).
+  //
+  // AuthProvider + Header + AuthModal live here, at the root, instead of in
+  // each page -- every route gets the same signed-in/out chrome and the
+  // same sign-in modal for free, matching how the old site had exactly one
+  // header and one auth modal shared by every tab.
   return (
     <html lang="en" data-theme="dark">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <Header />
+          {children}
+          <AuthModal />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
