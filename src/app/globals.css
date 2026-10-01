@@ -38,6 +38,27 @@ html[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
   background-color: #a9c7c1;
 }
 
+/* Diver certification / verified-host avatar ring colors, ported from the
+   old site's diverCertRingClass()/styles.css. Dedicated classes rather than
+   Tailwind's shared border-color utilities, which are reused all over the
+   app for unrelated chrome -- see diverCertRing() in lib/diverRing.ts for
+   the class each cert maps to. Used on every avatar <img> site-wide. */
+.diver-ring-verified   { border-color: #34d399; } /* emerald-400 */
+.diver-ring-instructor { border-color: #fbbf24; } /* amber-400 */
+.diver-ring-divemaster { border-color: #c084fc; } /* purple-400 */
+.diver-ring-rescue     { border-color: #60a5fa; } /* blue-400 */
+.diver-ring-advanced   { border-color: #22d3ee; } /* cyan-400 */
+.diver-ring-openwater  { border-color: #94a3b8; } /* slate-400 */
+.diver-ring-none       { border-color: #334155; } /* slate-700 -- no cert on file */
+
+/* Native <select> popups can render unreadable (white-on-white) in some
+   browsers without an explicit option background/color -- carried over
+   from the old site's dark-mode select fix (not a light-theme feature). */
+select option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
 /* ==========================================================
    Home page (src/app/page.tsx): custom classes the hero search pill and
    trip rows depend on that aren't plain Tailwind utilities. Carried over

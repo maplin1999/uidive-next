@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, Award } from "lucide-react";
 import { HostTrip, RosterDiver, fetchTripRoster } from "@/lib/host";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 // Migrated from the old site's openHostTripRosterModal() -- lists the divers
 // booked on a trip via the get_trip_roster() RPC.
@@ -57,7 +58,7 @@ export function TripRosterModal({ trip, onClose }: { trip: HostTrip; onClose: ()
                 <img
                   src={d.diver_avatar_url}
                   alt=""
-                  className="w-10 h-10 rounded-full object-cover border border-slate-700"
+                  className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(d.diver_cert)}`}
                 />
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-white truncate">

@@ -142,18 +142,34 @@ export function DiveDetailModal({
           {trip.description && <p className="text-sm text-slate-300">{trip.description}</p>}
 
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <ConditionTile icon={<Eye className="w-3.5 h-3.5" />} label="Visibility" value={trip.visibility} />
+            <ConditionTile
+              icon={<Eye className="w-3.5 h-3.5" />}
+              label="Visibility"
+              value={trip.visibility}
+              color="text-cyan-400"
+            />
             <ConditionTile
               icon={<Thermometer className="w-3.5 h-3.5" />}
               label="Water Temp"
               value={trip.water_temp}
+              color="text-emerald-400"
             />
-            <ConditionTile icon={<Waves className="w-3.5 h-3.5" />} label="Swell" value={trip.swell} />
-            <ConditionTile icon={<Wind className="w-3.5 h-3.5" />} label="Wind" value={trip.wind || "—"} />
+            <ConditionTile
+              icon={<Waves className="w-3.5 h-3.5" />}
+              label="Swell"
+              value={trip.swell}
+              color="text-indigo-400"
+            />
+            <ConditionTile
+              icon={<Wind className="w-3.5 h-3.5" />}
+              label="Wind"
+              value={trip.wind || "—"}
+              color="text-sky-400"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <ConditionTile label="Tide" value={trip.tide || "—"} />
-            <ConditionTile label="Current" value={trip.current || "—"} />
+            <ConditionTile label="Tide" value={trip.tide || "—"} color="text-teal-400" />
+            <ConditionTile label="Current" value={trip.current || "—"} color="text-orange-400" />
             <ConditionTile label="Level" value={trip.difficulty} />
             <ConditionTile label="Date" value={formatTripDate(trip)} />
           </div>
@@ -177,21 +193,34 @@ export function DiveDetailModal({
             </p>
           )}
 
-          <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-800">
-            <div>
-              <p className="text-2xl font-black text-cyan-400">${Number(trip.price).toLocaleString()} USD</p>
-              <p className="text-[10px] text-slate-500">
-                {isFull ? "Fully booked -- no spots left on this trip." : "Earn +50 🪸 Corals on booking"}
-              </p>
+          <div
+            className={`bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-center justify-between transition-opacity ${
+              isFull ? "opacity-50 grayscale" : ""
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🪸</span>
+              <div>
+                <p className="text-sm font-bold text-amber-400">
+                  {isFull ? "Trip full -- no rewards available" : "Earn +50 Corals"}
+                </p>
+                <p className="text-xs text-slate-400">
+                  {isFull ? "Fully booked -- no spots left on this trip." : "Added automatically upon dive log completion"}
+                </p>
+              </div>
             </div>
-            <button
-              onClick={handleConfirmClick}
-              disabled={isFull || booking}
-              className="shrink-0 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
-            >
-              {isFull ? "Fully Booked" : booking ? "Booking…" : "Confirm Booking"}
-            </button>
+            <span className="text-lg font-black text-white shrink-0">
+              ${Number(trip.price).toLocaleString()} USD
+            </span>
           </div>
+
+          <button
+            onClick={handleConfirmClick}
+            disabled={isFull || booking}
+            className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
+          >
+            {isFull ? "Fully Booked" : booking ? "Booking…" : "Confirm Booking"}
+          </button>
         </div>
       </div>
 
@@ -206,10 +235,12 @@ function ConditionTile({
   icon,
   label,
   value,
+  color,
 }: {
   icon?: React.ReactNode;
   label: string;
   value: string;
+  color?: string;
 }) {
   return (
     <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
@@ -217,7 +248,7 @@ function ConditionTile({
         {icon}
         {label}
       </p>
-      <p className="text-sm font-bold text-slate-200">{value}</p>
+      <p className={`text-sm font-bold ${color || "text-slate-200"}`}>{value}</p>
     </div>
   );
 }

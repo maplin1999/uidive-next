@@ -5,6 +5,7 @@ import { X, UserPlus } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import { DiverSearchResult, searchDivers, sendBuddyRequest } from "@/lib/inbox";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 // Migrated from the old site's #add-friend-modal (openAddFriendModal() /
 // searchForBuddy() / sendBuddyRequest()). Searches by Diver ID or partial
@@ -107,7 +108,7 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
                   <img
                     src={person.avatar_url || DEFAULT_AVATAR}
                     alt=""
-                    className="w-9 h-9 rounded-full object-cover border border-slate-700"
+                    className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
                   />
                   <div className="min-w-0">
                     <p className="font-bold text-white truncate text-sm">{person.name}</p>

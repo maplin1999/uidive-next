@@ -5,6 +5,7 @@ import { Ticket, Gem, ShoppingBag, Trophy, UserPlus, CalendarCheck, Camera, Gift
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import { fetchVouchers, fetchLeaderboard, redeemCorals, Voucher, LeaderboardEntry } from "@/lib/shop";
+import { diverCertRingClass } from "@/lib/diverRing";
 import Link from "next/link";
 
 const OFFERS = [
@@ -426,7 +427,7 @@ export default function DiveShopPage() {
                             <img
                               src={entry.avatar_url}
                               alt={entry.name}
-                              className="w-7 h-7 rounded-full object-cover"
+                              className={`w-7 h-7 rounded-full object-cover border-2 ${diverCertRingClass(entry.cert)}`}
                             />
                             <span className="font-bold text-slate-100">
                               {entry.name}

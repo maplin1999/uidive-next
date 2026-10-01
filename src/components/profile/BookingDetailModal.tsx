@@ -16,6 +16,7 @@ import { RosterDiver, fetchTripRoster } from "@/lib/host";
 import { supabase } from "@/lib/supabase";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -178,12 +179,12 @@ export function BookingDetailModal({
         {trip && (
           <>
             <div className="grid grid-cols-3 gap-2 text-xs">
-              <ConditionTile label="Visibility" value={trip.visibility || "—"} />
-              <ConditionTile label="Water Temp" value={trip.water_temp || "—"} />
-              <ConditionTile label="Swell" value={trip.swell || "—"} />
-              <ConditionTile label="Wind" value={trip.wind || "—"} />
-              <ConditionTile label="Tide" value={trip.tide || "—"} />
-              <ConditionTile label="Current" value={trip.current || "—"} />
+              <ConditionTile label="Visibility" value={trip.visibility || "—"} color="text-cyan-400" />
+              <ConditionTile label="Water Temp" value={trip.water_temp || "—"} color="text-emerald-400" />
+              <ConditionTile label="Swell" value={trip.swell || "—"} color="text-indigo-400" />
+              <ConditionTile label="Wind" value={trip.wind || "—"} color="text-sky-400" />
+              <ConditionTile label="Tide" value={trip.tide || "—"} color="text-teal-400" />
+              <ConditionTile label="Current" value={trip.current || "—"} color="text-orange-400" />
             </div>
             {trip.conditions_updated_at && (
               <p className="text-[10px] text-slate-500 flex items-center gap-1">
@@ -236,7 +237,7 @@ export function BookingDetailModal({
                   <img
                     src={d.diver_avatar_url || DEFAULT_AVATAR}
                     alt=""
-                    className="w-8 h-8 rounded-full object-cover shrink-0"
+                    className={`w-8 h-8 rounded-full object-cover shrink-0 border-2 ${diverCertRingClass(d.diver_cert)}`}
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-white truncate">
@@ -345,11 +346,11 @@ export function BookingDetailModal({
   );
 }
 
-function ConditionTile({ label, value }: { label: string; value: string }) {
+function ConditionTile({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
       <p className="text-[10px] text-slate-500 uppercase">{label}</p>
-      <p className="text-sm font-bold text-slate-200">{value}</p>
+      <p className={`text-sm font-bold ${color || "text-slate-200"}`}>{value}</p>
     </div>
   );
 }

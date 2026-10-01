@@ -13,6 +13,7 @@ import {
 } from "@/lib/profile";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 // The Profile tab (#tab-profile in the old site). Treasure Chest cosmetics
 // (calling card banner, equipped avatar, diver rings) and the buddies
@@ -85,7 +86,7 @@ export default function ProfilePage() {
               <img
                 src={user.avatar}
                 alt="Your profile photo"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-slate-700 shadow-lg"
+                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 shadow-lg ${diverCertRingClass(user.cert)}`}
               />
               <button
                 onClick={() => setEditOpen(true)}

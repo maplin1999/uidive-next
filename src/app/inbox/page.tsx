@@ -19,6 +19,7 @@ import {
 import { AddBuddyModal } from "@/components/inbox/AddBuddyModal";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 type Tab = "requests" | "messages" | "groups";
 
@@ -156,7 +157,7 @@ export default function InboxPage() {
                     <img
                       src={person.avatar_url || DEFAULT_AVATAR}
                       alt=""
-                      className="w-10 h-10 rounded-full object-cover border border-slate-700"
+                      className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-white truncate hover:underline">{person.name}</p>
@@ -204,7 +205,7 @@ export default function InboxPage() {
                   <img
                     src={c.partner.avatar_url || DEFAULT_AVATAR}
                     alt=""
-                    className="w-9 h-9 rounded-full object-cover border border-slate-700"
+                    className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(c.partner.cert)}`}
                   />
                 </button>
                 <button
@@ -244,7 +245,7 @@ export default function InboxPage() {
                         <img
                           src={b.avatar_url || DEFAULT_AVATAR}
                           alt=""
-                          className="w-9 h-9 rounded-full object-cover border border-slate-700"
+                          className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(b.cert)}`}
                         />
                       </button>
                       <button

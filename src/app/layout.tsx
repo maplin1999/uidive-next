@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Header } from "@/components/Header";
+import { MobileNav } from "@/components/MobileNav";
 import { SocialProvider } from "@/components/social/SocialContext";
 import { PublicProfileModal } from "@/components/social/PublicProfileModal";
 import { ReportModal } from "@/components/social/ReportModal";
@@ -32,6 +33,10 @@ export default function RootLayout({
           <SocialProvider>
             <Header />
             {children}
+            {/* Spacer so page content isn't hidden behind the fixed mobile
+                bottom nav -- matches that nav's own height + safe-area pad. */}
+            <div className="h-20 md:hidden" aria-hidden="true" />
+            <MobileNav />
             <AuthModal />
             <PublicProfileModal />
             <ReportModal />

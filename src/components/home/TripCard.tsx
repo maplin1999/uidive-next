@@ -2,11 +2,14 @@
 
 import { DiveTrip, ReviewStats, difficultyAccent, formatTripDate } from "@/lib/trips";
 
+const FALLBACK_IMG =
+  "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
+
 // The full-detail card used in the search grid. Migrated from
-// renderSearchTrips()'s template string in the old app.js -- same markup,
-// same classes, just JSX instead of a string join. Clicking opens the dive
-// detail modal in the old site; that modal hasn't been migrated yet, so
-// onOpen is a no-op placeholder for now (wired up once it exists).
+// renderSearchTrips()'s template string in the old app.js -- including its
+// cover photo, "Fully Booked" ribbon, and opacity-70 dim on a sold-out trip
+// (the main card originally shipped without these -- TopPickCard below had
+// the photo, this one didn't; this restores parity between the two).
 export function TripCard({
   trip,
   rating,
@@ -18,55 +21,76 @@ export function TripCard({
 }) {
   const accent = difficultyAccent(trip.difficulty);
   const spotsLeft = trip.capacity - trip.spots_booked;
-  const groupLabel = spotsLeft <= 0 ? "Fully Booked" : `${trip.spots_booked}/${trip.capacity} Divers`;
+  const isFull = spotsLeft <= 0;
+  const groupLabel = isFull ? "Fully Booked" : `${trip.spots_booked}/${trip.capacity} Divers`;
 
   return (
     <div
       onClick={() => onOpen(trip)}
-      className="trip-card p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 cursor-pointer space-y-4 transition-all"
+      className={`trip-card rounded-3xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition-all overflow-hidden relative ${
+        isFull ? "opacity-70" : ""
+      }`}
     >
-      <div className="flex justify-between items-start gap-3">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2 flex-wrap">
-            <h3 className="font-extrabold text-base text-slate-100">{trip.title}</h3>
-            <span
-              className={`${accent.tag} border text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap`}
-            >
-              {accent.label}
-            </span>
-            {rating.count > 0 && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-                ★ {rating.avg.toFixed(1)}{" "}
-                <span className="text-slate-500 font-semibold">({rating.count})</span>
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-slate-400">
-            {trip.trip_type === "boat" ? "Boat Charter" : "Shore Dive"} • {formatTripDate(trip)}
-          </p>
-        </div>
-        <span className="text-xl font-black text-cyan-400 shrink-0">${Number(trip.price)}</span>
+      {isFull && (
+        <span className="absolute top-3 right-3 z-10 text-[10px] font-bold uppercase tracking-wide bg-rose-500/90 text-white px-2.5 py-1 rounded-full shadow-md">
+          Fully Booked
+        </span>
+      )}
+      <div className="relative h-32 overflow-hidden bg-slate-800">
+        {/* eslint-disable-next-line @next/next/no-img-element -- remote
+            Supabase Storage / Unsplash URLs, with a runtime fallback on
+            error, same as TopPickCard below. */}
+        <img
+          src={trip.image_url || FALLBACK_IMG}
+          alt={trip.title}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = FALLBACK_IMG;
+          }}
+          className="w-full h-full object-cover"
+        />
       </div>
-      <div className="grid grid-cols-3 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 text-center">
-        <div>
-          <span className="text-[10px] text-slate-500 uppercase block">Visibility</span>
-          <strong className="text-cyan-400">{trip.visibility}</strong>
+      <div className="p-5 space-y-4">
+        <div className="flex justify-between items-start gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2 flex-wrap">
+              <h3 className="font-extrabold text-base text-slate-100">{trip.title}</h3>
+              <span
+                className={`${accent.tag} border text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap`}
+              >
+                {accent.label}
+              </span>
+              {rating.count > 0 && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                  ★ {rating.avg.toFixed(1)}{" "}
+                  <span className="text-slate-500 font-semibold">({rating.count})</span>
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400">
+              {trip.trip_type === "boat" ? "Boat Charter" : "Shore Dive"} • {formatTripDate(trip)}
+            </p>
+          </div>
+          <span className="text-xl font-black text-cyan-400 shrink-0">${Number(trip.price)}</span>
         </div>
-        <div>
-          <span className="text-[10px] text-slate-500 uppercase block">Group</span>
-          <strong className={spotsLeft <= 0 ? "text-rose-400" : ""}>{groupLabel}</strong>
-        </div>
-        <div>
-          <span className="text-[10px] text-slate-500 uppercase block">Reward</span>
-          <strong className="text-amber-400">+50 🪸</strong>
+        <div className="grid grid-cols-3 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 text-center">
+          <div>
+            <span className="text-[10px] text-slate-500 uppercase block">Visibility</span>
+            <strong className="text-cyan-400">{trip.visibility}</strong>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-500 uppercase block">Group</span>
+            <strong className={spotsLeft <= 0 ? "text-rose-400" : ""}>{groupLabel}</strong>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-500 uppercase block">Reward</span>
+            <strong className="text-amber-400">+50 🪸</strong>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-const FALLBACK_IMG =
-  "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
 
 // The compact horizontal-scroll card used in Top Picks. Migrated from
 // renderTopPicks()'s template string.

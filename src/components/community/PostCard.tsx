@@ -5,6 +5,8 @@ import { Heart, MessageCircle, MapPin, ChevronRight, MoreVertical, Pencil, Trash
 import { CommunityPost, PostComment } from "@/lib/posts";
 import { useSocial } from "@/components/social/SocialContext";
 import { toggleBlockUser } from "@/lib/social";
+import { diverCertRingClass } from "@/lib/diverRing";
+import { ImageLightbox } from "@/components/ImageLightbox";
 
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=300&q=80";
@@ -40,6 +42,7 @@ export function PostCard({
 }) {
   const [commentDraft, setCommentDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const { openProfile, openReport } = useSocial();
   const author = post.profiles || { name: "A diver", avatar_url: "", cert: "" };
   const when = new Date(post.created_at).toLocaleDateString("en-US", {
@@ -84,7 +87,7 @@ export function PostCard({
           <img
             src={author.avatar_url || DEFAULT_AVATAR}
             alt={author.name}
-            className="w-10 h-10 rounded-full object-cover border border-cyan-400/40"
+            className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(author.cert)}`}
           />
           <div>
             <div className="flex items-center gap-2">
@@ -174,7 +177,12 @@ export function PostCard({
       {post.image_url && (
         <div className="relative rounded-2xl overflow-hidden max-h-96">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={post.image_url} alt="" className="w-full h-full object-cover" />
+          <img
+            src={post.image_url}
+            alt=""
+            onClick={() => setLightboxOpen(true)}
+            className="w-full h-full object-cover cursor-zoom-in"
+          />
           {post.location_name && (
             <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-3 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
               <div className="flex items-center space-x-3 min-w-0">
@@ -256,6 +264,8 @@ export function PostCard({
           </button>
         </div>
       </div>
+
+      {lightboxOpen && <ImageLightbox src={post.image_url} onClose={() => setLightboxOpen(false)} />}
     </article>
   );
 }

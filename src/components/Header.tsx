@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Waves,
   Compass,
@@ -17,7 +18,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
-import { fetchBuddyRequests, fetchBuddies, fetchConversations } from "@/lib/inbox";
+import { useInboxBadge } from "@/lib/useInboxBadge";
+import { diverCertRingClass } from "@/lib/diverRing";
 
 // The site-wide header (migrated from index.html's <header>), now shared
 // across every page via layout.tsx instead of being one more tab-switched
@@ -35,7 +37,8 @@ export function Header() {
   const { message } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [inboxBadge, setInboxBadge] = useState(0);
+  const inboxBadge = useInboxBadge();
+  const pathname = usePathname();
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -46,33 +49,6 @@ export function Header() {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
-
-  // Mirrors the old site's updateInboxBadges() -- sum of pending buddy
-  // requests and conversations with something unread. Polled rather than
-  // realtime, same tradeoff as the chat modals themselves.
-  useEffect(() => {
-    if (!user) {
-      setInboxBadge(0);
-      return;
-    }
-    let cancelled = false;
-    async function check() {
-      try {
-        const [requests, buddies] = await Promise.all([fetchBuddyRequests(user!.id), fetchBuddies(user!.id)]);
-        const conversations = await fetchConversations(user!.id, buddies);
-        const unread = conversations.filter((c) => c.unread).length;
-        if (!cancelled) setInboxBadge(requests.length + unread);
-      } catch (err) {
-        console.error("Could not check Inbox badge:", err);
-      }
-    }
-    check();
-    const interval = setInterval(check, 25000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [user]);
 
   return (
     <>
@@ -93,19 +69,35 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" />
-            <NavLink href="/community" icon={<Camera className="w-4 h-4" />} label="Community" />
-            <NavLink href="/diveshop" icon={<ShoppingBag className="w-4 h-4" />} label="Dive Shop" />
+            <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" active={pathname === "/"} />
+            <NavLink
+              href="/community"
+              icon={<Camera className="w-4 h-4" />}
+              label="Community"
+              active={pathname?.startsWith("/community")}
+            />
+            <NavLink
+              href="/diveshop"
+              icon={<ShoppingBag className="w-4 h-4" />}
+              label="Dive Shop"
+              active={pathname?.startsWith("/diveshop")}
+            />
             {user && (
               <NavLink
                 href="/inbox"
                 icon={<InboxIcon className="w-4 h-4" />}
                 label="Inbox"
                 badge={inboxBadge}
+                active={pathname?.startsWith("/inbox")}
               />
             )}
             {user && (
-              <NavLink href="/host-dashboard" icon={<Anchor className="w-4 h-4" />} label="Host" />
+              <NavLink
+                href="/host-dashboard"
+                icon={<Anchor className="w-4 h-4" />}
+                label="Host"
+                active={pathname?.startsWith("/host-dashboard")}
+              />
             )}
           </nav>
 
@@ -144,7 +136,7 @@ export function Header() {
                   <img
                     src={user.avatar}
                     alt="Your profile photo"
-                    className="w-8 h-8 rounded-full object-cover"
+                    className={`w-8 h-8 rounded-full object-cover border-2 ${diverCertRingClass(user.cert)}`}
                   />
                   <span className="text-xs font-bold text-slate-200 hidden sm:inline">
                     {user.name.split(" ")[0]}
@@ -201,16 +193,20 @@ function NavLink({
   icon,
   label,
   badge,
+  active,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   badge?: number;
+  active?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="nav-btn relative px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-colors flex items-center space-x-2"
+      className={`nav-btn relative px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center space-x-2 ${
+        active ? "active text-cyan-400 bg-slate-900/80" : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+      }`}
     >
       {icon}
       <span>{label}</span>
