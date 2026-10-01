@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 // Migrated from the old site's #tab-legal section (index.html) and its
@@ -12,7 +13,20 @@ import { ArrowLeft } from "lucide-react";
 type LegalTab = "privacy" | "terms";
 
 export default function LegalPage() {
-  const [activeTab, setActiveTab] = useState<LegalTab>("privacy");
+  return (
+    <Suspense fallback={null}>
+      <LegalPageInner />
+    </Suspense>
+  );
+}
+
+// A ?tab=terms query param lets links elsewhere (the auth modal's sign-up
+// fine print, same as the old site's openLegalPage('terms')) land straight
+// on the Terms tab instead of always defaulting to Privacy.
+function LegalPageInner() {
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<LegalTab>(requestedTab === "terms" ? "terms" : "privacy");
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, CheckCircle, Backpack } from "lucide-react";
 import { EQUIPMENT_ITEMS } from "@/lib/trips";
 
 // Migrated from the old site's #equipment-checklist-modal -- shown after
@@ -19,20 +19,23 @@ export function EquipmentChecklistModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
-        <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
-          <h3 className="font-bold text-white text-base">Equipment Checklist</h3>
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-start">
+          <h3 className="font-black text-white text-xl flex items-center gap-2">
+            <Backpack className="w-5 h-5 text-cyan-400" /> Gear Checklist
+          </h3>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
+            className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <p className="text-xs text-slate-400">
-          Flag what gear you&apos;re bringing yourself -- helps the host plan ahead.
+          Check off what you&apos;re bringing yourself -- anything left unchecked, your dive host
+          will have ready to rent.
         </p>
 
         <div className="space-y-2">
@@ -54,9 +57,10 @@ export function EquipmentChecklistModal({
 
         <button
           onClick={() => onConfirm(checked)}
-          className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
+          className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center space-x-2"
         >
-          Confirm Booking
+          <span>Confirm Booking</span>
+          <CheckCircle className="w-4 h-4" />
         </button>
       </div>
     </div>

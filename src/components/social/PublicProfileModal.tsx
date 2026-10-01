@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   X,
   Award,
@@ -41,6 +42,7 @@ import { diverCertRingClass } from "@/lib/diverRing";
 export function PublicProfileModal() {
   const { user, requireAuth } = useAuth();
   const { profileUserId, closeProfile, openReport } = useSocial();
+  const router = useRouter();
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [posts, setPosts] = useState<PublicPost[]>([]);
@@ -125,19 +127,19 @@ export function PublicProfileModal() {
                   <MoreVertical className="w-4 h-4" />
                 </button>
                 {menuOpen && profile && (
-                  <div className="absolute left-0 top-full mt-1 w-44 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-10">
+                  <div className="absolute left-0 top-full mt-1 w-44 bg-slate-900 border border-slate-700 rounded-xl shadow-xl overflow-hidden py-1 z-30 text-left">
                     <button
                       onClick={() => {
                         setMenuOpen(false);
                         openReport("user", profile.id, profile.name);
                       }}
-                      className="w-full text-left px-3 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
                       <Flag className="w-3.5 h-3.5" /> Report user
                     </button>
                     <button
                       onClick={handleToggleBlock}
-                      className="w-full text-left px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                     >
                       <Ban className="w-3.5 h-3.5" /> {blocked ? "Unblock user" : "Block user"}
                     </button>
@@ -246,7 +248,7 @@ export function PublicProfileModal() {
 
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Grid className="w-5 h-5 text-cyan-400" /> Dive Logs &amp; Photos
+                <Grid className="w-5 h-5 text-cyan-400" /> {profile.name.split(" ")[0]}&apos;s Dive Logs &amp; Photos
               </h3>
               {posts.length === 0 ? (
                 <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
@@ -261,11 +263,16 @@ export function PublicProfileModal() {
                       day: "numeric",
                     });
                     const headline = post.caption || post.location_name || "Dive log";
+                    function goToPost() {
+                      closeProfile();
+                      router.push(`/community?post=${post.id}`);
+                    }
                     if (post.image_url) {
                       return (
                         <div
                           key={post.id}
-                          className="relative group rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-800"
+                          onClick={goToPost}
+                          className="relative group rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-800 cursor-pointer transition-all hover:border-cyan-500/50 hover:ring-2 hover:ring-cyan-500/30"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -274,11 +281,16 @@ export function PublicProfileModal() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                           {post.corals_awarded && (
-                            <span className="absolute top-2 left-2 text-[10px] font-extrabold text-white px-2 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-sm border border-amber-200/30">
-                              +10 🪸
-                            </span>
+                            <div className="always-dark absolute top-3 left-3 z-10">
+                              <span className="relative inline-flex items-center gap-1 text-[11px] font-extrabold text-white pl-1.5 pr-2.5 py-1 rounded-full overflow-hidden isolate backdrop-blur-md bg-orange-400/10 border border-orange-200/40 shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
+                                <span className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-200/35 via-cyan-300/10 to-amber-300/25" />
+                                <span className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-white/50 to-transparent" />
+                                <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">+10</span>
+                                <span>🪸</span>
+                              </span>
+                            </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
+                          <div className="always-dark absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
                             <p className="text-xs font-bold text-white truncate">{headline}</p>
                             <p className="text-[10px] text-slate-300">
                               Logged {when}
@@ -291,7 +303,8 @@ export function PublicProfileModal() {
                     return (
                       <div
                         key={post.id}
-                        className="relative rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-900 p-5 flex flex-col justify-between"
+                        onClick={goToPost}
+                        className="relative rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-900 p-5 flex flex-col justify-between cursor-pointer transition-all hover:border-cyan-500/50 hover:bg-slate-800/80"
                       >
                         <p className="text-sm text-slate-200 leading-relaxed line-clamp-6">{headline}</p>
                         <div>

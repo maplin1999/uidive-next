@@ -44,7 +44,7 @@ export function ReportModal() {
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl">
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">
             <Flag className="w-4 h-4 text-rose-400" /> Report {reportTarget.label}
@@ -57,6 +57,13 @@ export function ReportModal() {
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {!done && (
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Your report is sent to our moderation team for review -- the person you&apos;re
+            reporting won&apos;t be notified.
+          </p>
+        )}
 
         {done ? (
           <p className="text-sm text-emerald-400 font-semibold text-center py-4">
@@ -88,18 +95,23 @@ export function ReportModal() {
               </select>
             </div>
 
-            <textarea
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              rows={3}
-              placeholder="Any extra details (optional)"
-              className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"
-            />
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Additional details (optional)
+              </label>
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                rows={3}
+                placeholder="Anything else we should know?"
+                className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"
+              />
+            </div>
 
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full py-3 bg-rose-500 hover:bg-rose-400 disabled:opacity-60 text-white font-bold rounded-xl text-sm shadow-lg transition-all"
+              className="w-full py-3 bg-rose-500 hover:bg-rose-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-rose-500/20 transition-all"
             >
               {submitting ? "Submitting…" : "Submit Report"}
             </button>

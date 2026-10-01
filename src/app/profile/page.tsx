@@ -2,7 +2,26 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Award, CalendarCheck, Grid, ChevronRight, Pencil, ShieldCheck, Compass, Store, BadgeCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Award,
+  CalendarCheck,
+  Grid,
+  ChevronRight,
+  Pencil,
+  ShieldCheck,
+  Compass,
+  Store,
+  BadgeCheck,
+  Anchor,
+  Clock,
+  XCircle,
+  Ban,
+  MoreVertical,
+  Share2,
+  Trash2,
+  MapPin,
+} from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import {
@@ -11,11 +30,14 @@ import {
   diverIdFromUserId,
   fetchMyBookings,
   fetchMyPosts,
+  tripHasPassed,
 } from "@/lib/profile";
 import { fetchBuddiesCount } from "@/lib/social";
 import { fetchHostStatus, HostStatus } from "@/lib/host";
+import { deletePost } from "@/lib/posts";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
+import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { diverCertRingClass } from "@/lib/diverRing";
 
 // The Profile tab (#tab-profile in the old site). Treasure Chest cosmetics
@@ -26,6 +48,7 @@ import { diverCertRingClass } from "@/lib/diverRing";
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
+  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   const [bookings, setBookings] = useState<MyBooking[]>([]);
@@ -34,7 +57,9 @@ export default function ProfilePage() {
   const [postsStatus, setPostsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selectedBooking, setSelectedBooking] = useState<MyBooking | null>(null);
   const [buddiesCount, setBuddiesCount] = useState(0);
-  const [hostStatus, setHostStatus] = useState<HostStatus | null>(null);
+  const [hostStatus, setHostStatus] = useState<HostStatus | null | undefined>(undefined);
+  const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
+  const [adminPanelOpen, setAdminPanelOpen] = useState(false);
 
   function loadBookings() {
     if (!user) return;
@@ -113,12 +138,13 @@ export default function ProfilePage() {
                 <h1 className="text-xl sm:text-2xl font-black text-white">{user.name}</h1>
                 <div className="flex items-center gap-1.5">
                   {user.is_admin && (
-                    <div
-                      className="w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/40 flex items-center justify-center"
+                    <button
+                      onClick={() => setAdminPanelOpen(true)}
+                      className="w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/40 flex items-center justify-center hover:bg-violet-500/25 transition-colors"
                       title="Site Admin -- Review Host Applications"
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
-                    </div>
+                    </button>
                   )}
                   {hostStatus?.verification_status === "verified" && (
                     <div
@@ -149,12 +175,6 @@ export default function ProfilePage() {
               <p className="text-[10px] font-mono font-bold text-slate-500">
                 Diver ID: #{diverIdFromUserId(user.id)}
               </p>
-              <button
-                onClick={() => setEditOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-xl hover:bg-cyan-500/20 transition-colors mt-1"
-              >
-                <Pencil className="w-3.5 h-3.5" /> Edit Profile
-              </button>
             </div>
           </div>
 
@@ -182,6 +202,76 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* HOST STATUS -- verified hosts just get the badge above; this card
+            only covers the states that need an action: apply, pending,
+            rejected, or suspended. */}
+        {hostStatus === null && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                <Anchor className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">Run dive trips of your own?</p>
+                <p className="text-xs text-slate-400">
+                  Apply as a Dive Shop or Divemaster host once verified.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push("/host-dashboard")}
+              className="shrink-0 text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-4 py-2.5 rounded-xl transition-colors"
+            >
+              Become a Host
+            </button>
+          </div>
+        )}
+        {hostStatus?.verification_status === "pending" && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-300">Host Application Under Review</p>
+              <p className="text-xs text-amber-200/80">
+                We&apos;re verifying your details -- this usually doesn&apos;t take long.
+              </p>
+            </div>
+          </div>
+        )}
+        {hostStatus?.verification_status === "rejected" && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center shrink-0">
+                <XCircle className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-rose-300">Host Application Not Approved</p>
+                <p className="text-xs text-rose-200/80">
+                  {hostStatus.rejection_reason || "No reason was given."}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push("/host-dashboard")}
+              className="text-xs font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 px-4 py-2 rounded-xl transition-colors"
+            >
+              Reapply
+            </button>
+          </div>
+        )}
+        {hostStatus?.verification_status === "suspended" && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center shrink-0">
+              <Ban className="w-5 h-5 text-rose-400" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-rose-300">Host Account Suspended</p>
+              <p className="text-xs text-rose-200/80">Contact support if you believe this is a mistake.</p>
+            </div>
+          </div>
+        )}
 
         {/* MY BOOKINGS */}
         <div className="space-y-4">
@@ -230,6 +320,10 @@ export default function ProfilePage() {
                   ) : b.status === "cancelled" ? (
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/30 px-2 py-0.5 rounded-full">
                       Cancelled
+                    </span>
+                  ) : b.status === "confirmed" && tripHasPassed(b.dive_trips) ? (
+                    <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded-full">
+                      Completed
                     </span>
                   ) : (
                     <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
@@ -292,37 +386,160 @@ export default function ProfilePage() {
           )}
           {postsStatus === "ready" && posts.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 aspect-square cursor-pointer group"
-                  onClick={() => showToast("Jumping to your Community post is coming in a future update.")}
-                >
-                  {post.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={post.image_url}
-                      alt=""
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center p-4 text-center text-xs text-slate-400">
-                      {post.caption || post.location_name || "Dive log"}
+              {posts.map((post) => {
+                const when = new Date(post.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
+                const headline = post.caption || post.location_name || "Dive log";
+
+                function goToPost() {
+                  router.push(`/community?post=${post.id}`);
+                }
+
+                async function handleShare() {
+                  setOpenPostMenuId(null);
+                  const parts: string[] = [];
+                  if (post.caption) parts.push(post.caption);
+                  if (post.location_name) parts.push(`📍 ${post.location_name}`);
+                  const shareText = parts.length ? parts.join(" — ") : "Check out my dive log on UiDive!";
+                  const shareUrl = `${window.location.origin}/community?post=${post.id}`;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({ title: "UiDive Dive Log", text: shareText, url: shareUrl });
+                    } catch {
+                      // AbortError just means the share sheet was closed -- not worth surfacing.
+                    }
+                    return;
+                  }
+                  try {
+                    await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+                    showToast("🔗 Copied to clipboard -- paste it anywhere to share!");
+                  } catch {
+                    showToast("❌ Could not share -- try copying the link manually.");
+                  }
+                }
+
+                async function handleDelete() {
+                  setOpenPostMenuId(null);
+                  if (!window.confirm("Delete this dive log? This can't be undone.")) return;
+                  try {
+                    await deletePost(post.id);
+                    setPosts((prev) => prev.filter((p) => p.id !== post.id));
+                  } catch (err) {
+                    console.error("Could not delete post:", err);
+                    showToast("Could not delete that post -- please try again.");
+                  }
+                }
+
+                const menu = (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="always-dark absolute top-3 right-3 z-20"
+                  >
+                    <button
+                      onClick={() => setOpenPostMenuId((v) => (v === post.id ? null : post.id))}
+                      className="w-7 h-7 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center backdrop-blur-sm transition-all"
+                      aria-label="Post options"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {openPostMenuId === post.id && (
+                      <div className="absolute right-0 mt-1 w-36 bg-slate-900 border border-slate-700 rounded-xl shadow-xl overflow-hidden py-1 z-30">
+                        <button
+                          onClick={() => {
+                            setOpenPostMenuId(null);
+                            showToast("Editing from here is coming soon -- edit it from the Community tab for now.");
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+                        >
+                          <Pencil className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button
+                          onClick={handleShare}
+                          className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+                        >
+                          <Share2 className="w-3.5 h-3.5" /> Share
+                        </button>
+                        <button
+                          onClick={handleDelete}
+                          className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+
+                if (post.image_url) {
+                  return (
+                    <div
+                      key={post.id}
+                      onClick={goToPost}
+                      className="relative group rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-800 cursor-pointer transition-all hover:border-cyan-500/50 hover:ring-2 hover:ring-cyan-500/30"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={post.image_url}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {post.corals_awarded && (
+                        <div className="always-dark absolute top-3 left-3 z-10">
+                          <span className="relative inline-flex items-center gap-1 text-[11px] font-extrabold text-white pl-1.5 pr-2.5 py-1 rounded-full overflow-hidden isolate backdrop-blur-md bg-orange-400/10 border border-orange-200/40 shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
+                            <span className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-200/35 via-cyan-300/10 to-amber-300/25" />
+                            <span className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-white/50 to-transparent" />
+                            <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">+10</span>
+                            <span>🪸</span>
+                          </span>
+                        </div>
+                      )}
+                      {menu}
+                      <div className="always-dark absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
+                        <p className="text-xs font-bold text-white truncate">{headline}</p>
+                        <p className="text-[10px] text-slate-300">
+                          Logged {when}
+                          {post.location_name && post.caption ? ` • ${post.location_name}` : ""}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  {post.corals_awarded && (
-                    <span className="absolute top-2 left-2 text-[10px] font-extrabold text-white px-2 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-sm border border-amber-200/30">
-                      +10 🪸
-                    </span>
-                  )}
-                </div>
-              ))}
+                  );
+                }
+
+                return (
+                  <div
+                    key={post.id}
+                    onClick={goToPost}
+                    className="relative rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-900 p-5 flex flex-col justify-between cursor-pointer transition-all hover:border-cyan-500/50 hover:bg-slate-800/80"
+                  >
+                    {menu}
+                    <p className="text-sm text-slate-200 leading-relaxed line-clamp-6 pr-8">{headline}</p>
+                    <div>
+                      {post.location_name && (
+                        <p className="text-xs text-cyan-400 font-bold flex items-center gap-1.5 mb-1">
+                          <MapPin className="w-3.5 h-3.5" /> {post.location_name}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[10px] text-slate-500">Logged {when}</p>
+                        {post.corals_awarded && (
+                          <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 shrink-0">
+                            +10 🪸
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
       {editOpen && <EditProfileModal onClose={() => setEditOpen(false)} />}
+      {adminPanelOpen && <AdminPanelModal onClose={() => setAdminPanelOpen(false)} />}
       {selectedBooking && (
         <BookingDetailModal
           booking={selectedBooking}

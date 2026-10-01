@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Compass, Inbox as InboxIcon, Camera, ShoppingBag, Anchor, User } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useInboxBadge } from "@/lib/useInboxBadge";
+import { useVerifiedHost } from "@/lib/useVerifiedHost";
 
 // Mobile bottom tab bar (migrated from index.html's #mobile-nav-* buttons /
 // .mobile-nav-btn). Hidden on desktop (md:hidden), where the header's own
@@ -14,6 +15,7 @@ import { useInboxBadge } from "@/lib/useInboxBadge";
 export function MobileNav() {
   const { user, requireAuth } = useAuth();
   const inboxBadge = useInboxBadge();
+  const isVerifiedHost = useVerifiedHost();
   const pathname = usePathname();
 
   return (
@@ -43,7 +45,7 @@ export function MobileNav() {
         label="Shop"
         active={pathname?.startsWith("/diveshop")}
       />
-      {user && (
+      {isVerifiedHost && (
         <MobileNavLink
           href="/host-dashboard"
           icon={<Anchor className="w-5 h-5" />}

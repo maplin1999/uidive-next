@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Award } from "lucide-react";
+import { X, Award, Users } from "lucide-react";
 import { HostTrip, RosterDiver, fetchTripRoster } from "@/lib/host";
 import { diverCertRingClass } from "@/lib/diverRing";
 
@@ -26,8 +26,10 @@ export function TripRosterModal({ trip, onClose }: { trip: HostTrip; onClose: ()
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
-            <h3 className="font-bold text-white text-base">Trip Roster</h3>
-            <p className="text-xs text-slate-500">{trip.title}</p>
+            <h3 className="font-bold text-white text-base flex items-center gap-2">
+              <Users className="w-4 h-4 text-cyan-400" /> Trip Roster
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">{trip.title}</p>
           </div>
           <button
             onClick={onClose}

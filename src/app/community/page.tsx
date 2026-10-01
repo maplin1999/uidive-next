@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus } from "lucide-react";
 import {
   CommunityPost,
@@ -25,6 +26,17 @@ import { useAuth } from "@/components/auth/AuthContext";
 // site. "Book Site" opens the real trip detail/booking modal when a post is
 // linked to an actual bookable trip.
 export default function CommunityPage() {
+  return (
+    <Suspense fallback={null}>
+      <CommunityFeed />
+    </Suspense>
+  );
+}
+
+function CommunityFeed() {
+  const searchParams = useSearchParams();
+  const highlightPostId = searchParams.get("post");
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [commentsByPost, setCommentsByPost] = useState<Map<string, PostComment[]>>(new Map());
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
@@ -76,6 +88,19 @@ export default function CommunityPage() {
       })
       .catch((err) => console.error("Could not load trips for Community:", err));
   }, []);
+
+  // Jump to and briefly highlight a specific post -- used when arriving here
+  // from a dive-log tile on the Profile tab or a public profile's grid
+  // (goToCommunityPost() in the old site).
+  useEffect(() => {
+    if (!highlightPostId || status !== "ready") return;
+    const el = document.getElementById(`post-${highlightPostId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedId(highlightPostId);
+    const timer = setTimeout(() => setHighlightedId(null), 2000);
+    return () => clearTimeout(timer);
+  }, [highlightPostId, status]);
 
   async function handleToggleLike(post: CommunityPost) {
     const wasLiked = likedPostIds.has(post.id);
@@ -191,27 +216,34 @@ export default function CommunityPage() {
         {status === "ready" && posts.length > 0 && (
           <div className="space-y-6">
             {posts.map((post) => (
-              <PostCard
+              <div
                 key={post.id}
-                post={post}
-                comments={commentsByPost.get(post.id) || []}
-                liked={likedPostIds.has(post.id)}
-                isOwnPost={!!user && user.id === post.user_id}
-                onToggleLike={() => handleToggleLike(post)}
-                onSubmitComment={(content) => handleSubmitComment(post, content)}
-                onBookTrip={(tripId) => {
-                  const trip = trips.find((t) => t.id === tripId);
-                  if (trip) setSelectedTrip(trip);
-                  else showToast("Could not find that dive trip -- try refreshing.");
-                }}
-                onEdit={() => {
-                  setEditingPost(post);
-                  setFormOpen(true);
-                }}
-                onDelete={() => handleDelete(post)}
-                onRequireAuth={() => requireAuth()}
-                onBlocked={load}
-              />
+                id={`post-${post.id}`}
+                className={`rounded-3xl transition-all duration-500 ${
+                  highlightedId === post.id ? "ring-2 ring-cyan-500/60" : ""
+                }`}
+              >
+                <PostCard
+                  post={post}
+                  comments={commentsByPost.get(post.id) || []}
+                  liked={likedPostIds.has(post.id)}
+                  isOwnPost={!!user && user.id === post.user_id}
+                  onToggleLike={() => handleToggleLike(post)}
+                  onSubmitComment={(content) => handleSubmitComment(post, content)}
+                  onBookTrip={(tripId) => {
+                    const trip = trips.find((t) => t.id === tripId);
+                    if (trip) setSelectedTrip(trip);
+                    else showToast("Could not find that dive trip -- try refreshing.");
+                  }}
+                  onEdit={() => {
+                    setEditingPost(post);
+                    setFormOpen(true);
+                  }}
+                  onDelete={() => handleDelete(post)}
+                  onRequireAuth={() => requireAuth()}
+                  onBlocked={load}
+                />
+              </div>
             ))}
           </div>
         )}

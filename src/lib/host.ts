@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 export interface HostStatus {
   host_type: string;
   business_name: string;
-  verification_status: "pending" | "verified" | "rejected";
+  verification_status: "pending" | "verified" | "rejected" | "suspended";
   rejection_reason: string | null;
 }
 
@@ -83,8 +83,10 @@ export async function submitHostApplication(
 export interface HostTrip {
   id: string;
   title: string;
+  description: string;
   location: string;
   trip_type: "shore" | "boat";
+  activity_type: "scuba" | "freediving";
   difficulty: "Easy" | "Moderate" | "Advanced";
   max_depth: string;
   visibility: string;
@@ -149,8 +151,10 @@ export async function fetchHostDashboard(userId: string): Promise<{
 
 export interface TripFormFields {
   title: string;
+  description: string;
   location: string;
   tripType: string;
+  activityType: string;
   difficulty: string;
   maxDepth: string;
   visibility: string;
@@ -172,11 +176,20 @@ export interface TripFormFields {
 // both RPCs default those params to null, so trips just won't have a live
 // map pin yet. A real geocoding integration is future work, not a Host
 // Dashboard-specific gap.
+//
+// p_description/p_activity_type were added here to restore parity with the
+// old site's trip form (both columns already exist on dive_trips -- see
+// src/lib/trips.ts). If create_trip/update_trip in Supabase haven't been
+// updated to accept these two params, trip creation/editing will start
+// failing with a Postgres "function not found" error -- check the RPC
+// definitions first if that happens after this deploy.
 export async function createTrip(fields: TripFormFields): Promise<void> {
   const { error } = await supabase.rpc("create_trip", {
     p_title: fields.title,
+    p_description: fields.description,
     p_location: fields.location,
     p_trip_type: fields.tripType,
+    p_activity_type: fields.activityType,
     p_difficulty: fields.difficulty,
     p_max_depth: fields.maxDepth,
     p_visibility: fields.visibility,
@@ -200,8 +213,10 @@ export async function updateTrip(tripId: string, fields: TripFormFields): Promis
   const { error } = await supabase.rpc("update_trip", {
     p_trip_id: tripId,
     p_title: fields.title,
+    p_description: fields.description,
     p_location: fields.location,
     p_trip_type: fields.tripType,
+    p_activity_type: fields.activityType,
     p_difficulty: fields.difficulty,
     p_max_depth: fields.maxDepth,
     p_visibility: fields.visibility,

@@ -110,7 +110,7 @@ export default function HomePage() {
               <Sparkles className="w-3.5 h-3.5" /> Scuba Booking &amp; Ocean Social Network
             </span>
 
-            <p className="text-base sm:text-lg text-slate-400 max-w-3xl leading-snug tracking-tight">
+            <p className="text-base sm:text-lg text-slate-400 max-w-3xl leading-snug tracking-tight whitespace-normal sm:whitespace-nowrap">
               Find dive trips near you, book your spot, and connect with divers who&apos;ve been
               there.
             </p>
@@ -168,6 +168,9 @@ export default function HomePage() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <h3 className="text-sm font-bold text-amber-400">Daily Diver Log Streak</h3>
+                <span className="bg-amber-500/20 text-amber-300 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
+                  5 Days Active
+                </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Book or log a dive today to earn +50 🪸 Corals rewards!
@@ -189,9 +192,9 @@ export default function HomePage() {
             <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
               <Compass className="w-5 h-5 text-cyan-400" /> Find &amp; Book Dive Trips
             </h2>
-            {status === "ready" && (
+            {status === "ready" && filteredTrips.length > 0 && (
               <p className="text-xs text-slate-400">
-                {filteredTrips.length} trip{filteredTrips.length === 1 ? "" : "s"}
+                {filteredTrips.length} dive trip{filteredTrips.length === 1 ? "" : "s"}
               </p>
             )}
           </div>
@@ -210,8 +213,8 @@ export default function HomePage() {
                 onClick={() => setTripType(key)}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
                   tripType === key
-                    ? "bg-cyan-500 text-slate-950 border-cyan-500"
-                    : "bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700"
+                    ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300"
+                    : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"
                 }`}
               >
                 {label}

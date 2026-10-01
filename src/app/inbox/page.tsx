@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { UserPlus, Users, Inbox as InboxIcon, MessageSquare } from "lucide-react";
+import { UserPlus, Users, MessageSquare } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
@@ -21,17 +21,19 @@ import { ChatModal } from "@/components/inbox/ChatModal";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { diverCertRingClass } from "@/lib/diverRing";
 
-type Tab = "requests" | "messages" | "groups";
-
 // The Inbox tab (#tab-inbox in the old site): buddy requests, direct
 // messages with accepted buddies, and group chats for trips you're
-// confirmed on. Everything here is real (friendships/messages/
-// trip_chat_messages tables) -- cosmetics (equipped avatar rings on
-// messages) are left out, same as everywhere else in this rewrite.
+// confirmed on -- all three stacked in one page, same as the old site
+// (there's no tabbed switcher there). Everything here is real
+// (friendships/messages/trip_chat_messages tables) -- cosmetics (equipped
+// avatar rings on messages) are left out, same as everywhere else in this
+// rewrite. The old site's "Add Buddy" lives inside its separate Dive
+// Buddies list modal (opened from the profile header's Buddies tile) --
+// since that tile instead routes here in this rewrite, the button is kept
+// in the header so adding a buddy is still reachable.
 export default function InboxPage() {
   const { user, requireAuth } = useAuth();
   const { openProfile } = useSocial();
-  const [tab, setTab] = useState<Tab>("requests");
 
   const [requests, setRequests] = useState<BuddyRequest[]>([]);
   const [buddies, setBuddies] = useState<Buddy[]>([]);
@@ -95,34 +97,20 @@ export default function InboxPage() {
     }
   }
 
-  const unreadCount = conversations.filter((c) => c.unread).length;
-
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <InboxIcon className="w-6 h-6 text-cyan-400" /> Inbox
-          </h1>
+          <div>
+            <h1 className="text-2xl font-black text-white">Inbox</h1>
+            <p className="text-xs text-slate-400">Buddy requests and messages, all in one place</p>
+          </div>
           <button
             onClick={() => setAddBuddyOpen(true)}
             className="inline-flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-500/20 transition-all"
           >
             <UserPlus className="w-4 h-4" /> Add Buddy
           </button>
-        </div>
-
-        {/* TABS */}
-        <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl">
-          <TabButton active={tab === "requests"} onClick={() => setTab("requests")} badge={requests.length}>
-            Requests
-          </TabButton>
-          <TabButton active={tab === "messages"} onClick={() => setTab("messages")} badge={unreadCount}>
-            Messages
-          </TabButton>
-          <TabButton active={tab === "groups"} onClick={() => setTab("groups")}>
-            Group Chats
-          </TabButton>
         </div>
 
         {status === "loading" && <p className="text-xs text-slate-500 text-center py-10">Loading…</p>}
@@ -132,10 +120,14 @@ export default function InboxPage() {
           </p>
         )}
 
-        {status === "ready" && tab === "requests" && (
+        {/* BUDDY REQUESTS */}
+        {status === "ready" && (
           <div className="space-y-3">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-cyan-400" /> Buddy Requests
+            </h2>
             {requests.length === 0 && (
-              <EmptyState emoji="🤿" text="No pending buddy requests." />
+              <EmptyState emoji="📭" text="No pending buddy requests right now." />
             )}
             {requests.map((req) => {
               const person = req.profiles || {
@@ -184,12 +176,16 @@ export default function InboxPage() {
           </div>
         )}
 
-        {status === "ready" && tab === "messages" && (
-          <div className="space-y-3">
+        {/* MESSAGES */}
+        {status === "ready" && (
+          <div className="space-y-3 pt-2 border-t border-slate-800">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-cyan-400" /> Messages
+            </h2>
             {conversations.length === 0 && (
               <EmptyState
                 emoji="💬"
-                text="No conversations yet. Add a dive buddy and say hi!"
+                text="No conversations yet — start one from your Dive Buddies list."
               />
             )}
             {conversations.map((c) => (
@@ -224,51 +220,17 @@ export default function InboxPage() {
                 </button>
               </div>
             ))}
-
-            {buddies.length > 0 && (
-              <div className="pt-4 space-y-2">
-                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
-                  Your Buddies
-                </h3>
-                {buddies
-                  .filter((b) => !conversations.some((c) => c.partner.id === b.id))
-                  .map((b) => (
-                    <div
-                      key={b.id}
-                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800/80 transition-colors border border-slate-800"
-                    >
-                      <button
-                        onClick={() => openProfile(b.id)}
-                        className="shrink-0"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={b.avatar_url || DEFAULT_AVATAR}
-                          alt=""
-                          className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(b.cert)}`}
-                        />
-                      </button>
-                      <button
-                        onClick={() => setActiveChat({ id: b.id, name: b.name, avatar: b.avatar_url })}
-                        className="flex-1 flex items-center justify-between min-w-0 text-left ml-3"
-                      >
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-white truncate hover:underline">{b.name}</h4>
-                          <p className="text-[11px] text-slate-500">Start a conversation</p>
-                        </div>
-                        <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0" />
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            )}
           </div>
         )}
 
-        {status === "ready" && tab === "groups" && (
-          <div className="space-y-3">
+        {/* TRIP GROUP CHATS */}
+        {status === "ready" && (
+          <div className="space-y-3 pt-2 border-t border-slate-800">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-cyan-400" /> Trip Group Chats
+            </h2>
             {groupChats.length === 0 && (
-              <EmptyState emoji="🌊" text="Book a dive trip to join its group chat." />
+              <EmptyState emoji="🤿" text="Book a trip to join its group chat with fellow divers." />
             )}
             {groupChats.map((trip) => {
               const dateStr = trip.scheduled_date
@@ -321,38 +283,6 @@ export default function InboxPage() {
         />
       )}
     </main>
-  );
-}
-
-function TabButton({
-  active,
-  onClick,
-  badge,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  badge?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-        active ? "bg-cyan-500 text-slate-950" : "text-slate-400 hover:text-slate-200"
-      }`}
-    >
-      {children}
-      {!!badge && badge > 0 && (
-        <span
-          className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
-            active ? "bg-slate-950/20 text-slate-950" : "bg-cyan-500 text-slate-950"
-          }`}
-        >
-          {badge > 9 ? "9+" : badge}
-        </span>
-      )}
-    </button>
   );
 }
 

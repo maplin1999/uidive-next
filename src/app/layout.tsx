@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { SocialProvider } from "@/components/social/SocialContext";
 import { PublicProfileModal } from "@/components/social/PublicProfileModal";
 import { ReportModal } from "@/components/social/ReportModal";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 export const metadata: Metadata = {
   title: "UiDive",
@@ -40,6 +41,7 @@ export default function RootLayout({
             <AuthModal />
             <PublicProfileModal />
             <ReportModal />
+            <CookieConsentBanner />
           </SocialProvider>
         </AuthProvider>
       </body>

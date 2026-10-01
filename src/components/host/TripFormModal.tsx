@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Anchor, X } from "lucide-react";
 import { HostTrip, TripFormFields, createTrip, updateTrip } from "@/lib/host";
 
 const TRIP_TYPES = ["shore", "boat"];
+const ACTIVITY_TYPES = ["scuba", "freediving"];
 const DIFFICULTIES = ["Easy", "Moderate", "Advanced"];
 
 function tripToFields(trip?: HostTrip | null): TripFormFields {
   if (!trip) {
     return {
       title: "",
+      description: "",
       location: "",
       tripType: "boat",
+      activityType: "scuba",
       difficulty: "Easy",
       maxDepth: "",
       visibility: "",
@@ -32,8 +35,10 @@ function tripToFields(trip?: HostTrip | null): TripFormFields {
   }
   return {
     title: trip.title,
+    description: trip.description || "",
     location: trip.location,
     tripType: trip.trip_type,
+    activityType: trip.activity_type || "scuba",
     difficulty: trip.difficulty,
     maxDepth: trip.max_depth,
     visibility: trip.visibility,
@@ -53,9 +58,10 @@ function tripToFields(trip?: HostTrip | null): TripFormFields {
 }
 
 // Migrated from the old site's #host-trip-form-modal (submitHostTripForm()).
-// The old site's custom calendar/time-picker widgets are replaced with native
-// <input type="date">/<input type="time">, and lat/lng geocoding is dropped
-// entirely -- both create_trip/update_trip default those params to null.
+// The old site's custom calendar/time-picker widgets and max-depth live
+// formatter are replaced with native <input type="date">/<input type="time">
+// and a plain text field, and lat/lng geocoding is dropped entirely -- both
+// create_trip/update_trip default those params to null.
 export function TripFormModal({
   trip,
   onClose,
@@ -100,7 +106,14 @@ export function TripFormModal({
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
-          <h3 className="font-bold text-white text-base">{isEdit ? "Edit Trip" : "Create Trip"}</h3>
+          <div>
+            <h3 className="font-bold text-white text-base flex items-center gap-2">
+              <Anchor className="w-4 h-4 text-cyan-400" /> {isEdit ? "Edit Trip" : "Create Trip"}
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Divers will see this on the Explore page once saved
+            </p>
+          </div>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -116,26 +129,39 @@ export function TripFormModal({
           </p>
         )}
 
-        <Field label="Title">
+        <Field label="Trip Title">
           <input
             type="text"
             value={fields.title}
             onChange={(e) => update("title", e.target.value)}
-            placeholder="Sunrise Reef Charter"
+            maxLength={80}
+            placeholder="e.g. Sunrise Reef Charter"
             className={inputCls}
           />
         </Field>
 
-        <Field label="Location">
-          <input
-            type="text"
-            value={fields.location}
-            onChange={(e) => update("location", e.target.value)}
-            className={inputCls}
+        <Field label="Description">
+          <textarea
+            value={fields.description}
+            onChange={(e) => update("description", e.target.value)}
+            rows={3}
+            maxLength={600}
+            placeholder="What divers can expect on this trip -- marine life, route, what's included..."
+            className={`${inputCls} resize-none`}
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
+          <Field label="Location">
+            <input
+              type="text"
+              value={fields.location}
+              onChange={(e) => update("location", e.target.value)}
+              maxLength={80}
+              placeholder="Cebu, PH"
+              className={inputCls}
+            />
+          </Field>
           <Field label="Trip Type">
             <select
               value={fields.tripType}
@@ -145,6 +171,22 @@ export function TripFormModal({
               {TRIP_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {t === "boat" ? "Boat" : "Shore"}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Activity">
+            <select
+              value={fields.activityType}
+              onChange={(e) => update("activityType", e.target.value)}
+              className={`${inputCls} [color-scheme:dark]`}
+            >
+              {ACTIVITY_TYPES.map((a) => (
+                <option key={a} value={a}>
+                  {a === "freediving" ? "Free Diving" : "Scuba"}
                 </option>
               ))}
             </select>
@@ -161,6 +203,16 @@ export function TripFormModal({
             </select>
           </Field>
         </div>
+
+        <Field label="Max Depth">
+          <input
+            type="text"
+            value={fields.maxDepth}
+            onChange={(e) => update("maxDepth", e.target.value)}
+            placeholder="18m"
+            className={inputCls}
+          />
+        </Field>
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Date">
@@ -182,7 +234,7 @@ export function TripFormModal({
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Price (USD)">
+          <Field label="Price (per diver)">
             <input
               type="number"
               min={0}
@@ -202,103 +254,100 @@ export function TripFormModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Max Depth">
-            <input
-              type="text"
-              value={fields.maxDepth}
-              onChange={(e) => update("maxDepth", e.target.value)}
-              placeholder="18m"
-              className={inputCls}
-            />
-          </Field>
-          <Field label="Visibility">
+        <details className="text-xs">
+          <summary className="cursor-pointer text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
+            Dive Conditions (optional)
+          </summary>
+          <div className="grid grid-cols-2 gap-3 mt-3">
             <input
               type="text"
               value={fields.visibility}
               onChange={(e) => update("visibility", e.target.value)}
-              placeholder="20m+"
+              maxLength={20}
+              placeholder="Visibility (e.g. 15m)"
+              aria-label="Visibility"
               className={inputCls}
             />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Water Temp">
             <input
               type="text"
               value={fields.waterTemp}
               onChange={(e) => update("waterTemp", e.target.value)}
-              placeholder="24°C"
+              maxLength={20}
+              placeholder="Water Temp (e.g. 27°C)"
+              aria-label="Water Temp"
               className={inputCls}
             />
-          </Field>
-          <Field label="Swell">
             <input
               type="text"
               value={fields.swell}
               onChange={(e) => update("swell", e.target.value)}
+              maxLength={20}
+              placeholder="Swell (e.g. 0.5m)"
+              aria-label="Swell"
               className={inputCls}
             />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Wind">
             <input
               type="text"
               value={fields.wind}
               onChange={(e) => update("wind", e.target.value)}
+              maxLength={20}
+              placeholder="Wind (e.g. 10kt SE)"
+              aria-label="Wind"
               className={inputCls}
             />
-          </Field>
-          <Field label="Tide">
             <input
               type="text"
               value={fields.tide}
               onChange={(e) => update("tide", e.target.value)}
+              maxLength={20}
+              placeholder="Tide (e.g. Low, 8:45am)"
+              aria-label="Tide"
               className={inputCls}
             />
-          </Field>
-        </div>
+            <input
+              type="text"
+              value={fields.current}
+              onChange={(e) => update("current", e.target.value)}
+              maxLength={20}
+              placeholder="Current (e.g. Mild)"
+              aria-label="Current"
+              className={inputCls}
+            />
+            <input
+              type="text"
+              value={fields.conditionsLabel}
+              onChange={(e) => update("conditionsLabel", e.target.value)}
+              maxLength={60}
+              placeholder="Conditions summary (e.g. Good Conditions)"
+              aria-label="Conditions summary"
+              className={`${inputCls} col-span-2`}
+            />
+          </div>
+        </details>
 
-        <Field label="Current">
-          <input
-            type="text"
-            value={fields.current}
-            onChange={(e) => update("current", e.target.value)}
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Image URL">
-          <input
-            type="text"
-            value={fields.imageUrl}
-            onChange={(e) => update("imageUrl", e.target.value)}
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Highlight">
-          <input
-            type="text"
-            value={fields.highlight}
-            onChange={(e) => update("highlight", e.target.value)}
-            placeholder="Manta ray cleaning station"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Conditions Label">
-          <input
-            type="text"
-            value={fields.conditionsLabel}
-            onChange={(e) => update("conditionsLabel", e.target.value)}
-            placeholder="Calm & clear"
-            className={inputCls}
-          />
-        </Field>
+        <details className="text-xs">
+          <summary className="cursor-pointer text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
+            Media &amp; Highlight (optional)
+          </summary>
+          <div className="space-y-2 mt-3">
+            <input
+              type="url"
+              value={fields.imageUrl}
+              onChange={(e) => update("imageUrl", e.target.value)}
+              placeholder="Image URL"
+              aria-label="Image URL"
+              className={inputCls}
+            />
+            <input
+              type="text"
+              value={fields.highlight}
+              onChange={(e) => update("highlight", e.target.value)}
+              placeholder="Highlight tag (e.g. Giant Cuttlefish)"
+              aria-label="Highlight tag"
+              className={inputCls}
+            />
+          </div>
+        </details>
 
         <button
           onClick={handleSave}

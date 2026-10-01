@@ -53,7 +53,7 @@ export function TripCard({
       <div className="p-5 space-y-4">
         <div className="flex justify-between items-start gap-3">
           <div className="space-y-1">
-            <div className="flex items-center space-x-2 flex-wrap">
+            <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               <h3 className="font-extrabold text-base text-slate-100">{trip.title}</h3>
               <span
                 className={`${accent.tag} border text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap`}
@@ -68,10 +68,13 @@ export function TripCard({
               )}
             </div>
             <p className="text-xs text-slate-400">
+              {trip.activity_type === "freediving" ? "Free Diving" : "Scuba"} •{" "}
               {trip.trip_type === "boat" ? "Boat Charter" : "Shore Dive"} • {formatTripDate(trip)}
             </p>
           </div>
-          <span className="text-xl font-black text-cyan-400 shrink-0">${Number(trip.price)}</span>
+          <span className="text-xl font-black text-cyan-400 shrink-0">
+            ${Number(trip.price).toLocaleString()}
+          </span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 text-center">
           <div>
@@ -123,7 +126,7 @@ export function TopPickCard({
           }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <span className="absolute top-2 right-2 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1">
+        <span className="always-dark absolute top-2 right-2 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1">
           ★ {rating.avg.toFixed(1)}
           {rating.count > 0 ? ` (${rating.count})` : ""}
         </span>
@@ -131,7 +134,7 @@ export function TopPickCard({
       <div className="p-3">
         <h3 className="font-extrabold text-sm text-slate-100 truncate">{trip.title}</h3>
         <p className="text-[11px] text-slate-400 truncate">
-          {trip.location} • ${Number(trip.price)}
+          {trip.location} • ${Number(trip.price).toLocaleString()}
         </p>
       </div>
     </div>

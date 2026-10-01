@@ -76,9 +76,37 @@ select option {
 }
 
 /* "Sunken" panels (hero search pill, stat tiles) -- a slightly darker inset
-   look versus the surface around them. */
-.panel-sunken {
-  background-color: rgba(2, 6, 23, 0.6);
+   look versus the surface around them. Old site only overrides this in
+   light mode (its dark-mode background comes from each element's own
+   explicit bg-slate-950/NN utility) -- an unconditional base rule here
+   would win the cascade over those explicit per-element opacities and
+   flatten them all to the same shade, so this stays light-mode-only too. */
+html[data-theme="light"] .panel-sunken {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Spring Pop Modal Physics -- used by the auth modal's card so it bounces
+   in rather than just appearing, same as the old site. */
+@keyframes springPop {
+  0% {
+    transform: scale(0.2) rotate(-4deg);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.08) rotate(1deg);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.modal-spring {
+  animation: springPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Hero search pill: a hovered Where/When/Activity segment gets a shadow

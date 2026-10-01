@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Ticket, Gem, ShoppingBag, Trophy, UserPlus, CalendarCheck, Camera, Gift } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useSocial } from "@/components/social/SocialContext";
 import { useToast, Toast } from "@/components/Toast";
 import { fetchVouchers, fetchLeaderboard, redeemCorals, Voucher, LeaderboardEntry } from "@/lib/shop";
 import { diverCertRingClass } from "@/lib/diverRing";
+import { AddBuddyModal } from "@/components/inbox/AddBuddyModal";
 import Link from "next/link";
 
 const OFFERS = [
@@ -43,6 +46,8 @@ const OFFERS = [
 // its own, out of scope for this pass.
 export default function DiveShopPage() {
   const { user, requireAuth, refreshProfile } = useAuth();
+  const { openProfile } = useSocial();
+  const router = useRouter();
   const { message, showToast } = useToast();
 
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -52,6 +57,7 @@ export default function DiveShopPage() {
     "loading"
   );
   const [redeemingCost, setRedeemingCost] = useState<number | null>(null);
+  const [addBuddyOpen, setAddBuddyOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -295,14 +301,14 @@ export default function DiveShopPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-400" /> Dive Leaderboard
+                <Trophy className="w-5 h-5 text-amber-400" /> Friends Dive Leaderboard
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">Ranked by total Corals balance</p>
             </div>
             <button
               onClick={() => {
                 if (!requireAuth()) return;
-                showToast("Adding dive buddies is coming in a future update.");
+                setAddBuddyOpen(true);
               }}
               className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-2 transition-colors"
             >
@@ -415,25 +421,32 @@ export default function DiveShopPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-medium">
-                    {leaderboard.map((entry, i) => (
+                    {leaderboard.map((entry, i) => {
+                      const isUser = user?.id === entry.id;
+                      return (
                       <tr
                         key={entry.id}
-                        className={user?.id === entry.id ? "bg-cyan-500/5" : ""}
+                        className={isUser ? "bg-amber-500/10 font-bold border-l-4 border-amber-400" : "hover:bg-slate-800/50 transition-colors"}
                       >
-                        <td className="py-3 px-4 text-center font-bold text-slate-400">{i + 1}</td>
+                        <td className={`py-3 px-4 text-center font-black ${i + 1 === 1 ? "text-amber-400" : "text-slate-400"}`}>
+                          #{i + 1}
+                        </td>
                         <td className="py-3 px-4">
-                          <div className="flex items-center gap-2.5">
+                          <button
+                            onClick={() => (isUser ? router.push("/profile") : openProfile(entry.id))}
+                            className="flex items-center gap-2.5 text-left"
+                          >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={entry.avatar_url}
                               alt={entry.name}
                               className={`w-7 h-7 rounded-full object-cover border-2 ${diverCertRingClass(entry.cert)}`}
                             />
-                            <span className="font-bold text-slate-100">
+                            <span className={`font-bold hover:underline ${isUser ? "text-amber-300" : "text-slate-100"}`}>
                               {entry.name}
-                              {user?.id === entry.id ? " (You)" : ""}
+                              {isUser ? " (You)" : ""}
                             </span>
-                          </div>
+                          </button>
                         </td>
                         <td className="py-3 px-4 text-cyan-400 font-semibold">{entry.cert}</td>
                         <td className="py-3 px-4 text-center">{entry.dives}</td>
@@ -442,7 +455,8 @@ export default function DiveShopPage() {
                           🪸 {Number(entry.corals).toLocaleString()}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -451,6 +465,7 @@ export default function DiveShopPage() {
         </div>
       </div>
 
+      {addBuddyOpen && <AddBuddyModal onClose={() => setAddBuddyOpen(false)} />}
       <Toast message={message} />
     </main>
   );

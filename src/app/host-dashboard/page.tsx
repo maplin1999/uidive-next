@@ -7,11 +7,9 @@ import {
   DollarSign,
   Gauge,
   Star,
-  TrendingUp,
+  List,
   Users,
   Plus,
-  Pencil,
-  XCircle,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
@@ -193,6 +191,21 @@ export default function HostDashboardPage() {
     );
   }
 
+  // Suspended
+  if (hostStatus.verification_status === "suspended") {
+    return (
+      <main className="min-h-screen bg-slate-950 px-4 py-12">
+        <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-rose-500/30 text-center space-y-3">
+          <div className="text-3xl">🚫</div>
+          <h1 className="text-lg font-bold text-white">Host Account Suspended</h1>
+          <p className="text-xs text-slate-400">
+            Contact support if you believe this is a mistake.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   // Verified -- the real dashboard
   const activeTrips = trips.filter((t) => t.status === "active");
   const now = new Date();
@@ -208,19 +221,19 @@ export default function HostDashboardPage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+        <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl font-black text-white flex items-center gap-2 justify-center sm:justify-start">
               <Anchor className="w-6 h-6 text-cyan-400" /> Host Dashboard
             </h1>
-            <p className="text-xs text-slate-400">{hostStatus.business_name}</p>
+            <p className="text-xs text-slate-400 mt-1">Create and manage your own dive trips</p>
           </div>
           <button
             onClick={() => {
               setEditingTrip(null);
               setTripFormOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-500/20 transition-all"
+            className="shrink-0 flex items-center gap-2 text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" /> Create Trip
           </button>
@@ -237,7 +250,7 @@ export default function HostDashboardPage() {
         )}
         {dashStatus === "ready" && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
               <Stat icon={<Anchor className="w-4 h-4" />} label="Active Trips" value={activeTrips.length} />
               <Stat
                 icon={<CalendarDays className="w-4 h-4" />}
@@ -248,29 +261,27 @@ export default function HostDashboardPage() {
               <Stat
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Revenue"
-                value={`$${totalRevenue.toLocaleString()}`}
-                accent="emerald"
+                value={`$${totalRevenue.toFixed(2)}`}
               />
               <Stat icon={<Gauge className="w-4 h-4" />} label="Fill Rate" value={`${fillRate}%`} />
               <Stat
                 icon={<Star className="w-4 h-4" />}
-                label="Avg Rating"
-                value={reviewStats ? reviewStats.avg_rating.toFixed(1) : "—"}
-                accent="amber"
+                label={reviewStats && reviewStats.review_count > 0 ? `Avg Rating (${reviewStats.review_count})` : "Avg Rating"}
+                value={reviewStats && reviewStats.review_count > 0 ? `★ ${reviewStats.avg_rating.toFixed(1)}` : "—"}
               />
             </div>
 
             {/* TRIPS LIST */}
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-cyan-400" /> Your Trips
+                <List className="w-5 h-5 text-emerald-400" /> My Trips
               </h2>
 
               {trips.length === 0 && (
-                <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
-                  <div className="text-3xl">🌊</div>
+                <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
+                  <div className="text-3xl">🗓️</div>
                   <p className="text-sm font-bold text-slate-300">No trips yet</p>
-                  <p className="text-xs text-slate-500">Create your first dive trip to get started.</p>
+                  <p className="text-xs text-slate-500">Create your first trip and it&apos;ll show up here.</p>
                 </div>
               )}
 
@@ -278,61 +289,67 @@ export default function HostDashboardPage() {
                 <div className="space-y-3">
                   {trips.map((trip) => {
                     const dateStr = trip.scheduled_date
-                      ? new Date(trip.scheduled_date + "T00:00:00").toLocaleDateString("en-US", {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                        })
-                      : "No date set";
-                    const isFull = trip.spots_booked >= trip.capacity;
+                      ? (() => {
+                          const d = new Date(trip.scheduled_date + "T00:00:00").toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          });
+                          return trip.scheduled_time ? `${d} • ${trip.scheduled_time}` : d;
+                        })()
+                      : trip.scheduled_time || "";
+                    const isCancelled = trip.status === "cancelled";
+                    const spotsLeft = (trip.capacity || 0) - (trip.spots_booked || 0);
 
                     return (
                       <div
                         key={trip.id}
-                        className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className={`p-5 rounded-2xl bg-slate-900 border border-slate-800 ${
+                          isCancelled ? "opacity-60" : ""
+                        } flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3`}
                       >
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-sm font-extrabold text-white truncate">{trip.title}</h4>
-                            {trip.status === "cancelled" && (
-                              <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/30 px-2 py-0.5 rounded-full">
+                            <p className="text-sm font-bold text-white truncate">{trip.title}</p>
+                            {isCancelled && (
+                              <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full">
                                 Cancelled
                               </span>
                             )}
-                            {trip.status === "active" && isFull && (
+                            {!isCancelled && spotsLeft <= 0 && (
                               <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full">
                                 Full
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-[10px] text-slate-500">
                             {trip.location} • {dateStr}
-                            {trip.scheduled_time ? ` • ${trip.scheduled_time}` : ""}
                           </p>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            {trip.spots_booked}/{trip.capacity} booked • ${Number(trip.price)}
+                          <p className="text-[10px] text-slate-500">
+                            {trip.spots_booked || 0}/{trip.capacity || 0} booked • $
+                            {Number(trip.price || 0).toFixed(2)}/diver
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex gap-2 shrink-0">
                           <button
                             onClick={() => setRosterTrip(trip)}
-                            className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-cyan-400 hover:bg-slate-800/70 transition-colors"
-                            title="View roster"
+                            className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20 px-3 py-2 rounded-xl transition-colors"
                           >
-                            <Users className="w-4 h-4" />
+                            Divers
                           </button>
-                          <button
-                            onClick={() => {
-                              setEditingTrip(trip);
-                              setTripFormOpen(true);
-                            }}
-                            className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-cyan-400 hover:bg-slate-800/70 transition-colors"
-                            title="Edit trip"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          {trip.status === "active" && (
+                          {!isCancelled && (
+                            <button
+                              onClick={() => {
+                                setEditingTrip(trip);
+                                setTripFormOpen(true);
+                              }}
+                              className="text-[10px] font-bold text-slate-300 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {!isCancelled && (
                             <button
                               onClick={async () => {
                                 if (!window.confirm(`Cancel "${trip.title}"? This can't be undone.`)) return;
@@ -345,10 +362,9 @@ export default function HostDashboardPage() {
                                   showToast("Could not cancel this trip -- please try again.");
                                 }
                               }}
-                              className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-rose-400 hover:bg-slate-800/70 transition-colors"
-                              title="Cancel trip"
+                              className="text-[10px] font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 px-3 py-2 rounded-xl transition-colors"
                             >
-                              <XCircle className="w-4 h-4" />
+                              Cancel
                             </button>
                           )}
                         </div>
@@ -383,22 +399,16 @@ function Stat({
   icon,
   label,
   value,
-  accent,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  accent?: "emerald" | "amber";
 }) {
-  const valueColor =
-    accent === "emerald" ? "text-emerald-400" : accent === "amber" ? "text-amber-400" : "text-white";
   return (
-    <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
-      <div className="flex items-center gap-1.5 text-slate-500">
-        {icon}
-        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
-      </div>
-      <div className={`text-lg font-black ${valueColor}`}>{value}</div>
+    <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center">
+      <div className="text-cyan-400 mx-auto mb-1 w-fit">{icon}</div>
+      <div className="text-lg font-black text-white">{value}</div>
+      <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">{label}</div>
     </div>
   );
 }

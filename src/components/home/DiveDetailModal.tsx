@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, BadgeCheck, Wind, Waves, Thermometer, Eye } from "lucide-react";
+import { X, BadgeCheck, Radio, CheckCircle, Info } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import {
@@ -96,94 +96,88 @@ export function DiveDetailModal({
               }}
               className="w-full h-full object-cover"
             />
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="absolute top-3 right-3 p-2 rounded-full bg-slate-950/70 text-white hover:bg-slate-950/90 backdrop-blur-sm"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
         )}
 
         <div className="p-6 space-y-4 overflow-y-auto">
-          {!trip.image_url && (
-            <div className="flex justify-end -mt-2 -mr-2">
-              <button
-                onClick={onClose}
-                aria-label="Close"
-                className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          <div className="flex justify-between items-start gap-3">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded-md">
+                {trip.difficulty}
+              </span>
+              <h2 className="text-2xl font-black text-white mt-1">{trip.title}</h2>
+              <p className="text-xs text-slate-400">{trip.location}</p>
+              {trip.host_id && trip.profiles && (
+                <button
+                  onClick={() => openProfile(trip.host_id!)}
+                  className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
+                >
+                  <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
+                  Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
+                  {hostStats && hostStats.review_count > 0 && (
+                    <>
+                      <span className="text-amber-400">★ {Number(hostStats.avg_rating).toFixed(1)}</span>
+                      <span className="text-slate-500">({hostStats.review_count})</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {trip.description && (
+            <p className="text-xs text-slate-400 leading-relaxed">{trip.description}</p>
           )}
 
-          <div className="space-y-1">
-            <h2 className="text-xl font-black text-white">{trip.title}</h2>
-            <p className="text-sm text-slate-400">{trip.location}</p>
-            {trip.host_id && trip.profiles && (
-              <button
-                onClick={() => openProfile(trip.host_id!)}
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
-              >
-                <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
-                Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
-                {hostStats && hostStats.review_count > 0 && (
-                  <>
-                    <span className="text-amber-400">★ {Number(hostStats.avg_rating).toFixed(1)}</span>
-                    <span className="text-slate-500">({hostStats.review_count})</span>
-                  </>
-                )}
-              </button>
-            )}
+          <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Visibility</p>
+              <p className="text-base font-extrabold text-cyan-400 mt-0.5">{trip.visibility}</p>
+            </div>
+            <div className="border-x border-slate-800">
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Water Temp</p>
+              <p className="text-base font-extrabold text-emerald-400 mt-0.5">{trip.water_temp}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Swell</p>
+              <p className="text-base font-extrabold truncate text-indigo-400 mt-0.5">{trip.swell}</p>
+            </div>
           </div>
-
-          {trip.description && <p className="text-sm text-slate-300">{trip.description}</p>}
-
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <ConditionTile
-              icon={<Eye className="w-3.5 h-3.5" />}
-              label="Visibility"
-              value={trip.visibility}
-              color="text-cyan-400"
-            />
-            <ConditionTile
-              icon={<Thermometer className="w-3.5 h-3.5" />}
-              label="Water Temp"
-              value={trip.water_temp}
-              color="text-emerald-400"
-            />
-            <ConditionTile
-              icon={<Waves className="w-3.5 h-3.5" />}
-              label="Swell"
-              value={trip.swell}
-              color="text-indigo-400"
-            />
-            <ConditionTile
-              icon={<Wind className="w-3.5 h-3.5" />}
-              label="Wind"
-              value={trip.wind || "—"}
-              color="text-sky-400"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <ConditionTile label="Tide" value={trip.tide || "—"} color="text-teal-400" />
-            <ConditionTile label="Current" value={trip.current || "—"} color="text-orange-400" />
-            <ConditionTile label="Level" value={trip.difficulty} />
-            <ConditionTile label="Date" value={formatTripDate(trip)} />
+          <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Wind</p>
+              <p className="text-base font-extrabold truncate text-sky-400 mt-0.5">{trip.wind || "—"}</p>
+            </div>
+            <div className="border-x border-slate-800">
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Tide</p>
+              <p className="text-base font-extrabold truncate text-teal-400 mt-0.5">{trip.tide || "—"}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Current</p>
+              <p className="text-base font-extrabold truncate text-orange-400 mt-0.5">
+                {trip.current || "—"}
+              </p>
+            </div>
           </div>
 
           {trip.conditions_updated_at && (
-            <p className="text-[10px] text-slate-500 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Wind, swell &amp; current
-              update live -- last updated {formatRelativeTime(trip.conditions_updated_at)}
+            <p className="text-[9px] text-slate-500 -mt-2 flex items-center gap-1">
+              <Radio className="w-2.5 h-2.5 text-emerald-400" /> Wind, Swell &amp; Current update live ·
+              updated {formatRelativeTime(trip.conditions_updated_at)}
             </p>
           )}
 
           {rating.count > 0 && (
             <p className="text-xs text-amber-400 font-bold">
-              ★ {rating.avg.toFixed(1)} <span className="text-slate-500 font-semibold">({rating.count} reviews)</span>
+              ★ {rating.avg.toFixed(1)}{" "}
+              <span className="text-slate-500 font-semibold">({rating.count} reviews)</span>
             </p>
           )}
 
@@ -217,38 +211,21 @@ export function DiveDetailModal({
           <button
             onClick={handleConfirmClick}
             disabled={isFull || booking}
-            className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
+            className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center space-x-2"
           >
-            {isFull ? "Fully Booked" : booking ? "Booking…" : "Confirm Booking"}
+            <span>{isFull ? "Fully Booked" : booking ? "Booking…" : "Confirm Booking"}</span>
+            {!isFull && <CheckCircle className="w-4 h-4" />}
           </button>
+          <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
+            <Info className="w-3.5 h-3.5 shrink-0" />
+            Online payments are coming soon -- this reserves your spot now, free of charge.
+          </p>
         </div>
       </div>
 
       {checklistOpen && (
         <EquipmentChecklistModal onClose={() => setChecklistOpen(false)} onConfirm={handleFinalize} />
       )}
-    </div>
-  );
-}
-
-function ConditionTile({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: string;
-  color?: string;
-}) {
-  return (
-    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
-      <p className="text-[10px] text-slate-500 uppercase flex items-center gap-1">
-        {icon}
-        {label}
-      </p>
-      <p className={`text-sm font-bold ${color || "text-slate-200"}`}>{value}</p>
     </div>
   );
 }

@@ -44,21 +44,24 @@ export function CoralsCelebration({
   }, []);
 
   return (
-    <div
-      className={`fixed inset-0 z-[60] flex items-center justify-center p-4 transition-opacity duration-300 ${
-        visible ? "opacity-100" : "opacity-0"
-      }`}
-    >
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
       <div
-        className={`relative bg-slate-900 border border-amber-500/30 rounded-3xl px-8 py-6 shadow-2xl text-center space-y-1 transition-all duration-300 ${
-          visible ? "scale-100" : "scale-95"
+        className={`absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] transition-opacity duration-300 ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div
+        className={`relative bg-slate-900 border border-slate-800 rounded-3xl px-7 py-6 shadow-2xl flex items-center gap-4 max-w-xs mx-4 transition-all duration-300 ease-out ${
+          visible ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
       >
-        <p className="text-sm font-bold text-amber-400">{title}</p>
-        <p className="text-3xl font-black text-white">
-          +{displayed} <span className="text-2xl">🪸</span>
-        </p>
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl shrink-0">
+          🪸
+        </div>
+        <div className="text-left min-w-0">
+          <p className="text-sm font-bold text-white truncate">{title}</p>
+          <p className="text-xs text-slate-400 mt-0.5">+{displayed} added to your balance</p>
+        </div>
       </div>
     </div>
   );

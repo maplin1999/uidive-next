@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Star, Pencil, BadgeCheck, Users, MessageSquare } from "lucide-react";
+import { X, Star, Pencil, BadgeCheck, Users, MessageSquare, Backpack, Radio, XCircle } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import { EQUIPMENT_ITEMS, formatRelativeTime } from "@/lib/trips";
@@ -141,14 +141,15 @@ export function BookingDetailModal({
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-start border-b border-slate-800 pb-3.5">
-          <div className="space-y-1">
-            <h3 className="font-bold text-white text-base">{trip?.title || "Dive trip"}</h3>
+        <div className="flex justify-between items-start">
+          <div className="min-w-0">
+            <div className="mb-1">{statusBadge}</div>
+            <h2 className="text-2xl font-black text-white truncate">{trip?.title || "Dive trip"}</h2>
             <p className="text-xs text-slate-400">{trip?.location}</p>
             {trip?.host_id && trip.profiles && (
               <button
                 onClick={() => openProfile(trip.host_id!)}
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
+                className="mt-1 text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
               >
                 <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
                 Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
@@ -160,45 +161,65 @@ export function BookingDetailModal({
                 )}
               </button>
             )}
+            <p className="text-xs text-cyan-400 font-semibold mt-0.5">{whenStr}</p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
+            className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {statusBadge}
-          <span className="text-xs text-slate-400">{whenStr}</span>
-          <span className="text-xs font-bold text-cyan-400 ml-auto">${Number(booking.price_paid)}</span>
         </div>
 
         {trip && (
           <>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <ConditionTile label="Visibility" value={trip.visibility || "—"} color="text-cyan-400" />
-              <ConditionTile label="Water Temp" value={trip.water_temp || "—"} color="text-emerald-400" />
-              <ConditionTile label="Swell" value={trip.swell || "—"} color="text-indigo-400" />
-              <ConditionTile label="Wind" value={trip.wind || "—"} color="text-sky-400" />
-              <ConditionTile label="Tide" value={trip.tide || "—"} color="text-teal-400" />
-              <ConditionTile label="Current" value={trip.current || "—"} color="text-orange-400" />
+            <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+              <div>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Visibility</p>
+                <p className="text-base font-extrabold text-cyan-400 mt-0.5">{trip.visibility || "—"}</p>
+              </div>
+              <div className="border-x border-slate-800">
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Water Temp</p>
+                <p className="text-base font-extrabold text-emerald-400 mt-0.5">{trip.water_temp || "—"}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Swell</p>
+                <p className="text-base font-extrabold truncate text-indigo-400 mt-0.5">{trip.swell || "—"}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+              <div>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Wind</p>
+                <p className="text-base font-extrabold truncate text-sky-400 mt-0.5">{trip.wind || "—"}</p>
+              </div>
+              <div className="border-x border-slate-800">
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Tide</p>
+                <p className="text-base font-extrabold truncate text-teal-400 mt-0.5">{trip.tide || "—"}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">Current</p>
+                <p className="text-base font-extrabold truncate text-orange-400 mt-0.5">{trip.current || "—"}</p>
+              </div>
             </div>
             {trip.conditions_updated_at && (
-              <p className="text-[10px] text-slate-500 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Conditions update live --
-                last updated {formatRelativeTime(trip.conditions_updated_at)}
+              <p className="text-[9px] text-slate-500 -mt-2 flex items-center gap-1">
+                <Radio className="w-2.5 h-2.5 text-emerald-400" /> Wind, Swell &amp; Current update live ·
+                updated {formatRelativeTime(trip.conditions_updated_at)}
               </p>
             )}
           </>
         )}
 
-        <div className="space-y-2">
-          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Your Equipment
-          </h4>
+        <div className="flex items-center justify-between bg-slate-950 p-4 rounded-2xl border border-slate-800">
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amount Paid</p>
+          <span className="text-lg font-black text-white">${Number(booking.price_paid)}</span>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <Backpack className="w-3.5 h-3.5" /> Bringing Your Own
+          </h3>
           {ownedEquipment.length === 0 ? (
             <p className="text-xs text-slate-500">No equipment noted for this booking.</p>
           ) : (
@@ -215,10 +236,10 @@ export function BookingDetailModal({
           )}
         </div>
 
-        <div className="space-y-2">
-          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div>
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5" /> Fellow Divers
-          </h4>
+          </h3>
           {rosterStatus === "loading" && <p className="text-xs text-slate-500">Loading fellow divers…</p>}
           {rosterStatus === "error" && (
             <p className="text-xs text-slate-500">Fellow divers aren&apos;t available right now.</p>
@@ -318,22 +339,24 @@ export function BookingDetailModal({
         )}
 
         {isConfirmed && (
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+          <div className="space-y-2 pt-2 border-t border-slate-800">
             <button
               onClick={() => {
                 if (!requireAuth()) return;
                 setChatOpen(true);
               }}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors"
+              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
             >
-              <MessageSquare className="w-3.5 h-3.5" /> Group Chat
+              <MessageSquare className="w-4 h-4" />
+              <span>Open Group Chat</span>
             </button>
             <button
               onClick={handleCancel}
               disabled={cancelling}
-              className="flex-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors disabled:opacity-60"
+              className="w-full py-3 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              {cancelling ? "Cancelling…" : "Cancel Booking"}
+              <XCircle className="w-4 h-4" />
+              <span>{cancelling ? "Cancelling…" : "Cancel Booking"}</span>
             </button>
           </div>
         )}
@@ -342,15 +365,6 @@ export function BookingDetailModal({
       {chatOpen && trip && (
         <TripChatModal tripId={booking.trip_id} tripTitle={trip.title} onClose={() => setChatOpen(false)} />
       )}
-    </div>
-  );
-}
-
-function ConditionTile({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
-      <p className="text-[10px] text-slate-500 uppercase">{label}</p>
-      <p className={`text-sm font-bold ${color || "text-slate-200"}`}>{value}</p>
     </div>
   );
 }

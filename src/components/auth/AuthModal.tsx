@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { X, Waves, Eye, EyeOff, Zap } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { DEMO_ACCOUNT, CERT_OPTIONS } from "@/lib/auth-types";
@@ -146,7 +147,7 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl modal-spring max-h-[90vh] overflow-y-auto">
         {view === "confirm" ? (
           <ConfirmEmailView email={pendingEmail} onClose={handleClose} />
         ) : (
@@ -365,7 +366,25 @@ export function AuthModal() {
                 <p className="text-[10px] text-slate-500 text-center leading-relaxed">
                   By signing up you&apos;ll get a welcome bonus of{" "}
                   <span className="text-amber-400 font-bold">100 🪸 Corals</span>, and you agree
-                  to our Terms of Service and Privacy Policy.
+                  to our{" "}
+                  <Link
+                    href="/legal?tab=terms"
+                    target="_blank"
+                    rel="noopener"
+                    className="text-cyan-400 hover:underline font-semibold"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/legal?tab=privacy"
+                    target="_blank"
+                    rel="noopener"
+                    className="text-cyan-400 hover:underline font-semibold"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
                 </p>
               </form>
             )}

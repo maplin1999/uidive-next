@@ -56,6 +56,8 @@ export interface MyPost {
   caption: string;
   image_url: string;
   location_name: string;
+  trip_id: string | null;
+  likes: number;
   created_at: string;
   corals_awarded: boolean;
 }
@@ -100,7 +102,7 @@ export async function submitTripReview(
 export async function fetchMyPosts(userId: string): Promise<MyPost[]> {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, caption, image_url, location_name, created_at, corals_awarded")
+    .select("id, caption, image_url, location_name, trip_id, likes, created_at, corals_awarded")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -108,18 +110,33 @@ export async function fetchMyPosts(userId: string): Promise<MyPost[]> {
   return data || [];
 }
 
-// The fields Edit Profile actually lets you change -- avatar upload needs
-// Supabase Storage, which is its own separate migration, so it's left out
-// here for now.
 // A short, stable, shareable ID derived from the user's real database id --
 // same formula as the old site's diverIdFromUserId().
 export function diverIdFromUserId(userId: string): string {
   return "DIV-" + userId.replace(/-/g, "").slice(0, 6).toUpperCase();
 }
 
+// Mirrors the old site's handleProfileEditSubmit(): uploads to the same
+// "avatars" bucket, path `${userId}/avatar.${ext}` with upsert so re-saving
+// always overwrites the one existing file instead of accumulating old
+// uploads, then cache-busts the public URL with a timestamp so the new
+// photo shows immediately instead of a stale browser-cached copy at the
+// same URL.
+export async function uploadAvatar(userId: string, file: File): Promise<string> {
+  const ext = file.name.split(".").pop();
+  const path = `${userId}/avatar.${ext}`;
+  const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, {
+    upsert: true,
+  });
+  if (uploadError) throw uploadError;
+
+  const { data: publicUrlData } = supabase.storage.from("avatars").getPublicUrl(path);
+  return `${publicUrlData.publicUrl}?t=${Date.now()}`;
+}
+
 export async function updateProfile(
   userId: string,
-  fields: { cert: string; location: string; bio: string }
+  fields: { cert: string; location: string; bio: string; avatar_url?: string }
 ): Promise<void> {
   const { error } = await supabase.from("profiles").update(fields).eq("id", userId);
   if (error) throw error;
