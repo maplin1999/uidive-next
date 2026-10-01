@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { UserPlus, Users, MessageSquare } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import {
   BuddyRequest,
   Buddy,
@@ -19,15 +18,16 @@ import {
 import { AddBuddyModal } from "@/components/inbox/AddBuddyModal";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
-import { diverCertRingClass } from "@/lib/diverRing";
+import { DiverAvatar } from "@/components/DiverAvatar";
+import { resolveAvatarUrl } from "@/lib/cosmetics";
 
 // The Inbox tab (#tab-inbox in the old site): buddy requests, direct
 // messages with accepted buddies, and group chats for trips you're
 // confirmed on -- all three stacked in one page, same as the old site
 // (there's no tabbed switcher there). Everything here is real
-// (friendships/messages/trip_chat_messages tables) -- cosmetics (equipped
-// avatar rings on messages) are left out, same as everywhere else in this
-// rewrite. The old site's "Add Buddy" lives inside its separate Dive
+// (friendships/messages/trip_chat_messages tables), including equipped
+// cosmetic avatars on requests/conversations. The old site's "Add Buddy"
+// lives inside its separate Dive
 // Buddies list modal (opened from the profile header's Buddies tile) --
 // since that tile instead routes here in this rewrite, the button is kept
 // in the header so adding a buddy is still reachable.
@@ -135,6 +135,7 @@ export default function InboxPage() {
                 avatar_url: "",
                 cert: "",
                 diver_id: "",
+                equipped_avatar_id: null,
               };
               return (
                 <div
@@ -145,11 +146,11 @@ export default function InboxPage() {
                     onClick={() => openProfile(req.requester_id)}
                     className="flex items-center space-x-3 min-w-0 text-left"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={person.avatar_url || DEFAULT_AVATAR}
-                      alt=""
-                      className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
+                    <DiverAvatar
+                      avatarUrl={person.avatar_url}
+                      equippedAvatarId={person.equipped_avatar_id}
+                      cert={person.cert}
+                      sizeClass="w-10 h-10"
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-white truncate hover:underline">{person.name}</p>
@@ -197,16 +198,20 @@ export default function InboxPage() {
                   onClick={() => openProfile(c.partner.id)}
                   className="flex items-center space-x-3 min-w-0 text-left shrink-0"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={c.partner.avatar_url || DEFAULT_AVATAR}
-                    alt=""
-                    className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(c.partner.cert)}`}
+                  <DiverAvatar
+                    avatarUrl={c.partner.avatar_url}
+                    equippedAvatarId={c.partner.equipped_avatar_id}
+                    cert={c.partner.cert}
+                    sizeClass="w-9 h-9"
                   />
                 </button>
                 <button
                   onClick={() =>
-                    setActiveChat({ id: c.partner.id, name: c.partner.name, avatar: c.partner.avatar_url })
+                    setActiveChat({
+                      id: c.partner.id,
+                      name: c.partner.name,
+                      avatar: resolveAvatarUrl(c.partner.avatar_url, c.partner.equipped_avatar_id),
+                    })
                   }
                   className="flex-1 flex items-center justify-between min-w-0 text-left ml-3"
                 >

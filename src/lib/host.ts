@@ -247,6 +247,7 @@ export interface RosterDiver {
   diver_avatar_url: string;
   diver_cert: string;
   is_you: boolean;
+  equipped_avatar_id: string | null;
 }
 
 export async function fetchTripRoster(tripId: string): Promise<RosterDiver[]> {

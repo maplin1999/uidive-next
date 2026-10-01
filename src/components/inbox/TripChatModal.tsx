@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { X, Send, Users } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import { TripChatMessage, fetchTripChatMessages, sendTripChatMessage } from "@/lib/inbox";
+import { resolveAvatarUrl } from "@/lib/cosmetics";
 
 // Migrated from the old site's #trip-chat-modal -- a shared group chat among
 // co-divers on a trip (no separate host-led channel; everyone with a
@@ -85,7 +85,9 @@ export function TripChatModal({
           {messages.map((m, i) => {
             const isYou = m.user_id === user.id;
             const senderName = isYou ? "You" : m.profiles?.name || "Diver";
-            const avatarUrl = isYou ? user.avatar : m.profiles?.avatar_url || DEFAULT_AVATAR;
+            const avatarUrl = isYou
+              ? resolveAvatarUrl(user.avatar, user.equipped_avatar_id)
+              : resolveAvatarUrl(m.profiles?.avatar_url, m.profiles?.equipped_avatar_id);
             return isYou ? (
               <div key={i} className="flex justify-end">
                 <div className="bg-cyan-500 text-slate-950 px-4 py-2.5 rounded-2xl rounded-br-md max-w-[75%] shadow-md">

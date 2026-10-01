@@ -10,12 +10,16 @@ export interface PublicProfile {
   dives: number;
   corals: number;
   diver_id: string;
+  equipped_avatar_id: string | null;
+  equipped_calling_card_id: string | null;
 }
 
 export async function fetchPublicProfile(userId: string): Promise<PublicProfile> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, cert, location, bio, avatar_url, dives, corals, diver_id")
+    .select(
+      "id, name, cert, location, bio, avatar_url, dives, corals, diver_id, equipped_avatar_id, equipped_calling_card_id"
+    )
     .eq("id", userId)
     .single();
   if (error) throw error;
@@ -69,6 +73,7 @@ export interface Buddy {
   name: string;
   cert: string;
   avatar_url: string;
+  equipped_avatar_id: string | null;
 }
 
 // Mirrors renderMyBuddies(): a friendship row could have either person as
@@ -80,7 +85,7 @@ export async function fetchBuddiesList(userId: string): Promise<Buddy[]> {
   const { data, error } = await supabase
     .from("friendships")
     .select(
-      "requester_id, addressee_id, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url, cert), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url, cert)"
+      "requester_id, addressee_id, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url, cert, equipped_avatar_id), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url, cert, equipped_avatar_id)"
     )
     .eq("status", "accepted")
     .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);

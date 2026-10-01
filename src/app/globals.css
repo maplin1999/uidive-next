@@ -621,3 +621,157 @@ html[data-theme="light"] .always-dark .bg-slate-950 {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+
+/* Treasure Chest opening animation (Dive Shop proof of concept) -- the chest
+   art itself is a real frame-by-frame image sequence swapped in JS (see
+   CHEST_ANIM_FRAMES in src/lib/cosmetics.ts and ChestOpenModal.tsx).
+   Everything here is the "showmanship" layered around that art: an ambient
+   glow that idles behind the chest the whole time, a rattle while it's
+   still closed (anticipation), a per-frame "pop" as each opening frame
+   lands, then -- the moment the sequence reaches its fully-open frame and
+   #chest-stage gains .chest-open -- a light flash, two expanding shockwave
+   rings and a burst of sparks, all tinted to the best reward's tier color
+   via the --chest-glow-rgb custom property ChestOpenModal.tsx sets on
+   #chest-stage (falls back to gold). Reward cards then land with a
+   slightly springier pop than a plain fade. */
+#chest-stage {
+  --chest-glow-rgb: 251, 191, 36; /* gold -- default/common */
+}
+
+.chest-ambient-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 200px; height: 200px;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(var(--chest-glow-rgb), .35), transparent 70%);
+  filter: blur(4px);
+  animation: chest-ambient-breathe 2.4s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+@keyframes chest-ambient-breathe {
+  0%, 100% { opacity: .45; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: .8;  transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Anticipation -- a little pre-open rattle while the chest is still shut,
+   toggled on/off by JS just before the opening frames start stepping. */
+#chest-anim-img {
+  position: relative;
+  z-index: 10;
+}
+#chest-anim-img.chest-anticipate {
+  animation: chest-shake .45s ease-in-out infinite;
+}
+@keyframes chest-shake {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  20%      { transform: rotate(-2.5deg) translateY(0); }
+  40%      { transform: rotate(2deg) translateY(-2px); }
+  60%      { transform: rotate(-1.5deg) translateY(0); }
+  80%      { transform: rotate(1.5deg) translateY(-1px); }
+}
+/* Each time JS swaps in the next opening frame it also toggles this class
+   briefly, so every step of the sequence lands with a small punch instead
+   of just flatly replacing the image. */
+#chest-anim-img.chest-frame-pop {
+  animation: chest-frame-pop .22s cubic-bezier(.34, 1.56, .64, 1);
+}
+@keyframes chest-frame-pop {
+  0%   { transform: scale(0.94); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+#chest-stage.chest-open {
+  animation: chest-glow-pulse 0.7s ease;
+}
+@keyframes chest-glow-pulse {
+  0%   { filter: drop-shadow(0 0 0 rgba(var(--chest-glow-rgb), 0)); }
+  45%  { filter: drop-shadow(0 0 22px rgba(var(--chest-glow-rgb), 0.9)); }
+  100% { filter: drop-shadow(0 0 0 rgba(var(--chest-glow-rgb), 0)); }
+}
+
+/* Light flash -- a quick bright pop that reads as the chest "bursting"
+   open, right as the fully-open frame lands. */
+.chest-flash {
+  position: absolute;
+  inset: -30px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255,255,255,.95), rgba(var(--chest-glow-rgb), .5) 45%, transparent 72%);
+  opacity: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.chest-open .chest-flash {
+  animation: chest-flash-pop .55s ease-out both;
+}
+@keyframes chest-flash-pop {
+  0%   { opacity: 0;  transform: scale(.5); }
+  30%  { opacity: .9; transform: scale(1.05); }
+  100% { opacity: 0;  transform: scale(1.4); }
+}
+
+/* Two shockwave rings, staggered slightly so they read as a ripple rather
+   than a single pulse. */
+.chest-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 64px; height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 9999px;
+  border: 3px solid rgba(var(--chest-glow-rgb), .9);
+  opacity: 0;
+  transform: scale(.3);
+  z-index: 5;
+  pointer-events: none;
+}
+.chest-open .chest-ring {
+  animation: chest-ring-burst .9s cubic-bezier(.2, .8, .2, 1) both;
+}
+.chest-open .chest-ring-2 {
+  animation-delay: .15s;
+}
+@keyframes chest-ring-burst {
+  0%   { opacity: .9; transform: scale(.3); }
+  70%  { opacity: .3; }
+  100% { opacity: 0;  transform: scale(3.4); }
+}
+
+/* Sparks -- a fixed set of 10 slivers positioned/angled by hand (via the
+   inline --dx/--dy/--sd custom properties on each span in the JSX) so they
+   fly outward from the chest in a fan rather than all straight up, without
+   needing JS to generate them. */
+.chest-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.chest-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 7px; height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: linear-gradient(135deg, #fff, rgb(var(--chest-glow-rgb)));
+  box-shadow: 0 0 6px 1px rgba(var(--chest-glow-rgb), .8);
+  transform: rotate(45deg) translate(0, 0) scale(0);
+  opacity: 0;
+}
+.chest-open .chest-spark {
+  animation: chest-spark-fly .75s ease-out both;
+  animation-delay: var(--sd, 0s);
+}
+@keyframes chest-spark-fly {
+  0%   { transform: rotate(45deg) translate(0, 0) scale(0); opacity: 0; }
+  18%  { transform: rotate(45deg) translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: rotate(45deg) translate(var(--dx), var(--dy)) scale(.2); opacity: 0; }
+}
+
+.chest-reward-card {
+  animation: chest-reward-in 0.45s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+@keyframes chest-reward-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.85) rotate(-3deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}

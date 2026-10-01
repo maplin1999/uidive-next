@@ -38,13 +38,17 @@ import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BuddiesListModal } from "@/components/social/BuddiesListModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
-import { diverCertRingClass } from "@/lib/diverRing";
+import { DiverAvatar } from "@/components/DiverAvatar";
+import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
+import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 
-// The Profile tab (#tab-profile in the old site). Treasure Chest cosmetics
-// (calling card banner, equipped avatar, diver rings) are a separate
-// subsystem not migrated yet -- this covers the real header info (including
-// the admin/verified-host badges and real buddies count), bookings list +
-// full booking detail (roster/cancel/review), and dive-log grid.
+// The Profile tab (#tab-profile in the old site), including Treasure Chest
+// cosmetics (the equipped calling-card banner behind the header, the
+// equipped avatar via DiverAvatar, and the "Locker" launcher next to the
+// name -- see src/lib/cosmetics.ts and CosmeticsLockerModal) alongside the
+// real header info (admin/verified-host badges, real buddies count),
+// bookings list + full booking detail (roster/cancel/review), and dive-log
+// grid.
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
@@ -61,6 +65,7 @@ export default function ProfilePage() {
   const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [buddiesListOpen, setBuddiesListOpen] = useState(false);
+  const [lockerOpen, setLockerOpen] = useState(false);
 
   function loadBookings() {
     if (!user) return;
@@ -116,14 +121,44 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* PROFILE HEADER */}
-        <div className="relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl">
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
-            <div className="relative shrink-0 group">
+        {(() => {
+          const equippedCard = user.equipped_calling_card_id
+            ? COSMETIC_CATALOG[user.equipped_calling_card_id]
+            : null;
+          const cardItem = equippedCard && equippedCard.type === "calling_card" ? equippedCard : null;
+          return (
+        <div
+          className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
+        >
+          {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
+              behind everything else in this header. object-cover on a
+              right-anchored half-width strip with a left-fade mask shows the
+              card art without a hard rectangle edge, same treatment as the
+              public-profile header. */}
+          {cardItem && (
+            <div className="hidden sm:block absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={user.avatar}
+                src={cardItem.image}
+                alt=""
+                className="absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
+                style={{
+                  maskImage: "linear-gradient(to right, transparent, black 45%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+            </div>
+          )}
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
+            <div className="relative shrink-0 group">
+              <DiverAvatar
+                avatarUrl={user.avatar}
+                equippedAvatarId={user.equipped_avatar_id}
+                cert={user.cert}
                 alt="Your profile photo"
-                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 shadow-lg ${diverCertRingClass(user.cert)}`}
+                sizeClass="w-20 h-20 sm:w-24 sm:h-24"
+                borderClass="border-4 shadow-lg"
               />
               <button
                 onClick={() => setEditOpen(true)}
@@ -172,6 +207,17 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
+                <button
+                  onClick={() => setLockerOpen(true)}
+                  className="text-[10px] font-bold text-purple-300 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-full hover:bg-purple-500/20 transition-colors flex items-center gap-1"
+                >
+                  <svg viewBox="0 0 512 512" fill="currentColor" className="w-3 h-3 shrink-0">
+                    <path d="M385.723,84.402H126.277C56.647,84.402,0,141.05,0,210.679v216.919h259.446H512V210.679C512,141.05,455.352,84.402,385.723,84.402z M30.417,271.209h54.186v37.008h120.655v-37.008h54.186v47.777H30.417V271.209z M115.021,277.8v-43.598h59.82V277.8H115.021z M259.446,397.181H30.417v-47.777h229.029V397.181z M259.446,210.679v30.112H205.26v-37.008H84.604v37.008H30.417v-30.113c0-6.034,0.567-11.937,1.637-17.664h228.632C259.875,198.789,259.446,204.685,259.446,210.679z M43.376,162.596c16.621-28.547,47.556-47.778,82.901-47.778h177.341c-15.019,12.882-26.983,29.224-34.652,47.778H43.376z M481.583,397.181h-191.72V271.209h191.72V397.181z M481.583,240.792h-191.72V210.68c0-52.857,43.003-95.86,95.86-95.86c2.478,0,4.934,0.094,7.365,0.28c2.43,0.186,4.837,0.462,7.214,0.826c1.585,0.243,3.157,0.525,4.716,0.845c43.641,8.954,76.565,47.659,76.565,93.909V240.792z" />
+                    <path d="M385.723,135.097v30.417c24.905,0,45.164,20.261,45.164,45.164h30.417C461.305,169.003,427.399,135.097,385.723,135.097z" />
+                    <rect x="129.719" y="242.486" width="30.417" height="27.038" />
+                  </svg>{" "}
+                  Locker
+                </button>
               </div>
               <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
                 <Award className="w-4 h-4" /> {user.cert} • {user.location}
@@ -183,7 +229,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
+          <div className="relative z-10 grid grid-cols-3 gap-1.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
             <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-slate-800 text-center sm:min-w-[74px]">
               <div className="text-base sm:text-lg font-black text-white">
                 {Number(user.dives).toLocaleString()}
@@ -207,6 +253,8 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+          );
+        })()}
 
         {/* HOST STATUS -- verified hosts just get the badge above; this card
             only covers the states that need an action: apply, pending,
@@ -548,6 +596,7 @@ export default function ProfilePage() {
       {buddiesListOpen && user && (
         <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
       )}
+      {lockerOpen && <CosmeticsLockerModal onClose={() => setLockerOpen(false)} />}
       {selectedBooking && (
         <BookingDetailModal
           booking={selectedBooking}

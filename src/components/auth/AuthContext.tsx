@@ -37,7 +37,7 @@ async function fetchProfile(authUser: User): Promise<DiverProfile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "name, cert, location, bio, avatar_url, dives, max_depth, corals, last_daily_claim, account_type, is_admin"
+      "name, cert, location, bio, avatar_url, dives, max_depth, corals, last_daily_claim, account_type, is_admin, equipped_avatar_id, equipped_calling_card_id"
     )
     .eq("id", authUser.id)
     .single();
@@ -61,6 +61,8 @@ async function fetchProfile(authUser: User): Promise<DiverProfile | null> {
     last_daily_claim: data.last_daily_claim,
     account_type: data.account_type || "diver",
     is_admin: !!data.is_admin,
+    equipped_avatar_id: data.equipped_avatar_id || null,
+    equipped_calling_card_id: data.equipped_calling_card_id || null,
   };
 }
 

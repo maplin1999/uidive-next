@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import {
   PublicProfile,
   PublicPost,
@@ -34,11 +33,11 @@ import {
 } from "@/lib/social";
 import { sendBuddyRequest } from "@/lib/inbox";
 import { ChatModal } from "@/components/inbox/ChatModal";
-import { diverCertRingClass } from "@/lib/diverRing";
+import { DiverAvatar } from "@/components/DiverAvatar";
+import { COSMETIC_CATALOG, resolveAvatarUrl } from "@/lib/cosmetics";
 
-// Migrated from the old site's #public-profile-modal (viewPublicProfile()).
-// Cosmetics (equipped calling card/avatar ring) are left out, same as
-// everywhere else in this rewrite.
+// Migrated from the old site's #public-profile-modal (viewPublicProfile()),
+// including the equipped calling-card banner / avatar ring cosmetics.
 export function PublicProfileModal() {
   const { user, requireAuth } = useAuth();
   const { profileUserId, closeProfile, openReport } = useSocial();
@@ -95,6 +94,9 @@ export function PublicProfileModal() {
       console.error("Could not send buddy request:", err);
     }
   }
+
+  const equippedCard = profile?.equipped_calling_card_id ? COSMETIC_CATALOG[profile.equipped_calling_card_id] : null;
+  const cardItem = equippedCard && equippedCard.type === "calling_card" ? equippedCard : null;
 
   async function handleToggleBlock() {
     if (!profile) return;
@@ -164,15 +166,37 @@ export function PublicProfileModal() {
 
         {status === "ready" && profile && (
           <>
-            <div className="relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl -mt-2">
+            <div
+              className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl -mt-2 ${
+                cardItem ? "always-dark" : ""
+              }`}
+            >
+              {/* Equipped Calling Card banner (Treasure Chest cosmetics) --
+                  a dark overlay (via always-dark above) is layered under the
+                  art so name/stats on top of it stay readable regardless of
+                  how bright the artwork is. */}
+              {cardItem && (
+                <div className="hidden absolute inset-0 rounded-3xl overflow-hidden pointer-events-none sm:block" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cardItem.image}
+                    alt=""
+                    className="absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
+                    style={{
+                      maskImage: "linear-gradient(to right, transparent, black 45%)",
+                      WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
+                    }}
+                  />
+                </div>
+              )}
               <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={profile.avatar_url || DEFAULT_AVATAR}
-                  alt=""
-                  className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 shadow-lg shrink-0 ${diverCertRingClass(
-                    profile.cert
-                  )}`}
+                <DiverAvatar
+                  avatarUrl={profile.avatar_url}
+                  equippedAvatarId={profile.equipped_avatar_id}
+                  cert={profile.cert}
+                  isVerifiedHost={!!hostBadge}
+                  sizeClass="w-20 h-20 sm:w-24 sm:h-24"
+                  borderClass="border-4 shadow-lg"
                 />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
@@ -336,7 +360,7 @@ export function PublicProfileModal() {
         <ChatModal
           partnerId={profile.id}
           partnerName={profile.name}
-          partnerAvatar={profile.avatar_url}
+          partnerAvatar={resolveAvatarUrl(profile.avatar_url, profile.equipped_avatar_id)}
           onClose={() => setChatOpen(false)}
         />
       )}

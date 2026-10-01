@@ -15,8 +15,7 @@ import {
 import { RosterDiver, fetchTripRoster } from "@/lib/host";
 import { supabase } from "@/lib/supabase";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
-import { diverCertRingClass } from "@/lib/diverRing";
+import { DiverAvatar } from "@/components/DiverAvatar";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -254,11 +253,11 @@ export function BookingDetailModal({
                   key={d.diver_user_id}
                   className="flex items-center gap-2.5 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={d.diver_avatar_url || DEFAULT_AVATAR}
-                    alt=""
-                    className={`w-8 h-8 rounded-full object-cover shrink-0 border-2 ${diverCertRingClass(d.diver_cert)}`}
+                  <DiverAvatar
+                    avatarUrl={d.diver_avatar_url}
+                    equippedAvatarId={d.equipped_avatar_id}
+                    cert={d.diver_cert}
+                    sizeClass="w-8 h-8"
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-white truncate">

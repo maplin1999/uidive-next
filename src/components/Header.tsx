@@ -24,9 +24,9 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import { useInboxBadge } from "@/lib/useInboxBadge";
 import { useVerifiedHost } from "@/lib/useVerifiedHost";
-import { diverCertRingClass } from "@/lib/diverRing";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { Theme, applyTheme, readCurrentTheme, storeTheme } from "@/lib/theme";
+import { DiverAvatar } from "@/components/DiverAvatar";
 
 // The site-wide header (migrated from index.html's <header>), now shared
 // across every page via layout.tsx instead of being one more tab-switched
@@ -177,11 +177,13 @@ export function Header() {
                   }}
                   className="flex items-center justify-center sm:justify-start space-x-2 bg-slate-900 hover:bg-slate-800 sm:border sm:border-slate-800 p-1.5 sm:pr-3 rounded-full transition-colors min-h-[44px] min-w-[44px]"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={user.avatar}
+                  <DiverAvatar
+                    avatarUrl={user.avatar}
+                    equippedAvatarId={user.equipped_avatar_id}
+                    cert={user.cert}
+                    isVerifiedHost={isVerifiedHost}
+                    sizeClass="w-8 h-8"
                     alt="Your profile photo"
-                    className={`w-8 h-8 rounded-full object-cover border-2 ${diverCertRingClass(user.cert)}`}
                   />
                   <span className="text-xs font-bold text-slate-200 hidden sm:inline">
                     {user.name.split(" ")[0]}

@@ -4,6 +4,7 @@ export interface PostAuthor {
   name: string;
   avatar_url: string;
   cert: string;
+  equipped_avatar_id: string | null;
 }
 
 export interface PostComment {
@@ -43,7 +44,7 @@ export async function fetchCommunityPosts(viewerId?: string): Promise<{
   const { data: rawPosts, error } = await supabase
     .from("posts")
     .select(
-      "id, caption, image_url, location_name, trip_id, likes, created_at, user_id, corals_awarded, profiles!posts_user_id_fkey(name, avatar_url, cert)"
+      "id, caption, image_url, location_name, trip_id, likes, created_at, user_id, corals_awarded, profiles!posts_user_id_fkey(name, avatar_url, cert, equipped_avatar_id)"
     )
     .order("created_at", { ascending: false })
     .limit(20);

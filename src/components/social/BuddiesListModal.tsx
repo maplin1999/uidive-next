@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { X, MessageSquare, Users } from "lucide-react";
 import { Buddy, fetchBuddiesList } from "@/lib/social";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
-import { diverCertRingClass } from "@/lib/diverRing";
+import { resolveAvatarUrl } from "@/lib/cosmetics";
 import { useSocial } from "@/components/social/SocialContext";
 import { ChatModal } from "@/components/inbox/ChatModal";
+import { DiverAvatar } from "@/components/DiverAvatar";
 
 // Migrated from the old site's #buddies-list-modal (openBuddiesListModal()/
 // renderMyBuddies()) -- the Instagram-style "who's on your buddies list"
@@ -73,11 +73,12 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
                   }}
                   className="flex items-center space-x-3 min-w-0 text-left flex-1"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={b.avatar_url || DEFAULT_AVATAR}
+                  <DiverAvatar
+                    avatarUrl={b.avatar_url}
+                    equippedAvatarId={b.equipped_avatar_id}
+                    cert={b.cert}
+                    sizeClass="w-10 h-10"
                     alt={b.name}
-                    className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(b.cert)}`}
                   />
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-white truncate">{b.name}</p>
@@ -99,7 +100,7 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
         <ChatModal
           partnerId={chatWith.id}
           partnerName={chatWith.name}
-          partnerAvatar={chatWith.avatar_url || DEFAULT_AVATAR}
+          partnerAvatar={resolveAvatarUrl(chatWith.avatar_url, chatWith.equipped_avatar_id)}
           onClose={() => setChatWith(null)}
         />
       )}

@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { X, UserPlus, Search } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
-import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import { DiverSearchResult, searchDivers, sendBuddyRequest } from "@/lib/inbox";
-import { diverCertRingClass } from "@/lib/diverRing";
 import { useToast, Toast } from "@/components/Toast";
+import { DiverAvatar } from "@/components/DiverAvatar";
 
 type SendState = "idle" | "sending" | "sent" | "already";
 
@@ -120,11 +119,11 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
                   className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800"
                 >
                   <div className="flex items-center space-x-3 min-w-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={person.avatar_url || DEFAULT_AVATAR}
-                      alt=""
-                      className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
+                    <DiverAvatar
+                      avatarUrl={person.avatar_url}
+                      equippedAvatarId={person.equipped_avatar_id}
+                      cert={person.cert}
+                      sizeClass="w-9 h-9"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-white truncate">{person.name}</p>

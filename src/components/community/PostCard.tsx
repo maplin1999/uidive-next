@@ -16,11 +16,8 @@ import {
 import { CommunityPost, PostComment } from "@/lib/posts";
 import { useSocial } from "@/components/social/SocialContext";
 import { toggleBlockUser } from "@/lib/social";
-import { diverCertRingClass } from "@/lib/diverRing";
 import { ImageLightbox } from "@/components/ImageLightbox";
-
-const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=300&q=80";
+import { DiverAvatar } from "@/components/DiverAvatar";
 
 // Migrated from renderRealPosts()'s per-post template string in app.js.
 // Liking and commenting are now real (toggle_post_like RPC, post_comments
@@ -55,7 +52,7 @@ export function PostCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const { openProfile, openReport } = useSocial();
-  const author = post.profiles || { name: "A diver", avatar_url: "", cert: "" };
+  const author = post.profiles || { name: "A diver", avatar_url: "", cert: "", equipped_avatar_id: null };
   const when = new Date(post.created_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -93,12 +90,12 @@ export function PostCard({
           onClick={() => openProfile(post.user_id)}
           className="flex items-center space-x-3 text-left"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- remote
-              Supabase Storage URLs; see TripCard.tsx for the same note. */}
-          <img
-            src={author.avatar_url || DEFAULT_AVATAR}
+          <DiverAvatar
+            avatarUrl={author.avatar_url}
+            equippedAvatarId={author.equipped_avatar_id}
+            cert={author.cert}
+            sizeClass="w-10 h-10"
             alt={author.name}
-            className={`w-10 h-10 rounded-full object-cover border-2 ${diverCertRingClass(author.cert)}`}
           />
           <div>
             <div className="flex items-center gap-2">

@@ -14,6 +14,8 @@ export interface DiverProfile {
   last_daily_claim: string | null;
   account_type: string;
   is_admin: boolean;
+  equipped_avatar_id: string | null;
+  equipped_calling_card_id: string | null;
 }
 
 export const DEFAULT_AVATAR =

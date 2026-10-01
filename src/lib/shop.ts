@@ -15,6 +15,7 @@ export interface LeaderboardEntry {
   max_depth: string;
   corals: number;
   avatar_url: string;
+  equipped_avatar_id: string | null;
 }
 
 export async function fetchVouchers(userId: string): Promise<Voucher[]> {
@@ -36,7 +37,7 @@ export async function fetchVouchers(userId: string): Promise<Voucher[]> {
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, cert, dives, max_depth, corals, avatar_url")
+    .select("id, name, cert, dives, max_depth, corals, avatar_url, equipped_avatar_id")
     .order("corals", { ascending: false })
     .limit(50);
 

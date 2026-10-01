@@ -13,6 +13,7 @@ export interface BuddyRequest {
     avatar_url: string;
     cert: string;
     diver_id: string;
+    equipped_avatar_id: string | null;
   } | null;
 }
 
@@ -20,7 +21,7 @@ export async function fetchBuddyRequests(userId: string): Promise<BuddyRequest[]
   const { data, error } = await supabase
     .from("friendships")
     .select(
-      "id, requester_id, created_at, profiles!friendships_requester_id_fkey(name, avatar_url, cert, diver_id)"
+      "id, requester_id, created_at, profiles!friendships_requester_id_fkey(name, avatar_url, cert, diver_id, equipped_avatar_id)"
     )
     .eq("addressee_id", userId)
     .eq("status", "pending")
@@ -43,6 +44,7 @@ export interface Buddy {
   name: string;
   avatar_url: string;
   cert: string;
+  equipped_avatar_id: string | null;
 }
 
 // A friendship row could have either person as "requester" -- this picks
@@ -53,7 +55,7 @@ export async function fetchBuddies(userId: string): Promise<Buddy[]> {
   const { data, error } = await supabase
     .from("friendships")
     .select(
-      "requester_id, addressee_id, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url, cert), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url, cert)"
+      "requester_id, addressee_id, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url, cert, equipped_avatar_id), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url, cert, equipped_avatar_id)"
     )
     .eq("status", "accepted")
     .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
@@ -83,6 +85,7 @@ export interface DiverSearchResult {
   cert: string;
   avatar_url: string;
   diver_id: string;
+  equipped_avatar_id: string | null;
 }
 
 export async function searchDivers(query: string): Promise<DiverSearchResult[]> {
@@ -145,6 +148,7 @@ export async function fetchConversations(userId: string, buddies: Buddy[]): Prom
       name: "A diver",
       avatar_url: "",
       cert: "",
+      equipped_avatar_id: null,
     };
     conversations.push({ partner, lastMessage, unread: unreadPartners.has(partnerId) });
   }
@@ -223,13 +227,13 @@ export interface TripChatMessage {
   user_id: string;
   content: string;
   created_at: string;
-  profiles: { name: string; avatar_url: string } | null;
+  profiles: { name: string; avatar_url: string; equipped_avatar_id: string | null } | null;
 }
 
 export async function fetchTripChatMessages(tripId: string): Promise<TripChatMessage[]> {
   const { data, error } = await supabase
     .from("trip_chat_messages")
-    .select("user_id, content, created_at, profiles(name, avatar_url)")
+    .select("user_id, content, created_at, profiles(name, avatar_url, equipped_avatar_id)")
     .eq("trip_id", tripId)
     .order("created_at", { ascending: true });
 

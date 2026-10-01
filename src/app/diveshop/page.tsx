@@ -7,8 +7,11 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import { useToast, Toast } from "@/components/Toast";
 import { fetchVouchers, fetchLeaderboard, redeemCorals, Voucher, LeaderboardEntry } from "@/lib/shop";
-import { diverCertRingClass } from "@/lib/diverRing";
 import { AddBuddyModal } from "@/components/inbox/AddBuddyModal";
+import { DiverAvatar } from "@/components/DiverAvatar";
+import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
+import { ChestOpenModal } from "@/components/shop/ChestOpenModal";
+import { TREASURE_CHEST_COST, ChestResult, openTreasureChest } from "@/lib/cosmetics";
 import Link from "next/link";
 
 const OFFERS = [
@@ -40,10 +43,11 @@ const OFFERS = [
 
 // The Dive Shop tab (#tab-diveshop in the old site): Corals balance,
 // claimed vouchers, treasure chests, redeemable offers, and the leaderboard.
-// Vouchers and offer redemption are fully real (see src/lib/shop.ts) now
-// that auth exists. Treasure Chests are stubbed -- that's a whole cosmetics
-// subsystem (avatar rings, calling cards, the chest-opening animation) on
-// its own, out of scope for this pass.
+// Vouchers and offer redemption are fully real (see src/lib/shop.ts), and so
+// are Treasure Chests/Cosmetics now (see src/lib/cosmetics.ts,
+// CosmeticsLockerModal, ChestOpenModal) -- opening a chest calls the real
+// open_treasure_chest() RPC, and the Locker shows/equips whatever cosmetics
+// that account actually owns.
 export default function DiveShopPage() {
   const { user, requireAuth, refreshProfile } = useAuth();
   const { openProfile } = useSocial();
@@ -58,6 +62,9 @@ export default function DiveShopPage() {
   );
   const [redeemingCost, setRedeemingCost] = useState<number | null>(null);
   const [addBuddyOpen, setAddBuddyOpen] = useState(false);
+  const [lockerOpen, setLockerOpen] = useState(false);
+  const [openingChest, setOpeningChest] = useState(false);
+  const [chestResults, setChestResults] = useState<ChestResult[] | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -111,6 +118,29 @@ export default function DiveShopPage() {
   function copyCode(code: string) {
     if (navigator.clipboard) navigator.clipboard.writeText(code);
     showToast(`Code ${code} copied to clipboard!`);
+  }
+
+  async function handleOpenChest() {
+    if (!requireAuth()) return;
+    if (!user) return;
+    if (user.corals < TREASURE_CHEST_COST) {
+      showToast(`❌ Not enough 🪸 Corals! Need ${TREASURE_CHEST_COST - user.corals} more.`);
+      return;
+    }
+
+    setOpeningChest(true);
+    try {
+      const results = await openTreasureChest();
+      // The cost and any duplicate refunds were applied server-side inside
+      // the RPC -- re-read the real balance rather than computing a delta.
+      await refreshProfile();
+      setChestResults(results);
+    } catch (err) {
+      console.error("Could not open the chest:", err);
+      showToast("❌ Could not open the chest -- please try again.");
+    } finally {
+      setOpeningChest(false);
+    }
   }
 
   const top3 = leaderboard.slice(0, 3);
@@ -221,7 +251,7 @@ export default function DiveShopPage() {
           )}
         </div>
 
-        {/* TREASURE CHESTS (stub) */}
+        {/* TREASURE CHESTS */}
         <div className="space-y-4 pt-4 border-t border-slate-800">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -229,7 +259,7 @@ export default function DiveShopPage() {
             </h2>
             {user && (
               <button
-                onClick={() => showToast("Your Locker is coming in a future update.")}
+                onClick={() => setLockerOpen(true)}
                 className="text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-xl hover:bg-purple-500/20 transition-colors"
               >
                 My Locker
@@ -249,14 +279,19 @@ export default function DiveShopPage() {
               </p>
             </div>
             <button
-              onClick={() => {
-                if (!requireAuth()) return;
-                showToast("Opening Treasure Chests is coming in a future update.");
-              }}
-              className="shrink-0 py-2.5 px-5 bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md"
+              id="open-chest-btn"
+              onClick={handleOpenChest}
+              disabled={openingChest}
+              className="shrink-0 py-2.5 px-5 bg-purple-500 hover:bg-purple-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md"
             >
-              <span>Open for 150</span>
-              <span>🪸</span>
+              {openingChest ? (
+                <span>Opening…</span>
+              ) : (
+                <>
+                  <span>Open for 150</span>
+                  <span>🪸</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -352,13 +387,12 @@ export default function DiveShopPage() {
                       {isFirst && user?.id === entry.id ? "You" : `#${rank}`}
                     </span>
                     <div className="relative inline-block">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={entry.avatar_url}
+                      <DiverAvatar
+                        avatarUrl={entry.avatar_url}
+                        equippedAvatarId={entry.equipped_avatar_id}
                         alt={entry.name}
-                        className={`object-cover mx-auto border-2 rounded-full ${
-                          isFirst ? "w-20 h-20 border-amber-400 shadow-lg" : "w-16 h-16 border-slate-400"
-                        }`}
+                        sizeClass={isFirst ? "w-20 h-20" : "w-16 h-16"}
+                        borderClass={isFirst ? "border-2 border-amber-400 shadow-lg" : "border-2 border-slate-400"}
                       />
                       <span className="absolute -bottom-1 -right-1 bg-slate-800 text-slate-200 text-xs p-1 rounded-full">
                         {medal}
@@ -436,11 +470,12 @@ export default function DiveShopPage() {
                             onClick={() => (isUser ? router.push("/profile") : openProfile(entry.id))}
                             className="flex items-center gap-2.5 text-left"
                           >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={entry.avatar_url}
+                            <DiverAvatar
+                              avatarUrl={entry.avatar_url}
+                              equippedAvatarId={entry.equipped_avatar_id}
+                              cert={entry.cert}
                               alt={entry.name}
-                              className={`w-7 h-7 rounded-full object-cover border-2 ${diverCertRingClass(entry.cert)}`}
+                              sizeClass="w-7 h-7"
                             />
                             <span className={`font-bold hover:underline ${isUser ? "text-amber-300" : "text-slate-100"}`}>
                               {entry.name}
@@ -466,6 +501,10 @@ export default function DiveShopPage() {
       </div>
 
       {addBuddyOpen && <AddBuddyModal onClose={() => setAddBuddyOpen(false)} />}
+      {lockerOpen && <CosmeticsLockerModal onClose={() => setLockerOpen(false)} />}
+      {chestResults && (
+        <ChestOpenModal results={chestResults} onClose={() => setChestResults(null)} />
+      )}
       <Toast message={message} />
     </main>
   );
