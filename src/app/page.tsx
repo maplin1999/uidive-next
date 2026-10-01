@@ -9,6 +9,7 @@ import {
 } from "@/lib/trips";
 import { HeroSearch, ActivityFilter } from "@/components/home/HeroSearch";
 import { TripCard, TopPickCard } from "@/components/home/TripCard";
+import { useToast, Toast } from "@/components/Toast";
 
 type TripTypeFilter = "all" | "shore" | "boat";
 
@@ -23,7 +24,7 @@ export default function HomePage() {
     Record<string, { avg_rating: number; review_count: number }>
   >({});
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [toast, setToast] = useState<string | null>(null);
+  const { message, showToast } = useToast();
 
   const [query, setQuery] = useState("");
   const [activity, setActivity] = useState<ActivityFilter>("all");
@@ -48,11 +49,6 @@ export default function HomePage() {
       cancelled = true;
     };
   }, []);
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 3000);
-  }
 
   const filteredTrips = useMemo(() => {
     let result = trips;
@@ -298,13 +294,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Minimal toast -- promote to a shared/global version once more
-          pages need one (bookings, auth, etc.). */}
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-700 text-slate-100 text-sm font-semibold px-4 py-2.5 rounded-xl shadow-2xl max-w-[90vw] text-center">
-          {toast}
-        </div>
-      )}
+      <Toast message={message} />
     </main>
   );
 }

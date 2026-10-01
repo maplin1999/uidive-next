@@ -27,8 +27,8 @@ Variables before the first deploy.
 
 - [x] Project scaffold (this file's siblings)
 - [x] Legal tab (`/legal`)
-- [ ] Home (trip browse/search)
-- [ ] Community feed
+- [x] Home (trip browse/search) (`/`)
+- [x] Community feed (`/community`)
 - [ ] Inbox / messaging
 - [ ] Dive Shop (booking flow)
 - [ ] Profile (cosmetics, treasure chest, bookings)
