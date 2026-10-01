@@ -1,0 +1,283 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Search } from "lucide-react";
+import { DiveTrip, isoDate, upcomingSaturday } from "@/lib/trips";
+
+export type ActivityFilter = "all" | "Easy" | "Moderate" | "Advanced";
+
+const ACTIVITY_LABELS: Record<ActivityFilter, string> = {
+  all: "All Activities",
+  Easy: "Beginner Friendly",
+  Moderate: "Moderate",
+  Advanced: "Advanced",
+};
+
+// The old site's index.html wired up onclick handlers for a Where-suggestion
+// dropdown and an Activity dropdown (renderHeroWhereSuggestions(),
+// toggleHeroActivityDropdown(), etc.) that were never actually implemented
+// in app.js -- clicking them did nothing. This is a real, working version of
+// both, built fresh rather than ported, since there was nothing functional
+// to port. "Activity" is repurposed to filter by difficulty (Easy/Moderate/
+// Advanced), since trip_type (shore/boat) already has its own filter chips
+// below the hero and the data model has no separate "Scuba vs Free Diving"
+// field the way the old comment implied.
+export function HeroSearch({
+  trips,
+  query,
+  onQueryChange,
+  activity,
+  onActivityChange,
+  dateFilter,
+  dateLabel,
+  onDateChange,
+  onSearch,
+}: {
+  trips: DiveTrip[];
+  query: string;
+  onQueryChange: (q: string) => void;
+  activity: ActivityFilter;
+  onActivityChange: (a: ActivityFilter) => void;
+  dateFilter: string | null;
+  dateLabel: string;
+  onDateChange: (date: string | null, label: string) => void;
+  onSearch: () => void;
+}) {
+  const [whereOpen, setWhereOpen] = useState(false);
+  const [whenOpen, setWhenOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const destinations = useMemo(() => {
+    const set = new Set<string>();
+    trips.forEach((t) => {
+      if (t.location) set.add(t.location);
+    });
+    return Array.from(set).slice(0, 8);
+  }, [trips]);
+
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return destinations;
+    return destinations.filter((d) => d.toLowerCase().includes(q));
+  }, [destinations, query]);
+
+  // Click-away: close whichever dropdown is open when the user clicks
+  // outside this whole search pill, same job the old site's document-level
+  // click listeners did for its other dropdowns (profile menu, date picker).
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setWhereOpen(false);
+        setWhenOpen(false);
+        setActivityOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
+  function pickDatePreset(label: string, date: Date | null) {
+    onDateChange(date ? isoDate(date) : null, label);
+    setWhenOpen(false);
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <div className="relative" ref={wrapperRef}>
+        <div className="panel-sunken overflow-hidden flex flex-col sm:flex-row bg-slate-950/80 border border-slate-800 rounded-3xl sm:rounded-full shadow-lg w-full">
+          <div className="flex flex-col sm:flex-row flex-1">
+            {/* WHERE */}
+            <div
+              className="relative hover:z-10 flex-1 sm:min-w-[160px] flex flex-col justify-center px-5 py-3 sm:py-2.5 hover:bg-slate-800/50 hero-segment-shadow transition-colors cursor-text"
+              onClick={(e) => {
+                e.stopPropagation();
+                setWhereOpen(true);
+                setWhenOpen(false);
+                setActivityOpen(false);
+              }}
+            >
+              <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block pointer-events-none">
+                Where
+              </label>
+              <input
+                type="text"
+                autoComplete="off"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+                onFocus={() => setWhereOpen(true)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Search Destinations"
+                className="bg-transparent text-sm w-full focus:outline-none placeholder-slate-200 text-slate-200 truncate"
+              />
+            </div>
+
+            {/* WHEN */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setWhenOpen((v) => !v);
+                setWhereOpen(false);
+                setActivityOpen(false);
+              }}
+              className="relative hover:z-10 flex-1 sm:min-w-[130px] flex flex-col justify-center text-left px-5 py-3 sm:py-2.5 hover:bg-slate-800/50 hero-segment-shadow transition-colors"
+            >
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">When</div>
+              <span className="text-sm text-slate-200 whitespace-nowrap block truncate">{dateLabel}</span>
+            </button>
+
+            {/* ACTIVITY */}
+            <div
+              className="relative hover:z-10 flex-1 sm:min-w-[160px] flex items-center hover:bg-slate-800/50 hero-segment-shadow transition-colors"
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActivityOpen((v) => !v);
+                  setWhereOpen(false);
+                  setWhenOpen(false);
+                }}
+                className="flex-1 flex flex-col justify-center text-left px-5 py-3 sm:py-2.5"
+              >
+                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Activity</div>
+                <span className="text-sm text-slate-200 whitespace-nowrap block truncate">
+                  {ACTIVITY_LABELS[activity]}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={onSearch}
+                aria-label="Search dive trips"
+                className="hidden sm:flex shrink-0 mr-1.5 w-11 h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 items-center justify-center transition-colors"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-2 border-t border-slate-800 sm:hidden">
+            <button
+              type="button"
+              onClick={onSearch}
+              aria-label="Search dive trips"
+              className="w-full h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center gap-2 transition-colors"
+            >
+              <Search className="w-4 h-4" />
+              <span className="text-sm font-bold">Search</span>
+            </button>
+          </div>
+        </div>
+
+        {/* WHERE dropdown */}
+        {whereOpen && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute z-30 top-full mt-2 left-0 w-72 max-w-[85vw] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto"
+          >
+            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-2">
+              Popular Destinations
+            </div>
+            <div className="space-y-0.5">
+              {suggestions.length === 0 && (
+                <p className="text-xs text-slate-500 px-2 py-1.5">No matching destinations yet.</p>
+              )}
+              {suggestions.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => {
+                    onQueryChange(d);
+                    setWhereOpen(false);
+                  }}
+                  className="w-full text-left px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors truncate"
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* WHEN dropdown */}
+        {whenOpen && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute z-30 top-full mt-2 left-0 sm:left-auto sm:right-1/3 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 space-y-1"
+          >
+            <button
+              type="button"
+              onClick={() => pickDatePreset("Any Date", null)}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              Any Date
+            </button>
+            <button
+              type="button"
+              onClick={() => pickDatePreset("This Weekend", upcomingSaturday(0))}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              This Weekend
+            </button>
+            <button
+              type="button"
+              onClick={() => pickDatePreset("Next Weekend", upcomingSaturday(1))}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              Next Weekend
+            </button>
+            <div className="px-3 pt-1">
+              <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                Or pick a date
+              </label>
+              <input
+                type="date"
+                value={dateFilter || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val) return pickDatePreset("Any Date", null);
+                  const d = new Date(val + "T00:00:00");
+                  const label = d.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  });
+                  onDateChange(val, label);
+                  setWhenOpen(false);
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 [color-scheme:dark]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ACTIVITY dropdown */}
+        {activityOpen && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute z-30 top-full mt-2 right-0 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-1.5 space-y-0.5"
+          >
+            {(Object.keys(ACTIVITY_LABELS) as ActivityFilter[]).map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  onActivityChange(key);
+                  setActivityOpen(false);
+                }}
+                className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
+                  activity === key
+                    ? "bg-cyan-500 text-slate-950 font-bold"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                {ACTIVITY_LABELS[key]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
