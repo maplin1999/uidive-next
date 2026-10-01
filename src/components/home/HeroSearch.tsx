@@ -1,27 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Layers, Waves, Wind } from "lucide-react";
 import { DiveTrip, isoDate, upcomingSaturday } from "@/lib/trips";
 
-export type ActivityFilter = "all" | "Easy" | "Moderate" | "Advanced";
+export type ActivityFilter = "all" | "scuba" | "freediving";
 
 const ACTIVITY_LABELS: Record<ActivityFilter, string> = {
   all: "All Activities",
-  Easy: "Beginner Friendly",
-  Moderate: "Moderate",
-  Advanced: "Advanced",
+  scuba: "Scuba",
+  freediving: "Free Diving",
 };
 
-// The old site's index.html wired up onclick handlers for a Where-suggestion
-// dropdown and an Activity dropdown (renderHeroWhereSuggestions(),
-// toggleHeroActivityDropdown(), etc.) that were never actually implemented
-// in app.js -- clicking them did nothing. This is a real, working version of
-// both, built fresh rather than ported, since there was nothing functional
-// to port. "Activity" is repurposed to filter by difficulty (Easy/Moderate/
-// Advanced), since trip_type (shore/boat) already has its own filter chips
-// below the hero and the data model has no separate "Scuba vs Free Diving"
-// field the way the old comment implied.
+const ACTIVITY_ICONS: Record<ActivityFilter, React.ComponentType<{ className?: string }>> = {
+  all: Layers,
+  scuba: Waves,
+  freediving: Wind,
+};
+
+// Migrated from the old site's HERO_ACTIVITY_OPTIONS/selectHeroActivity() --
+// this filters by trip.activity_type (Scuba vs Free Diving), same as the old
+// site. The Where-suggestion dropdown below it (renderHeroWhereSuggestions())
+// genuinely wasn't implemented in app.js, but the Activity dropdown was fully
+// wired, so it's ported for real rather than repurposed.
 export function HeroSearch({
   trips,
   query,
@@ -258,23 +259,28 @@ export function HeroSearch({
             onClick={(e) => e.stopPropagation()}
             className="absolute z-30 top-full mt-2 right-0 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-1.5 space-y-0.5"
           >
-            {(Object.keys(ACTIVITY_LABELS) as ActivityFilter[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => {
-                  onActivityChange(key);
-                  setActivityOpen(false);
-                }}
-                className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
-                  activity === key
-                    ? "bg-cyan-500 text-slate-950 font-bold"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`}
-              >
-                {ACTIVITY_LABELS[key]}
-              </button>
-            ))}
+            {(Object.keys(ACTIVITY_LABELS) as ActivityFilter[]).map((key) => {
+              const active = activity === key;
+              const Icon = ACTIVITY_ICONS[key];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    onActivityChange(key);
+                    setActivityOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors ${
+                    active
+                      ? "bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 font-bold"
+                      : "border border-transparent hover:bg-slate-800 text-slate-200 font-semibold"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-cyan-400" : "text-slate-400"}`} />
+                  <span>{ACTIVITY_LABELS[key]}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

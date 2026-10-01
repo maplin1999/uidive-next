@@ -217,7 +217,7 @@ export function DiveDetailModal({
             {!isFull && <CheckCircle className="w-4 h-4" />}
           </button>
           <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
-            <Info className="w-3.5 h-3.5 shrink-0" />
+            <Info className="w-3 h-3 shrink-0" />
             Online payments are coming soon -- this reserves your spot now, free of charge.
           </p>
         </div>

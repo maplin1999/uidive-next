@@ -178,23 +178,23 @@ export function PublicProfileModal() {
                   <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                     <h2 className="text-xl sm:text-2xl font-black text-white">{profile.name}</h2>
                     {hostBadge && (
-                      <div
-                        className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center"
-                        title={
-                          hostBadge.host_type === "shop"
+                      <div className="relative group">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
+                          {hostBadge.host_type === "shop" ? (
+                            <Store className="w-3.5 h-3.5 text-emerald-300" />
+                          ) : hostBadge.host_type === "both" ? (
+                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                          ) : (
+                            <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                          )}
+                        </div>
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                          {hostBadge.host_type === "shop"
                             ? "Verified Dive Shop"
                             : hostBadge.host_type === "both"
                               ? "Verified Dive Shop & Divemaster"
-                              : "Verified Divemaster"
-                        }
-                      >
-                        {hostBadge.host_type === "shop" ? (
-                          <Store className="w-3.5 h-3.5 text-emerald-300" />
-                        ) : hostBadge.host_type === "both" ? (
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
-                        ) : (
-                          <Compass className="w-3.5 h-3.5 text-emerald-300" />
-                        )}
+                              : "Verified Divemaster"}
+                        </div>
                       </div>
                     )}
                   </div>

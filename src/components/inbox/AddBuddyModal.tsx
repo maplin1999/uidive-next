@@ -1,22 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { X, UserPlus } from "lucide-react";
+import { X, UserPlus, Search } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import { DiverSearchResult, searchDivers, sendBuddyRequest } from "@/lib/inbox";
 import { diverCertRingClass } from "@/lib/diverRing";
+import { useToast, Toast } from "@/components/Toast";
+
+type SendState = "idle" | "sending" | "sent" | "already";
 
 // Migrated from the old site's #add-friend-modal (openAddFriendModal() /
 // searchForBuddy() / sendBuddyRequest()). Searches by Diver ID or partial
 // name via the search_divers() RPC.
 export function AddBuddyModal({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
+  const { message, showToast } = useToast();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
   const [results, setResults] = useState<DiverSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
-  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
+  const [sendStates, setSendStates] = useState<Record<string, SendState>>({});
 
   if (!user) return null;
 
@@ -46,24 +50,30 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
   }
 
   async function handleSend(addresseeId: string) {
+    setSendStates((prev) => ({ ...prev, [addresseeId]: "sending" }));
     try {
       await sendBuddyRequest(user!.id, addresseeId);
-      setSentIds((prev) => new Set(prev).add(addresseeId));
+      setSendStates((prev) => ({ ...prev, [addresseeId]: "sent" }));
+      showToast("🤿 Buddy request sent!");
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       if (code === "23505") {
-        setSentIds((prev) => new Set(prev).add(addresseeId));
+        setSendStates((prev) => ({ ...prev, [addresseeId]: "already" }));
       } else {
         console.error("Could not send buddy request:", err);
+        setSendStates((prev) => ({ ...prev, [addresseeId]: "idle" }));
+        showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not send buddy request.");
       }
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
-          <h3 className="font-bold text-white text-base">Add a Dive Buddy</h3>
+          <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <UserPlus className="w-4 h-4 text-cyan-400" /> Add Dive Buddy
+          </h3>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -73,63 +83,76 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch();
-            }}
-            placeholder="Diver ID or name"
-            className="flex-1 bg-slate-950 px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
-          />
-          <button
-            onClick={handleSearch}
-            disabled={searching}
-            className="px-4 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs shrink-0 transition-colors"
-          >
-            Search
-          </button>
-        </div>
+        <div className="space-y-3 text-xs">
+          <label className="text-slate-400 block font-semibold">Enter Diver ID or Name</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSearch();
+                }
+              }}
+              placeholder="e.g. DIV-4F9A2B or Elena"
+              className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-slate-200 focus:outline-none focus:border-cyan-500"
+            />
+            <button
+              onClick={handleSearch}
+              disabled={searching}
+              aria-label="Search for a dive buddy"
+              className="shrink-0 bg-slate-800 hover:bg-slate-700 disabled:opacity-60 border border-slate-700 text-cyan-400 font-bold px-4 py-3 rounded-xl transition-colors"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
 
-        {status && <p className="text-xs text-slate-400">{status}</p>}
+          {status && <p className="text-slate-500">{status}</p>}
 
-        <div className="space-y-2">
-          {results.map((person) => {
-            const sent = sentIds.has(person.id);
-            return (
-              <div
-                key={person.id}
-                className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800"
-              >
-                <div className="flex items-center space-x-3 min-w-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={person.avatar_url || DEFAULT_AVATAR}
-                    alt=""
-                    className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-bold text-white truncate text-sm">{person.name}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">
-                      #{person.diver_id} • {person.cert}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleSend(person.id)}
-                  disabled={sent}
-                  className="shrink-0 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold px-3 py-2 rounded-lg text-[11px] flex items-center gap-1 transition-colors"
+          <div className="space-y-2 max-h-52 overflow-y-auto">
+            {results.map((person) => {
+              const sendState = sendStates[person.id] || "idle";
+              return (
+                <div
+                  key={person.id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800"
                 >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  {sent ? "Sent ✓" : "Send Request"}
-                </button>
-              </div>
-            );
-          })}
+                  <div className="flex items-center space-x-3 min-w-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={person.avatar_url || DEFAULT_AVATAR}
+                      alt=""
+                      className={`w-9 h-9 rounded-full object-cover border-2 ${diverCertRingClass(person.cert)}`}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-bold text-white truncate">{person.name}</p>
+                      <p className="text-[10px] text-slate-500 font-mono">
+                        #{person.diver_id} • {person.cert}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleSend(person.id)}
+                    disabled={sendState !== "idle"}
+                    className="shrink-0 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors"
+                  >
+                    {sendState === "sending"
+                      ? "Sending…"
+                      : sendState === "sent"
+                        ? "Request sent ✓"
+                        : sendState === "already"
+                          ? "Already sent"
+                          : "Send Request"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+      <Toast message={message} />
     </div>
   );
 }

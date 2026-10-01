@@ -63,24 +63,22 @@ export function TripChatModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl flex flex-col shadow-2xl max-h-[85vh]">
-        <div className="flex justify-between items-center border-b border-slate-800 px-5 py-3.5 shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 text-cyan-300" />
-            </div>
-            <h3 className="font-bold text-white text-sm truncate">{tripTitle}</h3>
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col h-[500px] max-h-[85dvh]">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 shrink-0">
+          <div className="flex items-center space-x-2.5 min-w-0">
+            <Users className="w-4 h-4 text-cyan-400 shrink-0" />
+            <h3 className="font-bold text-white text-base truncate">{tripTitle}</h3>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
+            className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div ref={boxRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-[300px]">
+        <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 text-xs pt-3">
           {messages.length === 0 && (
             <p className="text-xs text-slate-500 text-center py-4">Say hi to your fellow divers 👋</p>
           )}
@@ -109,7 +107,7 @@ export function TripChatModal({
           })}
         </div>
 
-        <div className="flex items-center gap-2 border-t border-slate-800 p-3 shrink-0">
+        <div className="flex items-center space-x-2 pt-2 border-t border-slate-800 shrink-0">
           <input
             type="text"
             value={input}
@@ -117,15 +115,16 @@ export function TripChatModal({
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
-            placeholder="Message the group…"
-            className="flex-1 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+            placeholder="Message everyone on this trip…"
+            className="bg-slate-950 text-xs px-4 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500"
           />
           <button
             onClick={handleSend}
             disabled={sending || !input.trim()}
-            className="p-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 transition-colors shrink-0"
+            className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1 transition-colors shrink-0"
           >
-            <Send className="w-4 h-4" />
+            <span>Send</span>
+            <Send className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

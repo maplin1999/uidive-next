@@ -59,7 +59,8 @@ export default function HomePage() {
   const filteredTrips = useMemo(() => {
     let result = trips;
     if (tripType !== "all") result = result.filter((t) => t.trip_type === tripType);
-    if (activity !== "all") result = result.filter((t) => t.difficulty === activity);
+    if (activity === "scuba") result = result.filter((t) => (t.activity_type || "scuba") === "scuba");
+    else if (activity === "freediving") result = result.filter((t) => t.activity_type === "freediving");
     if (dateFilter) result = result.filter((t) => t.scheduled_date === dateFilter);
     const q = query.trim().toLowerCase();
     if (q) {
