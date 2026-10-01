@@ -174,11 +174,18 @@ export default function ProfilePage() {
                 sizeClass="w-20 h-20 sm:w-24 sm:h-24"
                 borderClass="border-4 shadow-lg"
               />
+              {/* always-dark: this hover scrim sits directly on the user's
+                  own profile photo, so it needs to stay a dark dimming
+                  overlay (with a white pencil icon) in both themes -- the
+                  same "glass chip on a photo" treatment as PostCard.tsx's
+                  photo overlay. Without it, light mode's generic overrides
+                  would turn this into a light tint behind a dark icon,
+                  breaking the guaranteed contrast this scrim exists for. */}
               <button
                 onClick={() => setEditOpen(true)}
                 aria-label="Edit profile photo"
                 title="Edit profile"
-                className="absolute inset-0 rounded-full bg-slate-950/60 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                className="always-dark absolute inset-0 rounded-full bg-slate-950/60 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
               >
                 <Pencil className="w-6 h-6 text-white" />
               </button>

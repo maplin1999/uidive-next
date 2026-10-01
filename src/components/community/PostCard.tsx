@@ -183,7 +183,15 @@ export function PostCard({
       </div>
 
       {post.image_url && (
-        <div className="relative rounded-2xl overflow-hidden max-h-96">
+        // always-dark: this whole region sits on top of a photo, so its
+        // glass chips (expand icon, location/Book Site bar) need to stay
+        // dark-chrome-on-photo in both themes rather than flipping to
+        // light-mode's page-background colors -- same treatment as the
+        // corals-earned badge and caption overlay elsewhere (PublicProfileModal,
+        // profile dive-log grid). Without it, light mode's generic
+        // ".text-white" override turned the expand icon almost the same
+        // color as its own dark circle, making it nearly invisible.
+        <div className="always-dark relative rounded-2xl overflow-hidden max-h-96">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={post.image_url} alt="" className="w-full h-full object-cover" />
           <div className="absolute top-3 right-3 z-10">

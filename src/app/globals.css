@@ -622,6 +622,32 @@ html[data-theme="light"] .always-dark .bg-slate-950 {
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Community post photo overlay (PostCard.tsx) -- its location/Book-Site
+   chip uses bg-slate-950/85 rather than the bare class above, so it needs
+   its own always-dark "undo" pair restoring that same dark, near-opaque
+   glass look in light mode. Without this, light mode's generic override
+   (near-white) would leave the chip's now-forced-white text/icons
+   (text-white, text-cyan-400, via the always-dark rules above) sitting on
+   a near-white background -- an unreadable regression worse than the bug
+   being fixed. No other element in the app uses bg-slate-950/85, so this
+   is safe to add without affecting anything else. */
+.always-dark .bg-slate-950\/85 {
+  background-color: rgba(2, 6, 23, 0.85) !important;
+}
+html[data-theme="light"] .always-dark .bg-slate-950\/85 {
+  background-color: rgba(2, 6, 23, 0.85) !important;
+}
+
+/* Profile photo hover-edit scrim (profile/page.tsx) -- uses bg-slate-950/60
+   rather than the bare class or /85, so it needs its own always-dark "undo"
+   pair too, restoring the same dark dimming overlay in light mode. */
+.always-dark .bg-slate-950\/60 {
+  background-color: rgba(2, 6, 23, 0.6) !important;
+}
+html[data-theme="light"] .always-dark .bg-slate-950\/60 {
+  background-color: rgba(2, 6, 23, 0.6) !important;
+}
+
 /* Treasure Chest opening animation (Dive Shop proof of concept) -- the chest
    art itself is a real frame-by-frame image sequence swapped in JS (see
    CHEST_ANIM_FRAMES in src/lib/cosmetics.ts and ChestOpenModal.tsx).
