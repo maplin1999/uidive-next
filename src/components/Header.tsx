@@ -2,7 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Waves, Compass, Camera, ChevronDown, LogIn, LogOut, User, Pencil } from "lucide-react";
+import {
+  Waves,
+  Compass,
+  Camera,
+  ShoppingBag,
+  ChevronDown,
+  LogIn,
+  LogOut,
+  User,
+  Pencil,
+} from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 
@@ -54,18 +64,19 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-1">
             <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" />
             <NavLink href="/community" icon={<Camera className="w-4 h-4" />} label="Community" />
+            <NavLink href="/diveshop" icon={<ShoppingBag className="w-4 h-4" />} label="Dive Shop" />
           </nav>
 
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             {user && (
-              <button
-                onClick={() => showToast("Dive Shop is coming in a future update.")}
+              <Link
+                href="/diveshop"
                 className="shrink-0 flex items-center space-x-1.5 sm:space-x-2 bg-amber-500/10 border border-amber-500/30 px-2.5 sm:px-3.5 py-2.5 rounded-full hover:bg-amber-500/20 transition-all"
               >
                 <span className="text-base">🪸</span>
                 <span className="text-sm font-bold text-amber-400">{user.corals}</span>
                 <span className="hidden sm:inline text-xs font-bold text-amber-400">Corals</span>
-              </button>
+              </Link>
             )}
 
             {!user && (

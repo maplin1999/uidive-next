@@ -29,7 +29,8 @@ Variables before the first deploy.
 - [x] Legal tab (`/legal`)
 - [x] Home (trip browse/search) (`/`)
 - [x] Community feed (`/community`)
+- [x] Auth (sign in / sign up / sign out, shared header across all pages)
 - [ ] Inbox / messaging
-- [ ] Dive Shop (booking flow)
+- [x] Dive Shop (vouchers, offers, leaderboard) (`/diveshop`) -- Treasure Chests stubbed
 - [ ] Profile (cosmetics, treasure chest, bookings)
 - [ ] Host Dashboard
