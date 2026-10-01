@@ -99,6 +99,12 @@ export default function ProfilePage() {
               <p className="text-[10px] font-mono font-bold text-slate-500">
                 Diver ID: #{diverIdFromUserId(user.id)}
               </p>
+              <button
+                onClick={() => setEditOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-xl hover:bg-cyan-500/20 transition-colors mt-1"
+              >
+                <Pencil className="w-3.5 h-3.5" /> Edit Profile
+              </button>
             </div>
           </div>
 
