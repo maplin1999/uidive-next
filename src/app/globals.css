@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================
+   Carried over as-is from the old site's styles.css: things that are
+   truly global and don't depend on any one page's markup. Page-specific
+   CSS (diver rings, chest animation, modal chrome, etc.) migrates
+   alongside the page that uses it, not in here -- see the migration plan.
+   ========================================================== */
+
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: #020617;
+}
+
+/* Dark-theme (default) scrollbar; light overrides live next to it so both
+   stay in sync as one pair instead of drifting apart. */
+*::-webkit-scrollbar-thumb {
+  background-color: #334155;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+}
+html[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background-color: #c3d9d4;
+}
+html[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
+  background-color: #a9c7c1;
+}
