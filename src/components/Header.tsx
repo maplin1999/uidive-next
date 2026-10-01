@@ -8,6 +8,7 @@ import {
   Camera,
   ShoppingBag,
   Anchor,
+  Inbox as InboxIcon,
   ChevronDown,
   LogIn,
   LogOut,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
+import { fetchBuddyRequests, fetchBuddies, fetchConversations } from "@/lib/inbox";
 
 // The site-wide header (migrated from index.html's <header>), now shared
 // across every page via layout.tsx instead of being one more tab-switched
@@ -33,6 +35,7 @@ export function Header() {
   const { message } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [inboxBadge, setInboxBadge] = useState(0);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -43,6 +46,33 @@ export function Header() {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
+
+  // Mirrors the old site's updateInboxBadges() -- sum of pending buddy
+  // requests and conversations with something unread. Polled rather than
+  // realtime, same tradeoff as the chat modals themselves.
+  useEffect(() => {
+    if (!user) {
+      setInboxBadge(0);
+      return;
+    }
+    let cancelled = false;
+    async function check() {
+      try {
+        const [requests, buddies] = await Promise.all([fetchBuddyRequests(user!.id), fetchBuddies(user!.id)]);
+        const conversations = await fetchConversations(user!.id, buddies);
+        const unread = conversations.filter((c) => c.unread).length;
+        if (!cancelled) setInboxBadge(requests.length + unread);
+      } catch (err) {
+        console.error("Could not check Inbox badge:", err);
+      }
+    }
+    check();
+    const interval = setInterval(check, 25000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [user]);
 
   return (
     <>
@@ -66,6 +96,14 @@ export function Header() {
             <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" />
             <NavLink href="/community" icon={<Camera className="w-4 h-4" />} label="Community" />
             <NavLink href="/diveshop" icon={<ShoppingBag className="w-4 h-4" />} label="Dive Shop" />
+            {user && (
+              <NavLink
+                href="/inbox"
+                icon={<InboxIcon className="w-4 h-4" />}
+                label="Inbox"
+                badge={inboxBadge}
+              />
+            )}
             {user && (
               <NavLink href="/host-dashboard" icon={<Anchor className="w-4 h-4" />} label="Host" />
             )}
@@ -162,18 +200,25 @@ function NavLink({
   href,
   icon,
   label,
+  badge,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
+  badge?: number;
 }) {
   return (
     <Link
       href={href}
-      className="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-colors flex items-center space-x-2"
+      className="nav-btn relative px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-colors flex items-center space-x-2"
     >
       {icon}
       <span>{label}</span>
+      {!!badge && badge > 0 && (
+        <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      )}
     </Link>
   );
 }

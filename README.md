@@ -30,7 +30,7 @@ Variables before the first deploy.
 - [x] Home (trip browse/search) (`/`)
 - [x] Community feed (`/community`)
 - [x] Auth (sign in / sign up / sign out, shared header across all pages)
-- [ ] Inbox / messaging
+- [x] Inbox / messaging (buddy requests, add buddy, direct messages, trip group chats) (`/inbox`)
 - [x] Dive Shop (vouchers, offers, leaderboard) (`/diveshop`) -- Treasure Chests stubbed
 - [x] Profile (header, bookings, dive logs, edit cert/location/bio) (`/profile`) -- cosmetics/treasure chest stubbed
 - [x] Host Dashboard (application flow, analytics, trips, create/edit/cancel, roster) (`/host-dashboard`)
