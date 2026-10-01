@@ -37,7 +37,7 @@ import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 // yet (see tailwind.config.ts), so a toggle with nothing to switch to would
 // just be a dead button. It comes back once that theme exists.
 export function Header() {
-  const { user, openAuthModal, signOut } = useAuth();
+  const { user, loading, openAuthModal, signOut } = useAuth();
   const { message } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -119,7 +119,14 @@ export function Header() {
               </Link>
             )}
 
-            {!user && (
+            {/* Ported from the old site's "auth-checking" CSS fix: while
+                restoreSession() is still asking Supabase whether a session
+                exists, `user` reads as null just like the signed-out state,
+                so without this guard every refresh -- even for an
+                already-signed-in diver -- would flash the Log In button
+                for a moment before flipping to the real state. Hiding both
+                variants until loading resolves avoids that flash/pop. */}
+            {!loading && !user && (
               <button
                 onClick={() => openAuthModal("signin")}
                 className="shrink-0 whitespace-nowrap flex items-center space-x-1.5 sm:space-x-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 sm:px-4 py-2.5 rounded-xl text-xs transition-colors shadow-md shadow-cyan-500/20 min-h-[44px]"

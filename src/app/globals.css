@@ -23,13 +23,36 @@ body {
   background: #020617;
 }
 
-/* Dark-theme (default) scrollbar; light overrides live next to it so both
-   stay in sync as one pair instead of drifting apart. */
+/* Site-wide scrollbar styling, ported in full from the old site's
+   styles.css (Firefox's scrollbar-width/-color plus the full WebKit
+   pseudo-element set -- track, thumb shape/hover, and corner). Dark-theme
+   (default) rules; light overrides live next to each one so both stay in
+   sync as one pair instead of drifting apart. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent; /* thumb: slate-700, track: transparent */
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
 *::-webkit-scrollbar-thumb {
-  background-color: #334155;
+  background-color: #334155; /* slate-700 */
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background-color: #475569;
+  background-color: #22d3ee; /* cyan-400, matches the site's accent */
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+html[data-theme="light"] {
+  scrollbar-color: #c3d9d4 transparent;
 }
 html[data-theme="light"] *::-webkit-scrollbar-thumb {
   background-color: #c3d9d4;
@@ -50,6 +73,31 @@ html[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
 .diver-ring-advanced   { border-color: #22d3ee; } /* cyan-400 */
 .diver-ring-openwater  { border-color: #94a3b8; } /* slate-400 */
 .diver-ring-none       { border-color: #334155; } /* slate-700 -- no cert on file */
+
+/* Mobile zoom-on-focus fix: iOS Safari (and some Android browsers)
+   auto-zoom the viewport when a focused form control's computed font-size
+   is under 16px. Most of this site's inputs use Tailwind's text-sm (14px)
+   or text-xs (12px), which read fine at their intended size on desktop
+   but trigger that zoom on phones -- so below the sm breakpoint (640px,
+   matching every sm: layout swap already used elsewhere) every text
+   input, textarea and select is bumped to exactly 16px, the smallest size
+   that avoids it. !important is needed because a plain element selector
+   is lower specificity than the Tailwind utility classes (.text-sm/
+   .text-xs) that would otherwise win. */
+@media (max-width: 639px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
 
 /* Native <select> popups can render unreadable (white-on-white) in some
    browsers without an explicit option background/color -- carried over
