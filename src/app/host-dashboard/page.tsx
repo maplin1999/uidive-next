@@ -106,21 +106,21 @@ export default function HostDashboardPage() {
     );
   }
 
-  // Status still loading
-  if (hostStatus === undefined && !statusError) {
-    return (
-      <main className="min-h-screen bg-slate-950 px-4 py-12">
-        <p className="text-xs text-slate-500 text-center py-12">Loading…</p>
-      </main>
-    );
-  }
-
   if (statusError) {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <p className="text-xs text-rose-400 text-center py-12">
           Could not load your host status -- please refresh.
         </p>
+      </main>
+    );
+  }
+
+  // Status still loading
+  if (hostStatus === undefined) {
+    return (
+      <main className="min-h-screen bg-slate-950 px-4 py-12">
+        <p className="text-xs text-slate-500 text-center py-12">Loading…</p>
       </main>
     );
   }
