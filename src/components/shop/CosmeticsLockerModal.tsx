@@ -130,9 +130,18 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3.5">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        {/* Sticky so the close button always stays reachable, even scrolled
+            deep into the Avatars/Calling Cards grids -- clicking the
+            backdrop also closes it, so there's no need to scroll back up
+            just to find an exit. */}
+        <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm flex items-center justify-between border-b border-slate-800 px-6 py-4 rounded-t-3xl">
           <h3 className="text-base font-black text-white flex items-center gap-2">
             <svg viewBox="0 0 512 512" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
               <path d="M385.723,84.402H126.277C56.647,84.402,0,141.05,0,210.679v216.919h259.446H512V210.679C512,141.05,455.352,84.402,385.723,84.402z M30.417,271.209h54.186v37.008h120.655v-37.008h54.186v47.777H30.417V271.209z M115.021,277.8v-43.598h59.82V277.8H115.021z M259.446,397.181H30.417v-47.777h229.029V397.181z M259.446,210.679v30.112H205.26v-37.008H84.604v37.008H30.417v-30.113c0-6.034,0.567-11.937,1.637-17.664h228.632C259.875,198.789,259.446,204.685,259.446,210.679z M43.376,162.596c16.621-28.547,47.556-47.778,82.901-47.778h177.341c-15.019,12.882-26.983,29.224-34.652,47.778H43.376z M481.583,397.181h-191.72V271.209h191.72V397.181z M481.583,240.792h-191.72V210.68c0-52.857,43.003-95.86,95.86-95.86c2.478,0,4.934,0.094,7.365,0.28c2.43,0.186,4.837,0.462,7.214,0.826c1.585,0.243,3.157,0.525,4.716,0.845c43.641,8.954,76.565,47.659,76.565,93.909V240.792z" />
@@ -149,6 +158,8 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        <div className="p-6 space-y-5">
 
         {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">Loading…</p>}
         {status === "error" && (
@@ -168,6 +179,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
             </div>
           </>
         )}
+        </div>
       </div>
       <Toast message={message} />
     </div>

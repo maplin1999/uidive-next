@@ -76,7 +76,7 @@ export function ChestOpenModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="relative bg-slate-900 border border-purple-500/30 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl text-center max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-slate-900 border border-purple-500/30 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl text-center">
         <button
           type="button"
           onClick={onClose}

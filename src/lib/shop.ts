@@ -78,3 +78,23 @@ export async function redeemCorals(
 
   return { code, newBalance };
 }
+
+// Ported from the old site's claimDailyReward() -- goes through the
+// claim_daily_reward() RPC, which is the only thing that actually enforces
+// "once per day" (the button's disabled state is just a client-side hint,
+// not the real protection: even a direct RPC call from the console a
+// second time the same day would still be refused server-side).
+export async function claimDailyReward(): Promise<number> {
+  const { data, error } = await supabase.rpc("claim_daily_reward");
+  if (error) throw error;
+  return data && data[0] ? data[0].new_balance : 0;
+}
+
+// Same "already claimed today" check as the old site's updateDailyClaimUI()
+// -- last_daily_claim is a date string (YYYY-MM-DD), compared against
+// today's date in the same format.
+export function alreadyClaimedDailyToday(lastDailyClaim: string | null): boolean {
+  if (!lastDailyClaim) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  return lastDailyClaim >= today;
+}

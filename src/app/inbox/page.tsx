@@ -21,16 +21,21 @@ import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { resolveAvatarUrl } from "@/lib/cosmetics";
 
+type InboxTab = "requests" | "messages" | "groups";
+
 // The Inbox tab (#tab-inbox in the old site): buddy requests, direct
 // messages with accepted buddies, and group chats for trips you're
-// confirmed on -- all three stacked in one page, same as the old site
-// (there's no tabbed switcher there). Everything here is real
-// (friendships/messages/trip_chat_messages tables), including equipped
+// confirmed on. The old site stacks all three vertically with no switcher;
+// this rewrite instead splits them into their own tabs (Requests/Messages/
+// Group Chats, each with a badge count) since stacking got unwieldy once
+// there was real content in all three sections at once -- a deliberate
+// departure from the old site, not a missed-parity gap. Everything here is
+// real (friendships/messages/trip_chat_messages tables), including equipped
 // cosmetic avatars on requests/conversations. The old site's "Add Buddy"
-// lives inside its separate Dive
-// Buddies list modal (opened from the profile header's Buddies tile) --
-// since that tile instead routes here in this rewrite, the button is kept
-// in the header so adding a buddy is still reachable.
+// lives inside its separate Dive Buddies list modal (opened from the
+// profile header's Buddies tile) -- since that tile instead routes here in
+// this rewrite, the button is kept in the header so adding a buddy is still
+// reachable.
 export default function InboxPage() {
   const { user, requireAuth } = useAuth();
   const { openProfile } = useSocial();
@@ -40,6 +45,7 @@ export default function InboxPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChatTrip[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [activeTab, setActiveTab] = useState<InboxTab>("requests");
 
   const [addBuddyOpen, setAddBuddyOpen] = useState(false);
   const [activeChat, setActiveChat] = useState<{ id: string; name: string; avatar: string } | null>(null);
@@ -120,12 +126,35 @@ export default function InboxPage() {
           </p>
         )}
 
-        {/* BUDDY REQUESTS */}
         {status === "ready" && (
+          <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl w-fit max-w-full overflow-x-auto">
+            <InboxTabButton
+              label="Requests"
+              icon={UserPlus}
+              count={requests.length}
+              active={activeTab === "requests"}
+              onClick={() => setActiveTab("requests")}
+            />
+            <InboxTabButton
+              label="Messages"
+              icon={MessageSquare}
+              count={conversations.filter((c) => c.unread).length}
+              active={activeTab === "messages"}
+              onClick={() => setActiveTab("messages")}
+            />
+            <InboxTabButton
+              label="Group Chats"
+              icon={Users}
+              count={0}
+              active={activeTab === "groups"}
+              onClick={() => setActiveTab("groups")}
+            />
+          </div>
+        )}
+
+        {/* BUDDY REQUESTS */}
+        {status === "ready" && activeTab === "requests" && (
           <div className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-cyan-400" /> Buddy Requests
-            </h2>
             {requests.length === 0 && (
               <EmptyState emoji="📭" text="No pending buddy requests right now." />
             )}
@@ -178,11 +207,8 @@ export default function InboxPage() {
         )}
 
         {/* MESSAGES */}
-        {status === "ready" && (
-          <div className="space-y-3 pt-2 border-t border-slate-800">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-cyan-400" /> Messages
-            </h2>
+        {status === "ready" && activeTab === "messages" && (
+          <div className="space-y-3">
             {conversations.length === 0 && (
               <EmptyState
                 emoji="💬"
@@ -229,11 +255,8 @@ export default function InboxPage() {
         )}
 
         {/* TRIP GROUP CHATS */}
-        {status === "ready" && (
-          <div className="space-y-3 pt-2 border-t border-slate-800">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Users className="w-5 h-5 text-cyan-400" /> Trip Group Chats
-            </h2>
+        {status === "ready" && activeTab === "groups" && (
+          <div className="space-y-3">
             {groupChats.length === 0 && (
               <EmptyState emoji="🤿" text="Book a trip to join its group chat with fellow divers." />
             )}
@@ -297,5 +320,41 @@ function EmptyState({ emoji, text }: { emoji: string; text: string }) {
       <div className="text-3xl">{emoji}</div>
       <p className="text-xs text-slate-500">{text}</p>
     </div>
+  );
+}
+
+function InboxTabButton({
+  label,
+  icon: Icon,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+        active ? "bg-cyan-500 text-slate-950" : "text-slate-400 hover:text-slate-200"
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+      <span>{label}</span>
+      {count > 0 && (
+        <span
+          className={`text-[10px] font-black rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center ${
+            active ? "bg-slate-950/20 text-slate-950" : "bg-cyan-500/20 text-cyan-300"
+          }`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
   );
 }

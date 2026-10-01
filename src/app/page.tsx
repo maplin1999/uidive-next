@@ -13,6 +13,8 @@ import { TripCard, TopPickCard } from "@/components/home/TripCard";
 import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
 import { useAuth } from "@/components/auth/AuthContext";
+import { CoralsCelebration } from "@/components/CoralsCelebration";
+import { claimDailyReward, alreadyClaimedDailyToday } from "@/lib/shop";
 
 type TripTypeFilter = "all" | "shore" | "boat";
 
@@ -29,7 +31,9 @@ export default function HomePage() {
   const [hostReviewStats, setHostReviewStats] = useState<Record<string, HostReviewStats>>({});
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const { message, showToast } = useToast();
-  const { requireAuth } = useAuth();
+  const { user, requireAuth, refreshProfile } = useAuth();
+  const [claimingDaily, setClaimingDaily] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
 
   const [query, setQuery] = useState("");
   const [activity, setActivity] = useState<ActivityFilter>("all");
@@ -87,13 +91,24 @@ export default function HomePage() {
     setSelectedTrip(trip);
   }
 
-  function handleClaimDaily() {
-    // Real requireAuth() gate now that auth is migrated: opens the sign-in
-    // modal if nobody's signed in. The actual claim_daily_reward RPC call
-    // (crediting Corals) is still a future update -- this just gets the
-    // gate right first.
+  const alreadyClaimedToday = !!user && alreadyClaimedDailyToday(user.last_daily_claim);
+
+  async function handleClaimDaily() {
     if (!requireAuth()) return;
-    showToast("Claiming daily Corals is coming in a future update.");
+    if (alreadyClaimedToday) return;
+
+    setClaimingDaily(true);
+    try {
+      await claimDailyReward();
+      await refreshProfile();
+      setCelebrating(true);
+    } catch (err) {
+      console.error("Could not claim daily reward:", err);
+      showToast("❌ Could not claim your daily reward -- please try again.");
+      await refreshProfile(); // in case it actually succeeded server-side already today
+    } finally {
+      setClaimingDaily(false);
+    }
   }
 
   return (
@@ -180,10 +195,17 @@ export default function HomePage() {
           </div>
           <button
             onClick={handleClaimDaily}
-            className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors shrink-0 flex items-center justify-center space-x-1 shadow-lg"
+            disabled={alreadyClaimedToday || claimingDaily}
+            className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors shrink-0 flex items-center justify-center space-x-1 shadow-lg"
           >
-            <span>Claim 50 Corals</span>
-            <span>🪸</span>
+            <span>
+              {alreadyClaimedToday
+                ? "Claimed for Today ✓"
+                : claimingDaily
+                  ? "Claiming…"
+                  : "Claim 50 Corals"}
+            </span>
+            {!alreadyClaimedToday && <span>🪸</span>}
           </button>
         </div>
 
@@ -317,6 +339,9 @@ export default function HomePage() {
         />
       )}
 
+      {celebrating && (
+        <CoralsCelebration amount={50} title="🎉 Daily Streak Claimed!" onDone={() => setCelebrating(false)} />
+      )}
       <Toast message={message} />
     </main>
   );

@@ -34,12 +34,14 @@ import {
 import { fetchBuddiesCount } from "@/lib/social";
 import { fetchHostStatus, HostStatus } from "@/lib/host";
 import { deletePost } from "@/lib/posts";
+import { fetchTrips, DiveTrip } from "@/lib/trips";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BuddiesListModal } from "@/components/social/BuddiesListModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
+import { PostFormModal } from "@/components/community/PostFormModal";
 import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 
 // The Profile tab (#tab-profile in the old site), including Treasure Chest
@@ -66,6 +68,19 @@ export default function ProfilePage() {
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [buddiesListOpen, setBuddiesListOpen] = useState(false);
   const [lockerOpen, setLockerOpen] = useState(false);
+  const [trips, setTrips] = useState<DiveTrip[]>([]);
+  const [editingPost, setEditingPost] = useState<MyPost | null>(null);
+
+  function loadPosts() {
+    if (!user) return;
+    fetchMyPosts(user.id)
+      .then(setPosts)
+      .then(() => setPostsStatus("ready"))
+      .catch((err) => {
+        console.error("Could not load your posts:", err);
+        setPostsStatus("error");
+      });
+  }
 
   function loadBookings() {
     if (!user) return;
@@ -81,19 +96,18 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return;
     loadBookings();
-    fetchMyPosts(user.id)
-      .then(setPosts)
-      .then(() => setPostsStatus("ready"))
-      .catch((err) => {
-        console.error("Could not load your posts:", err);
-        setPostsStatus("error");
-      });
+    loadPosts();
     fetchBuddiesCount(user.id)
       .then(setBuddiesCount)
       .catch((err) => console.error("Could not load your buddies count:", err));
     fetchHostStatus(user.id)
       .then(setHostStatus)
       .catch((err) => console.error("Could not load host status:", err));
+    // Needed for the edit-post form's "linked trip" dropdown, same as the
+    // Community tab -- only fetched once, not re-fetched on every post edit.
+    fetchTrips()
+      .then(({ trips }) => setTrips(trips))
+      .catch((err) => console.error("Could not load dive trips:", err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -492,7 +506,9 @@ export default function ProfilePage() {
                   >
                     <button
                       onClick={() => setOpenPostMenuId((v) => (v === post.id ? null : post.id))}
-                      className="w-7 h-7 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center backdrop-blur-sm transition-all"
+                      className={`w-7 h-7 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center backdrop-blur-sm transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 ${
+                        openPostMenuId === post.id ? "sm:opacity-100" : ""
+                      }`}
                       aria-label="Post options"
                     >
                       <MoreVertical className="w-4 h-4" />
@@ -502,7 +518,7 @@ export default function ProfilePage() {
                         <button
                           onClick={() => {
                             setOpenPostMenuId(null);
-                            showToast("Editing from here is coming soon -- edit it from the Community tab for now.");
+                            setEditingPost(post);
                           }}
                           className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
                         >
@@ -564,7 +580,7 @@ export default function ProfilePage() {
                   <div
                     key={post.id}
                     onClick={goToPost}
-                    className="relative rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-900 p-5 flex flex-col justify-between cursor-pointer transition-all hover:border-cyan-500/50 hover:bg-slate-800/80"
+                    className="relative group rounded-2xl overflow-hidden h-64 border border-slate-800 shadow-md bg-slate-900 p-5 flex flex-col justify-between cursor-pointer transition-all hover:border-cyan-500/50 hover:bg-slate-800/80"
                   >
                     {menu}
                     <p className="text-sm text-slate-200 leading-relaxed line-clamp-6 pr-8">{headline}</p>
@@ -597,6 +613,18 @@ export default function ProfilePage() {
         <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
       )}
       {lockerOpen && <CosmeticsLockerModal onClose={() => setLockerOpen(false)} />}
+      {editingPost && (
+        <PostFormModal
+          trips={trips}
+          editingPost={editingPost}
+          onClose={() => setEditingPost(null)}
+          onSaved={() => {
+            setEditingPost(null);
+            loadPosts();
+            showToast("✅ Dive log updated!");
+          }}
+        />
+      )}
       {selectedBooking && (
         <BookingDetailModal
           booking={selectedBooking}

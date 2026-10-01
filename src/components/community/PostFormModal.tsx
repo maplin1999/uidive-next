@@ -4,9 +4,21 @@ import { useState } from "react";
 import { X, Camera, Pencil, MapPin } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { DiveTrip } from "@/lib/trips";
-import { CommunityPost, createPost, updatePost, uploadPostImage } from "@/lib/posts";
+import { createPost, updatePost, uploadPostImage } from "@/lib/posts";
 
 const CUSTOM_LOCATION = "__custom__";
+
+// Only the fields this form actually reads/writes -- deliberately narrower
+// than the full CommunityPost (Community feed) or MyPost (own-profile dive
+// logs) shapes so this modal can edit a post from either page without
+// either page needing to pad its post objects with fields it doesn't have.
+export interface EditablePost {
+  id: string;
+  caption: string;
+  image_url: string;
+  location_name: string;
+  trip_id: string | null;
+}
 
 // Migrated from the old site's #post-log-modal (openPostLogModal()/
 // openEditPostModal()/handlePostSubmit()). The old site's drag-to-crop tool
@@ -19,7 +31,7 @@ export function PostFormModal({
   onSaved,
 }: {
   trips: DiveTrip[];
-  editingPost?: CommunityPost | null;
+  editingPost?: EditablePost | null;
   onClose: () => void;
   onSaved: (opts: { coralsAwarded: boolean }) => void;
 }) {
