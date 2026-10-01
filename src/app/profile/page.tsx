@@ -170,6 +170,7 @@ export default function ProfilePage() {
                 avatarUrl={user.avatar}
                 equippedAvatarId={user.equipped_avatar_id}
                 cert={user.cert}
+                isVerifiedHost={hostStatus?.verification_status === "verified"}
                 alt="Your profile photo"
                 sizeClass="w-20 h-20 sm:w-24 sm:h-24"
                 borderClass="border-4 shadow-lg"

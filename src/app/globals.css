@@ -434,30 +434,13 @@ html[data-theme="light"] .border-violet-400 {
 html[data-theme="light"] .border-amber-400 {
   border-color: #a15c07 !important;
 }
-/* Diver certification / verified-host avatar rings -- darker/richer shades
-   of the same dark-mode colors so they stay readable against the light
-   theme's pale surfaces instead of looking washed out. */
-html[data-theme="light"] .diver-ring-verified {
-  border-color: #047857 !important;
-}
-html[data-theme="light"] .diver-ring-instructor {
-  border-color: #a15c07 !important;
-}
-html[data-theme="light"] .diver-ring-divemaster {
-  border-color: #7e22ce !important;
-}
-html[data-theme="light"] .diver-ring-rescue {
-  border-color: #1d4ed8 !important;
-}
-html[data-theme="light"] .diver-ring-advanced {
-  border-color: var(--l-accent) !important;
-}
-html[data-theme="light"] .diver-ring-openwater {
-  border-color: #475569 !important;
-}
-html[data-theme="light"] .diver-ring-none {
-  border-color: var(--l-border-strong) !important;
-}
+/* Diver certification / verified-host avatar rings are deliberately NOT
+   re-themed for light mode (unlike the cosmetic-tier accents above) -- the
+   whole point of a cert ring is that it's the same recognizable color for
+   that cert everywhere, in both themes, so a previous "darker shade for
+   light mode" pass here was actually a bug: it made every ring color
+   inconsistent between themes. .diver-ring-* (globals.css above) stays a
+   single fixed color per cert/verified-host, full stop. */
 html[data-theme="light"] .focus\:border-cyan-500:focus {
   border-color: var(--l-accent) !important;
 }
