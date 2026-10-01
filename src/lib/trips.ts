@@ -11,12 +11,19 @@ export interface HostProfile {
 export interface DiveTrip {
   id: string;
   title: string;
+  description: string;
   location: string;
   trip_type: "shore" | "boat";
+  activity_type: "scuba" | "freediving";
   difficulty: "Easy" | "Moderate" | "Advanced";
+  max_depth: string;
   visibility: string;
   water_temp: string;
   swell: string;
+  wind: string;
+  tide: string;
+  current: string;
+  conditions_updated_at: string | null;
   rating: number;
   price: number;
   capacity: number;
@@ -35,20 +42,28 @@ export interface ReviewStats {
   real: boolean;
 }
 
+export interface HostReviewStats {
+  avg_rating: number;
+  review_count: number;
+}
+
 // Loads every active trip plus the review-stats views alongside it, same
 // pairing the old site's loadTrips()/loadReviewStats() did -- every place a
-// rating shows (Top Picks, search cards) needs both at once.
+// rating shows (Top Picks, search cards, "Hosted by" lines) needs all three
+// at once.
 export async function fetchTrips(): Promise<{
   trips: DiveTrip[];
   tripReviewStatsById: Record<string, { avg_rating: number; review_count: number }>;
+  hostReviewStatsById: Record<string, HostReviewStats>;
 }> {
-  const [tripsRes, reviewRes] = await Promise.all([
+  const [tripsRes, reviewRes, hostReviewRes] = await Promise.all([
     supabase
       .from("dive_trips")
       .select("*, profiles!host_id(name, avatar_url)")
       .eq("status", "active")
       .order("scheduled_date", { ascending: true }),
     supabase.from("trip_review_stats").select("trip_id, avg_rating, review_count"),
+    supabase.from("host_review_stats").select("host_id, avg_rating, review_count"),
   ]);
 
   if (tripsRes.error) throw tripsRes.error;
@@ -60,8 +75,59 @@ export async function fetchTrips(): Promise<{
     });
   }
 
-  return { trips: (tripsRes.data || []) as DiveTrip[], tripReviewStatsById };
+  const hostReviewStatsById: Record<string, HostReviewStats> = {};
+  if (!hostReviewRes.error) {
+    (hostReviewRes.data || []).forEach((r) => {
+      hostReviewStatsById[r.host_id] = r;
+    });
+  }
+
+  return { trips: (tripsRes.data || []) as DiveTrip[], tripReviewStatsById, hostReviewStatsById };
 }
+
+// Mirrors confirmBooking()'s RPC call in the old app.js -- books for free
+// right away (no real payment gateway is wired up), capacity-checked and
+// price-computed atomically on the server by book_trip().
+export async function bookTrip(
+  tripId: string,
+  price: number,
+  equipment: Record<string, boolean>
+): Promise<{ bookingId: string; spotsLeft: number }> {
+  const { data, error } = await supabase.rpc("book_trip", {
+    p_trip_id: tripId,
+    p_price: price,
+    p_equipment: equipment,
+  });
+  if (error) throw error;
+  const row = data?.[0];
+  if (!row) throw new Error("Could not complete booking -- please try again.");
+  return { bookingId: row.booking_id, spotsLeft: row.spots_left };
+}
+
+export function formatRelativeTime(isoString: string | null): string {
+  if (!isoString) return "";
+  const then = new Date(isoString).getTime();
+  if (Number.isNaN(then)) return "";
+  const diffMs = Date.now() - then;
+  const minutes = Math.round(diffMs / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return `${days}d ago`;
+}
+
+export const EQUIPMENT_ITEMS: { id: string; label: string }[] = [
+  { id: "wetsuit", label: "Wetsuit / Drysuit" },
+  { id: "bcd", label: "BCD" },
+  { id: "regulator", label: "Regulator Set" },
+  { id: "fins", label: "Fins" },
+  { id: "mask", label: "Mask & Snorkel" },
+  { id: "computer", label: "Dive Computer" },
+  { id: "weights", label: "Weights & Belt" },
+  { id: "tank", label: "Tank / Cylinder" },
+];
 
 // A trip's real rating once it has at least one review, otherwise the
 // original seeded placeholder value (same rule as the old site: a

@@ -4,11 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Compass, Flame, Sparkles } from "lucide-react";
 import {
   DiveTrip,
+  HostReviewStats,
   effectiveTripRating,
   fetchTrips,
 } from "@/lib/trips";
 import { HeroSearch, ActivityFilter } from "@/components/home/HeroSearch";
 import { TripCard, TopPickCard } from "@/components/home/TripCard";
+import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
 import { useAuth } from "@/components/auth/AuthContext";
 
@@ -24,6 +26,7 @@ export default function HomePage() {
   const [reviewStats, setReviewStats] = useState<
     Record<string, { avg_rating: number; review_count: number }>
   >({});
+  const [hostReviewStats, setHostReviewStats] = useState<Record<string, HostReviewStats>>({});
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const { message, showToast } = useToast();
   const { requireAuth } = useAuth();
@@ -33,23 +36,24 @@ export default function HomePage() {
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [dateLabel, setDateLabel] = useState("Any Date");
   const [tripType, setTripType] = useState<TripTypeFilter>("all");
+  const [selectedTrip, setSelectedTrip] = useState<DiveTrip | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  const load = () => {
     fetchTrips()
-      .then(({ trips, tripReviewStatsById }) => {
-        if (cancelled) return;
+      .then(({ trips, tripReviewStatsById, hostReviewStatsById }) => {
         setTrips(trips);
         setReviewStats(tripReviewStatsById);
+        setHostReviewStats(hostReviewStatsById);
         setStatus("ready");
       })
       .catch((err) => {
         console.error("Could not load dive trips:", err);
-        if (!cancelled) setStatus("error");
+        setStatus("error");
       });
-    return () => {
-      cancelled = true;
-    };
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   const filteredTrips = useMemo(() => {
@@ -79,9 +83,7 @@ export default function HomePage() {
   );
 
   function openDiveDetail(trip: DiveTrip) {
-    // The dive-detail/booking modal hasn't been migrated yet -- stubbed for
-    // now so clicking a card gives real feedback instead of doing nothing.
-    showToast(`🤿 ${trip.title} -- trip details are coming in a future update.`);
+    setSelectedTrip(trip);
   }
 
   function handleClaimDaily() {
@@ -297,6 +299,24 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {selectedTrip && (
+        <DiveDetailModal
+          trip={selectedTrip}
+          rating={effectiveTripRating(selectedTrip, reviewStats)}
+          hostStats={selectedTrip.host_id ? hostReviewStats[selectedTrip.host_id] || null : null}
+          onClose={() => setSelectedTrip(null)}
+          onBooked={() => {
+            setSelectedTrip(null);
+            load();
+          }}
+          onViewHost={() => {
+            // The public profile modal hasn't been migrated yet -- stubbed
+            // for now (see Task: Public profiles, reporting & blocking).
+            showToast("Viewing diver profiles is coming in a future update.");
+          }}
+        />
+      )}
 
       <Toast message={message} />
     </main>

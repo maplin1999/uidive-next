@@ -12,12 +12,13 @@ import {
   fetchMyPosts,
 } from "@/lib/profile";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
+import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 
 // The Profile tab (#tab-profile in the old site). Treasure Chest cosmetics
-// (calling card banner, equipped avatar, diver rings), the buddies system,
-// and the booking-detail modal (roster/cancel/reviews) are all separate
-// subsystems not migrated yet -- this covers the real header info, bookings
-// list, and dive-log grid, with those extras stubbed.
+// (calling card banner, equipped avatar, diver rings) and the buddies
+// system are separate subsystems not migrated yet -- this covers the real
+// header info, bookings list + full booking detail (roster/cancel/review),
+// and dive-log grid, with those extras stubbed.
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
@@ -27,8 +28,9 @@ export default function ProfilePage() {
   const [bookingsStatus, setBookingsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [postsStatus, setPostsStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [selectedBooking, setSelectedBooking] = useState<MyBooking | null>(null);
 
-  useEffect(() => {
+  function loadBookings() {
     if (!user) return;
     fetchMyBookings(user.id)
       .then(setBookings)
@@ -37,6 +39,11 @@ export default function ProfilePage() {
         console.error("Could not load bookings:", err);
         setBookingsStatus("error");
       });
+  }
+
+  useEffect(() => {
+    if (!user) return;
+    loadBookings();
     fetchMyPosts(user.id)
       .then(setPosts)
       .then(() => setPostsStatus("ready"))
@@ -44,6 +51,7 @@ export default function ProfilePage() {
         console.error("Could not load your posts:", err);
         setPostsStatus("error");
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   if (!user) {
@@ -184,7 +192,7 @@ export default function ProfilePage() {
                 return (
                   <div
                     key={b.id}
-                    onClick={() => showToast("Booking details are coming in a future update.")}
+                    onClick={() => setSelectedBooking(b)}
                     className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4 cursor-pointer transition-colors hover:bg-slate-800/80 hover:border-cyan-500/40"
                   >
                     <div className="min-w-0">
@@ -267,6 +275,13 @@ export default function ProfilePage() {
       </div>
 
       {editOpen && <EditProfileModal onClose={() => setEditOpen(false)} />}
+      {selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+          onChanged={loadBookings}
+        />
+      )}
       <Toast message={message} />
     </main>
   );
