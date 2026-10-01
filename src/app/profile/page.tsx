@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Award,
@@ -36,6 +35,7 @@ import { fetchBuddiesCount } from "@/lib/social";
 import { fetchHostStatus, HostStatus } from "@/lib/host";
 import { deletePost } from "@/lib/posts";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
+import { BuddiesListModal } from "@/components/social/BuddiesListModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { diverCertRingClass } from "@/lib/diverRing";
@@ -60,6 +60,7 @@ export default function ProfilePage() {
   const [hostStatus, setHostStatus] = useState<HostStatus | null | undefined>(undefined);
   const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  const [buddiesListOpen, setBuddiesListOpen] = useState(false);
 
   function loadBookings() {
     if (!user) return;
@@ -189,15 +190,15 @@ export default function ProfilePage() {
               </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Dives</div>
             </div>
-            <Link
-              href="/inbox"
+            <button
+              onClick={() => setBuddiesListOpen(true)}
               className="p-2 sm:p-2.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 hover:border-cyan-500/40 text-center sm:min-w-[74px] transition-colors"
             >
               <div className="text-base sm:text-lg font-black text-cyan-400">
                 {Number(buddiesCount).toLocaleString()}
               </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Buddies</div>
-            </Link>
+            </button>
             <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-amber-500/30 text-center sm:min-w-[74px]">
               <div className="text-base sm:text-lg font-black text-amber-400">
                 {Number(user.corals).toLocaleString()}
@@ -544,6 +545,9 @@ export default function ProfilePage() {
 
       {editOpen && <EditProfileModal onClose={() => setEditOpen(false)} />}
       {adminPanelOpen && <AdminPanelModal onClose={() => setAdminPanelOpen(false)} />}
+      {buddiesListOpen && user && (
+        <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
+      )}
       {selectedBooking && (
         <BookingDetailModal
           booking={selectedBooking}

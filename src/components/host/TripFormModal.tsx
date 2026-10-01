@@ -73,15 +73,29 @@ export function TripFormModal({
 }) {
   const [fields, setFields] = useState<TripFormFields>(tripToFields(trip));
   const [error, setError] = useState("");
+  // Ported from the old site's field-invalid class / validateRequiredFields():
+  // required fields left empty get a red border, not just the text error
+  // banner above, and clear it again the moment they're edited.
+  const [invalidFields, setInvalidFields] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const isEdit = !!trip;
 
   function update<K extends keyof TripFormFields>(key: K, value: TripFormFields[K]) {
     setFields((f) => ({ ...f, [key]: value }));
+    setInvalidFields((prev) => {
+      if (!prev.has(key as string)) return prev;
+      const next = new Set(prev);
+      next.delete(key as string);
+      return next;
+    });
   }
 
   async function handleSave() {
     if (!fields.title.trim() || !fields.location.trim()) {
+      const bad = new Set<string>();
+      if (!fields.title.trim()) bad.add("title");
+      if (!fields.location.trim()) bad.add("location");
+      setInvalidFields(bad);
       setError("Title and location are required.");
       return;
     }
@@ -136,7 +150,7 @@ export function TripFormModal({
             onChange={(e) => update("title", e.target.value)}
             maxLength={80}
             placeholder="e.g. Sunrise Reef Charter"
-            className={inputCls}
+            className={fieldCls(invalidFields.has("title"))}
           />
         </Field>
 
@@ -159,7 +173,7 @@ export function TripFormModal({
               onChange={(e) => update("location", e.target.value)}
               maxLength={80}
               placeholder="Cebu, PH"
-              className={inputCls}
+              className={fieldCls(invalidFields.has("location"))}
             />
           </Field>
           <Field label="Trip Type">
@@ -363,6 +377,13 @@ export function TripFormModal({
 
 const inputCls =
   "bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500";
+
+// field-invalid equivalent: swaps the border to rose-500 (!important in the
+// old site's CSS since it's fighting the same specificity as inputCls's own
+// border-slate-800) when this field failed the last required-field check.
+function fieldCls(invalid: boolean) {
+  return invalid ? `${inputCls} !border-rose-500` : inputCls;
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

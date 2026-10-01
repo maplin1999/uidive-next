@@ -74,6 +74,22 @@ html[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
 .diver-ring-openwater  { border-color: #94a3b8; } /* slate-400 */
 .diver-ring-none       { border-color: #334155; } /* slate-700 -- no cert on file */
 
+/* Some Android WebViews (older Samsung Internet / embedded browsers) don't
+   support the dvh unit at all, which makes Tailwind's max-h-[85dvh]
+   (ChatModal, TripChatModal) an invalid declaration the browser drops
+   entirely -- leaving those modal cards with no height cap, so their
+   footer (message input + Send button) gets pushed out past the bottom of
+   the screen. vh is applied first as a safe fallback for every browser,
+   then overridden with dvh only where it's actually supported. */
+.max-h-\[85dvh\] {
+  max-height: 85vh !important;
+}
+@supports (height: 100dvh) {
+  .max-h-\[85dvh\] {
+    max-height: 85dvh !important;
+  }
+}
+
 /* Mobile zoom-on-focus fix: iOS Safari (and some Android browsers)
    auto-zoom the viewport when a focused form control's computed font-size
    is under 16px. Most of this site's inputs use Tailwind's text-sm (14px)
@@ -106,6 +122,13 @@ select option {
   background-color: #0f172a;
   color: #e2e8f0;
 }
+html[data-theme="light"] select {
+  color-scheme: light;
+}
+html[data-theme="light"] select option {
+  background-color: var(--l-surface);
+  color: var(--l-text-body);
+}
 
 /* ==========================================================
    Home page (src/app/page.tsx): custom classes the hero search pill and
@@ -121,16 +144,6 @@ select option {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* "Sunken" panels (hero search pill, stat tiles) -- a slightly darker inset
-   look versus the surface around them. Old site only overrides this in
-   light mode (its dark-mode background comes from each element's own
-   explicit bg-slate-950/NN utility) -- an unconditional base rule here
-   would win the cascade over those explicit per-element opacities and
-   flatten them all to the same shade, so this stays light-mode-only too. */
-html[data-theme="light"] .panel-sunken {
-  background-color: rgba(255, 255, 255, 0.6);
 }
 
 /* Spring Pop Modal Physics -- used by the auth modal's card so it bounces
@@ -158,10 +171,453 @@ html[data-theme="light"] .panel-sunken {
 }
 
 /* Hero search pill: a hovered Where/When/Activity segment gets a shadow
-   cast to both sides so it visibly "lifts" off its neighbors. */
+   cast to both sides so it visibly "lifts" off its neighbors -- doing the
+   same distinguishing job the removed divider lines used to do. Light
+   mode (the default) gets a plain soft shadow, which already reads clearly
+   against its bright surface; dark mode gets a stronger, cyan-tinted glow
+   plus a slightly lighter/more opaque hover tint, since a plain dark
+   shadow barely reads against the pill's already-dark background. */
 .hero-segment-shadow:hover {
+  box-shadow: 6px 0 14px -4px rgba(15, 23, 42, 0.18), -6px 0 14px -4px rgba(15, 23, 42, 0.18);
+}
+html[data-theme="dark"] .hover\:bg-slate-800\/50:hover {
+  background-color: rgba(51, 65, 85, 0.85);
+}
+html[data-theme="dark"] .hero-segment-shadow:hover {
   box-shadow:
     6px 0 18px -2px rgba(34, 211, 238, 0.18),
     -6px 0 18px -2px rgba(34, 211, 238, 0.18),
     0 0 0 1px rgba(34, 211, 238, 0.25);
+}
+
+.theme-toggle-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle-btn .icon-dark {
+  display: none;
+}
+html[data-theme="dark"] .theme-toggle-btn .icon-light {
+  display: none;
+}
+html[data-theme="dark"] .theme-toggle-btn .icon-dark {
+  display: block;
+}
+
+/* ==========================================================
+   THEME SYSTEM, ported in full from the old site's styles.css.
+   Light  = "Sunlit Coastal" (default/main theme)
+   Dark   = "Deep Ocean" (the original palette this app shipped with)
+   The dark palette needs no overrides below since every existing utility
+   class in the markup already renders that look (bg-slate-950, bg-slate-900,
+   text-slate-400, etc. -- this app was built dark-first). Only the light
+   theme is layered on top, keyed off html[data-theme="light"], remapping
+   those same Tailwind utility classes to the "Sunlit Coastal" palette via
+   its --l-* custom properties.
+   ========================================================== */
+
+html[data-theme="light"] {
+  --l-bg: #f4faf9;
+  --l-bg-header: rgba(255, 255, 255, 0.82);
+  --l-bg-header-strong: rgba(255, 255, 255, 0.92);
+  --l-surface: #ffffff;
+  --l-surface-muted: #eaf5f2;
+  --l-surface-hover: rgba(14, 143, 166, 0.08);
+  --l-border: #d7e6e2;
+  --l-border-strong: #c3d9d4;
+  --l-border-soft: rgba(15, 42, 46, 0.12);
+  --l-text-heading: #0e3d42;
+  --l-text-body: #16323a;
+  --l-text-secondary: #3a5559;
+  --l-text-muted: #5b7a7e;
+  --l-text-faint: #7c9a9d;
+  --l-accent: #0e8fa6;
+  --l-accent-hover: #0c7f93;
+  --l-accent-button: #0c7488;
+  --l-accent-button-hover: #0a6577;
+  --l-accent-soft-10: rgba(14, 143, 166, 0.08);
+  --l-accent-soft-20: rgba(14, 143, 166, 0.16);
+  --l-accent-soft-30: rgba(14, 143, 166, 0.28);
+  --l-accent-soft-40: rgba(14, 143, 166, 0.4);
+}
+
+html[data-theme="light"] body {
+  background: var(--l-bg);
+}
+
+/* Backgrounds */
+html[data-theme="light"] .bg-slate-950 {
+  background-color: var(--l-bg) !important;
+}
+html[data-theme="light"] .bg-slate-950\/60 {
+  background-color: var(--l-surface-muted) !important;
+}
+/* Mobile bottom nav reuses bg-slate-950/95, but so does the coral-award
+   popup, which must always stay dark -- give the nav its own hook instead
+   of theming the raw utility class. */
+html[data-theme="light"] .chrome-nav-strong {
+  background-color: var(--l-bg-header-strong) !important;
+}
+/* Desktop header reuses bg-slate-950/90, but so do other dark-only
+   backdrops elsewhere -- same fix as chrome-nav-strong above. */
+html[data-theme="light"] .chrome-header-strong {
+  background-color: var(--l-bg-header) !important;
+}
+/* "Sunken" stat panels (hero search bar, leaderboard runner-up cards) reuse
+   bg-slate-950/80 and /60, which elsewhere is a deliberately-dark scrim
+   (photo badges, modal backdrops). Tag just these panels so they can go
+   light without touching every other use of that class. */
+html[data-theme="light"] .panel-sunken {
+  background-color: var(--l-surface-muted) !important;
+}
+html[data-theme="light"] .bg-slate-900 {
+  background-color: var(--l-surface) !important;
+}
+html[data-theme="light"] .bg-slate-900\/60 {
+  background-color: var(--l-surface-muted) !important;
+}
+html[data-theme="light"] .bg-slate-950\/85 {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+}
+html[data-theme="light"] .bg-slate-800 {
+  background-color: var(--l-surface-muted) !important;
+}
+html[data-theme="light"] .bg-slate-800\/80 {
+  background-color: var(--l-surface-hover) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-800\/80:hover {
+  background-color: var(--l-surface-hover) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-800\/60:hover {
+  background-color: var(--l-surface-hover) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-800\/50:hover {
+  background-color: var(--l-surface-hover) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-800:hover {
+  background-color: var(--l-surface-muted) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-900:hover {
+  background-color: var(--l-surface-muted) !important;
+}
+html[data-theme="light"] .hover\:bg-slate-700:hover {
+  background-color: var(--l-border-strong) !important;
+}
+
+/* Borders */
+html[data-theme="light"] .border-slate-950 {
+  border-color: var(--l-bg) !important;
+}
+html[data-theme="light"] .border-slate-800 {
+  border-color: var(--l-border) !important;
+}
+html[data-theme="light"] .border-slate-800\/80 {
+  border-color: var(--l-border-soft) !important;
+}
+html[data-theme="light"] .border-slate-700 {
+  border-color: var(--l-border-strong) !important;
+}
+html[data-theme="light"] .border-slate-700\/80 {
+  border-color: var(--l-border-soft) !important;
+}
+html[data-theme="light"] .hover\:border-slate-700:hover {
+  border-color: var(--l-border-strong) !important;
+}
+
+/* Text */
+html[data-theme="light"] .text-slate-100 {
+  color: var(--l-text-heading) !important;
+}
+html[data-theme="light"] .text-slate-200 {
+  color: var(--l-text-body) !important;
+}
+html[data-theme="light"] .hover\:text-slate-200:hover {
+  color: var(--l-text-body) !important;
+}
+html[data-theme="light"] .text-slate-300 {
+  color: var(--l-text-secondary) !important;
+}
+html[data-theme="light"] .text-slate-400 {
+  color: var(--l-text-muted) !important;
+}
+html[data-theme="light"] .text-slate-500 {
+  color: var(--l-text-faint) !important;
+}
+html[data-theme="light"] .text-white {
+  color: var(--l-text-heading) !important;
+}
+/* The hero search bar's "Search Destinations" placeholder is the only spot
+   on the site that sets placeholder-slate-200 explicitly -- deliberately
+   matches the input's own text-slate-200 rather than a more muted shade. */
+html[data-theme="light"] .placeholder-slate-200::placeholder {
+  color: var(--l-text-body) !important;
+}
+
+/* Brand accent (cyan -> sunlit teal) */
+html[data-theme="light"] .text-cyan-400 {
+  color: var(--l-accent) !important;
+}
+html[data-theme="light"] .text-cyan-300 {
+  color: var(--l-accent-hover) !important;
+}
+html[data-theme="light"] .bg-cyan-500 {
+  background-color: var(--l-accent) !important;
+}
+html[data-theme="light"] .hover\:bg-cyan-400:hover {
+  background-color: var(--l-accent-hover) !important;
+}
+/* Solid CTA buttons (bg-cyan-500 + text-slate-950, e.g. "Find Dives",
+   "Log in", "Confirm Booking") originally pair the accent with near-black
+   text, which reads fine against bright dark-mode cyan but looks muddy/too
+   dark against the softer light-mode teal -- give these buttons a richer,
+   deliberately darker teal plus white text instead. */
+html[data-theme="light"] .bg-cyan-500.text-slate-950 {
+  background-color: var(--l-accent-button) !important;
+  color: #ffffff !important;
+}
+html[data-theme="light"] .bg-cyan-500.text-slate-950.hover\:bg-cyan-400:hover {
+  background-color: var(--l-accent-button-hover) !important;
+}
+/* The "You" chat bubble reuses bg-cyan-500 + text-slate-950 like the CTA
+   buttons above, but its label/message text carry their own explicit
+   text-slate-900/text-slate-950 classes that win over the inherited color. */
+html[data-theme="light"] .bg-cyan-500.text-slate-950 .text-slate-900,
+html[data-theme="light"] .bg-cyan-500.text-slate-950 .text-slate-950 {
+  color: #ffffff !important;
+}
+html[data-theme="light"] .hover\:bg-cyan-500\/20:hover {
+  background-color: var(--l-accent-soft-20) !important;
+}
+html[data-theme="light"] .bg-cyan-500\/10 {
+  background-color: var(--l-accent-soft-10) !important;
+}
+html[data-theme="light"] .bg-cyan-500\/20 {
+  background-color: var(--l-accent-soft-20) !important;
+}
+html[data-theme="light"] .border-cyan-500\/20 {
+  border-color: var(--l-accent-soft-20) !important;
+}
+html[data-theme="light"] .border-cyan-500\/30 {
+  border-color: var(--l-accent-soft-30) !important;
+}
+html[data-theme="light"] .border-cyan-500\/40 {
+  border-color: var(--l-accent-soft-40) !important;
+}
+html[data-theme="light"] .hover\:border-cyan-500\/40:hover {
+  border-color: var(--l-accent-soft-40) !important;
+}
+html[data-theme="light"] .border-cyan-400 {
+  border-color: var(--l-accent) !important;
+}
+html[data-theme="light"] .border-cyan-400\/40 {
+  border-color: var(--l-accent-soft-40) !important;
+}
+/* Cosmetic tier accents -- keep readable against the light surface instead
+   of the dark-tuned defaults. */
+html[data-theme="light"] .border-emerald-400 {
+  border-color: #047857 !important;
+}
+html[data-theme="light"] .border-violet-400 {
+  border-color: #6d28d9 !important;
+}
+html[data-theme="light"] .border-amber-400 {
+  border-color: #a15c07 !important;
+}
+/* Diver certification / verified-host avatar rings -- darker/richer shades
+   of the same dark-mode colors so they stay readable against the light
+   theme's pale surfaces instead of looking washed out. */
+html[data-theme="light"] .diver-ring-verified {
+  border-color: #047857 !important;
+}
+html[data-theme="light"] .diver-ring-instructor {
+  border-color: #a15c07 !important;
+}
+html[data-theme="light"] .diver-ring-divemaster {
+  border-color: #7e22ce !important;
+}
+html[data-theme="light"] .diver-ring-rescue {
+  border-color: #1d4ed8 !important;
+}
+html[data-theme="light"] .diver-ring-advanced {
+  border-color: var(--l-accent) !important;
+}
+html[data-theme="light"] .diver-ring-openwater {
+  border-color: #475569 !important;
+}
+html[data-theme="light"] .diver-ring-none {
+  border-color: var(--l-border-strong) !important;
+}
+html[data-theme="light"] .focus\:border-cyan-500:focus {
+  border-color: var(--l-accent) !important;
+}
+html[data-theme="light"] .focus\:border-cyan-500\/50:focus {
+  border-color: var(--l-accent-soft-40) !important;
+}
+html[data-theme="light"] .hover\:text-cyan-400:hover {
+  color: var(--l-accent) !important;
+}
+html[data-theme="light"] .shadow-cyan-500\/20 {
+  --tw-shadow-color: var(--l-accent-soft-20) !important;
+}
+html[data-theme="light"] .nav-btn.active {
+  color: var(--l-accent) !important;
+  background-color: var(--l-surface-muted) !important;
+}
+
+/* Badge accents: darken the -400/-300 shades so text stays readable on
+   light surfaces */
+html[data-theme="light"] .text-amber-400 {
+  color: #a15c07 !important;
+}
+html[data-theme="light"] .text-amber-300 {
+  color: #92400e !important;
+}
+html[data-theme="light"] .text-emerald-400 {
+  color: #047857 !important;
+}
+html[data-theme="light"] .text-emerald-300 {
+  color: #065f46 !important;
+}
+html[data-theme="light"] .text-purple-400 {
+  color: #7e22ce !important;
+}
+html[data-theme="light"] .text-purple-300 {
+  color: #6b21a8 !important;
+}
+html[data-theme="light"] .text-rose-400 {
+  color: #be123c !important;
+}
+html[data-theme="light"] .text-rose-300 {
+  color: #9f1239 !important;
+}
+html[data-theme="light"] .text-indigo-400 {
+  color: #4338ca !important;
+}
+html[data-theme="light"] .text-violet-400 {
+  color: #6d28d9 !important;
+}
+html[data-theme="light"] .text-violet-300 {
+  color: #5b21b6 !important;
+}
+/* Live-conditions stat trio (Wind/Tide/Current) on the dive-details and
+   booking-detail modals. */
+html[data-theme="light"] .text-sky-400 {
+  color: #0369a1 !important;
+}
+html[data-theme="light"] .text-teal-400 {
+  color: #0f766e !important;
+}
+html[data-theme="light"] .text-orange-400 {
+  color: #c2410c !important;
+}
+
+/* Same idea for the pastel "/80"-opacity body text used in the host status
+   cards (pending/rejected/suspended) -- tuned to sit on a dark navy card,
+   near-invisible on the light theme's pale card backgrounds without this. */
+html[data-theme="light"] .text-amber-200\/80 {
+  color: #92400e !important;
+}
+html[data-theme="light"] .text-rose-200\/80 {
+  color: #9f1239 !important;
+}
+html[data-theme="light"] .text-emerald-200\/80 {
+  color: #065f46 !important;
+}
+
+/* Gradients: overriding the raw background-image is more reliable than
+   fighting Tailwind's chained --tw-gradient-stops variables per-stop */
+html[data-theme="light"] .from-cyan-400.via-teal-300.to-emerald-400 {
+  background-image: linear-gradient(to right, #0e8fa6, #0d9488, #059669) !important;
+}
+html[data-theme="light"] .from-slate-900.via-cyan-950\/60.to-slate-900 {
+  background-image: linear-gradient(to right, #ffffff, rgba(14, 143, 166, 0.1), #ffffff) !important;
+}
+html[data-theme="light"] .from-cyan-300.to-amber-300 {
+  background-image: linear-gradient(to right, #0e8fa6, #b45309) !important;
+}
+html[data-theme="light"] .from-amber-500\/10.via-slate-900.to-slate-900 {
+  background-image: linear-gradient(to right, rgba(224, 142, 43, 0.14), #fdfbf6, #fdfbf6) !important;
+}
+html[data-theme="light"] .from-slate-900.via-amber-950\/20.to-slate-900 {
+  background-image: linear-gradient(to bottom right, #ffffff, rgba(224, 142, 43, 0.12), #ffffff) !important;
+}
+/* Treasure Chest card (Dive Shop) -- same "light gradient with a themed
+   tint" treatment as the amber hero card above, purple to match its accent. */
+html[data-theme="light"] .from-slate-900.via-purple-950\/20.to-slate-900 {
+  background-image: linear-gradient(to bottom right, #ffffff, rgba(168, 85, 247, 0.12), #ffffff) !important;
+}
+
+/* "Always dark" elements: photo badges, the photo caption bar, profile-grid
+   photo captions all sit on top of imagery, so they keep their original
+   dark-theme colors in both themes. Without this, the light-theme
+   overrides above would apply inside them too and make the text unreadable. */
+html[data-theme="light"] .always-dark .text-white {
+  color: #ffffff !important;
+}
+html[data-theme="light"] .always-dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+html[data-theme="light"] .always-dark .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+html[data-theme="light"] .always-dark .text-cyan-400 {
+  color: #22d3ee !important;
+}
+html[data-theme="light"] .always-dark .text-amber-400 {
+  color: #fbbf24 !important;
+}
+html[data-theme="light"] .always-dark.text-emerald-400 {
+  color: #34d399 !important;
+}
+html[data-theme="light"] .always-dark.text-cyan-400 {
+  color: #22d3ee !important;
+}
+html[data-theme="light"] .always-dark.text-purple-400 {
+  color: #c084fc !important;
+}
+html[data-theme="light"] .always-dark.text-amber-400 {
+  color: #fbbf24 !important;
+}
+html[data-theme="light"] .always-dark.border-slate-800 {
+  border-color: #1e293b !important;
+}
+html[data-theme="light"] .always-dark.border-cyan-500\/30 {
+  border-color: rgba(34, 211, 238, 0.3) !important;
+}
+html[data-theme="light"] .always-dark.bg-slate-900 {
+  background-color: #0f172a !important;
+}
+html[data-theme="light"] .always-dark .text-slate-500 {
+  color: #64748b !important;
+}
+html[data-theme="light"] .always-dark .text-purple-300 {
+  color: #d8b4fe !important;
+}
+html[data-theme="light"] .always-dark .text-emerald-300 {
+  color: #6ee7b7 !important;
+}
+html[data-theme="light"] .always-dark .text-violet-300 {
+  color: #c4b5fd !important;
+}
+
+/* The profile header's Dives/Buddies/Corals tiles (and the public-profile
+   equivalent) use bg-slate-950 -- a solid box, fine on a flat background,
+   but a hard opaque cutout once a banner shows behind them. Inside an
+   always-dark header, turn them into a frosted glass pane instead so they
+   float on the artwork. Defined unprefixed (applies under dark mode's own
+   already-dark bg-slate-950) and repeated under the light-theme selector
+   so it also outranks the plain light-mode bg-slate-950 override above. */
+.always-dark .bg-slate-950 {
+  background-color: rgba(15, 23, 42, 0.38) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+html[data-theme="light"] .always-dark .bg-slate-950 {
+  background-color: rgba(15, 23, 42, 0.38) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }

@@ -64,6 +64,44 @@ export async function fetchPublicProfilePosts(userId: string): Promise<PublicPos
   return data || [];
 }
 
+export interface Buddy {
+  id: string;
+  name: string;
+  cert: string;
+  avatar_url: string;
+}
+
+// Mirrors renderMyBuddies(): a friendship row could have either person as
+// "requester", so pick whichever side isn't us, then de-dupe by the other
+// person's id -- the unique constraint on friendships only guards one
+// direction, so it's possible for both A->B and B->A to exist as separate
+// accepted rows for the same pair.
+export async function fetchBuddiesList(userId: string): Promise<Buddy[]> {
+  const { data, error } = await supabase
+    .from("friendships")
+    .select(
+      "requester_id, addressee_id, requester:profiles!friendships_requester_id_fkey(id, name, avatar_url, cert), addressee:profiles!friendships_addressee_id_fkey(id, name, avatar_url, cert)"
+    )
+    .eq("status", "accepted")
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+  if (error) throw error;
+
+  const seen = new Set<string>();
+  const buddies: Buddy[] = [];
+  for (const f of (data as unknown as Array<{
+    requester_id: string;
+    requester: Buddy | null;
+    addressee: Buddy | null;
+  }>) || []) {
+    const other = f.requester_id === userId ? f.addressee : f.requester;
+    if (other && !seen.has(other.id)) {
+      seen.add(other.id);
+      buddies.push(other);
+    }
+  }
+  return buddies;
+}
+
 export async function fetchBuddiesCount(userId: string): Promise<number> {
   const { count } = await supabase
     .from("friendships")

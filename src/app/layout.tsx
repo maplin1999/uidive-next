@@ -19,16 +19,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // data-theme starts as "dark" to match the old site's default; the real
-  // theme-toggle button (with its localStorage persistence) comes back once
-  // the light theme is ported (see Header.tsx's comment on this).
+  // data-theme defaults to "light" ("Sunlit Coastal") -- the old site's real
+  // default for a visitor with nothing saved yet, not dark. The inline
+  // script below re-applies a saved choice (if any) before first paint, the
+  // same job the old site's own <head> script did, so the page never
+  // flashes the wrong theme. suppressHydrationWarning is needed because
+  // that script can flip the attribute before React hydrates.
   //
   // AuthProvider + Header + AuthModal live here, at the root, instead of in
   // each page -- every route gets the same signed-in/out chrome and the
   // same sign-in modal for free, matching how the old site had exactly one
   // header and one auth modal shared by every tab.
   return (
-    <html lang="en" data-theme="dark">
+    <html lang="en" data-theme="light" suppressHydrationWarning>
+      <head>
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('uidive_theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();",
+          }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <SocialProvider>

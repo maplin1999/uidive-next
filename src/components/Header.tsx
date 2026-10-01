@@ -17,6 +17,8 @@ import {
   Pencil,
   ShieldCheck,
   CalendarCheck,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
@@ -24,6 +26,7 @@ import { useInboxBadge } from "@/lib/useInboxBadge";
 import { useVerifiedHost } from "@/lib/useVerifiedHost";
 import { diverCertRingClass } from "@/lib/diverRing";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
+import { Theme, applyTheme, readCurrentTheme, storeTheme } from "@/lib/theme";
 
 // The site-wide header (migrated from index.html's <header>), now shared
 // across every page via layout.tsx instead of being one more tab-switched
@@ -32,19 +35,35 @@ import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 // their matching .auth-signed-in-el / host-nav-el visibility rules did on
 // the old site.
 //
-// The old header also had a light/dark theme toggle. It's left out here on
-// purpose: the light ("Sunlit Coastal") theme hasn't been ported to Tailwind
-// yet (see tailwind.config.ts), so a toggle with nothing to switch to would
-// just be a dead button. It comes back once that theme exists.
+// Light ("Sunlit Coastal") / dark ("Deep Ocean") toggle, migrated from the
+// old site's theme-toggle-btn/toggleTheme(). Light is the real default --
+// layout.tsx's inline anti-FOUC script and lib/theme.ts both fall back to
+// it, matching the old site's own index.html default.
 export function Header() {
   const { user, loading, openAuthModal, signOut } = useAuth();
-  const { message } = useToast();
+  const { message, showToast } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inboxBadge = useInboxBadge();
   const isVerifiedHost = useVerifiedHost();
   const pathname = usePathname();
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  // Mirrors the old site's toggleTheme(): read whatever the anti-FOUC
+  // script in layout.tsx already applied, rather than assuming light, so
+  // the icon shown here doesn't flash/mismatch on first paint.
+  const [theme, setTheme] = useState<Theme>("light");
+
+  useEffect(() => {
+    setTheme(readCurrentTheme());
+  }, []);
+
+  function handleToggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    applyTheme(next);
+    storeTheme(next);
+    setTheme(next);
+    showToast(next === "dark" ? "🌙 Deep Ocean mode" : "☀️ Sunlit Coastal mode");
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -58,7 +77,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3.5">
+      <header className="chrome-header-strong sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <Link href="/" className="flex items-center space-x-3 group text-left min-w-0">
             <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors shrink-0">
@@ -108,6 +127,19 @@ export function Header() {
           </nav>
 
           <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+            <button
+              onClick={handleToggleTheme}
+              title="Switch theme"
+              aria-label="Switch theme"
+              className="theme-toggle-btn shrink-0 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-300" />
+              )}
+            </button>
+
             {user && (
               <Link
                 href="/diveshop"

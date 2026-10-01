@@ -20,7 +20,7 @@ export function MobileNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80 px-2 pt-2 flex items-center justify-around"
+      className="chrome-nav-strong md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80 px-2 pt-2 flex items-center justify-around"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
       <MobileNavLink href="/" icon={<Compass className="w-5 h-5" />} label="Explore" active={pathname === "/"} />
