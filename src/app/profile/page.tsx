@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Award, CalendarCheck, Grid, ChevronRight, Pencil } from "lucide-react";
+import Link from "next/link";
+import { Award, CalendarCheck, Grid, ChevronRight, Pencil, ShieldCheck, Compass, Store, BadgeCheck } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import {
@@ -11,15 +12,17 @@ import {
   fetchMyBookings,
   fetchMyPosts,
 } from "@/lib/profile";
+import { fetchBuddiesCount } from "@/lib/social";
+import { fetchHostStatus, HostStatus } from "@/lib/host";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { diverCertRingClass } from "@/lib/diverRing";
 
 // The Profile tab (#tab-profile in the old site). Treasure Chest cosmetics
-// (calling card banner, equipped avatar, diver rings) and the buddies
-// system are separate subsystems not migrated yet -- this covers the real
-// header info, bookings list + full booking detail (roster/cancel/review),
-// and dive-log grid, with those extras stubbed.
+// (calling card banner, equipped avatar, diver rings) are a separate
+// subsystem not migrated yet -- this covers the real header info (including
+// the admin/verified-host badges and real buddies count), bookings list +
+// full booking detail (roster/cancel/review), and dive-log grid.
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
@@ -30,6 +33,8 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [postsStatus, setPostsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selectedBooking, setSelectedBooking] = useState<MyBooking | null>(null);
+  const [buddiesCount, setBuddiesCount] = useState(0);
+  const [hostStatus, setHostStatus] = useState<HostStatus | null>(null);
 
   function loadBookings() {
     if (!user) return;
@@ -52,6 +57,12 @@ export default function ProfilePage() {
         console.error("Could not load your posts:", err);
         setPostsStatus("error");
       });
+    fetchBuddiesCount(user.id)
+      .then(setBuddiesCount)
+      .catch((err) => console.error("Could not load your buddies count:", err));
+    fetchHostStatus(user.id)
+      .then(setHostStatus)
+      .catch((err) => console.error("Could not load host status:", err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -100,6 +111,36 @@ export default function ProfilePage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-white">{user.name}</h1>
+                <div className="flex items-center gap-1.5">
+                  {user.is_admin && (
+                    <div
+                      className="w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/40 flex items-center justify-center"
+                      title="Site Admin -- Review Host Applications"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
+                    </div>
+                  )}
+                  {hostStatus?.verification_status === "verified" && (
+                    <div
+                      className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center"
+                      title={
+                        hostStatus.host_type === "shop"
+                          ? "Verified Dive Shop"
+                          : hostStatus.host_type === "both"
+                            ? "Verified Dive Shop & Divemaster"
+                            : "Verified Divemaster"
+                      }
+                    >
+                      {hostStatus.host_type === "shop" ? (
+                        <Store className="w-3.5 h-3.5 text-emerald-300" />
+                      ) : hostStatus.host_type === "both" ? (
+                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                      ) : (
+                        <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
                 <Award className="w-4 h-4" /> {user.cert} • {user.location}
@@ -119,18 +160,24 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-3 gap-1.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
             <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-slate-800 text-center sm:min-w-[74px]">
-              <div className="text-base sm:text-lg font-black text-white">{user.dives}</div>
+              <div className="text-base sm:text-lg font-black text-white">
+                {Number(user.dives).toLocaleString()}
+              </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Dives</div>
             </div>
-            <button
-              onClick={() => showToast("Dive buddies are coming in a future update.")}
+            <Link
+              href="/inbox"
               className="p-2 sm:p-2.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 hover:border-cyan-500/40 text-center sm:min-w-[74px] transition-colors"
             >
-              <div className="text-base sm:text-lg font-black text-cyan-400">0</div>
+              <div className="text-base sm:text-lg font-black text-cyan-400">
+                {Number(buddiesCount).toLocaleString()}
+              </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Buddies</div>
-            </button>
+            </Link>
             <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-amber-500/30 text-center sm:min-w-[74px]">
-              <div className="text-base sm:text-lg font-black text-amber-400">{user.corals}</div>
+              <div className="text-base sm:text-lg font-black text-amber-400">
+                {Number(user.corals).toLocaleString()}
+              </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Corals</div>
             </div>
           </div>

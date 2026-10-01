@@ -22,6 +22,28 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfile>
   return data;
 }
 
+export interface PublicHostBadge {
+  host_type: "shop" | "divemaster" | "both" | string;
+}
+
+// Verified-host badge for someone else's public profile, ported from
+// renderPublicProfileBadges(). host_profiles is publicly readable by RLS,
+// so this works for signed-out visitors too -- null if they aren't a
+// verified host.
+export async function fetchPublicHostBadge(userId: string): Promise<PublicHostBadge | null> {
+  const { data, error } = await supabase
+    .from("host_profiles")
+    .select("host_type, verification_status")
+    .eq("user_id", userId)
+    .eq("verification_status", "verified")
+    .maybeSingle();
+  if (error) {
+    console.warn("Could not check host-verified status:", error);
+    return null;
+  }
+  return data;
+}
+
 export interface PublicPost {
   id: string;
   image_url: string;

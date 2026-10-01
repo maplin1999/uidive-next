@@ -388,7 +388,7 @@ export default function DiveShopPage() {
                           : "font-bold text-amber-400 bg-amber-500/10 border-amber-500/20 py-1.5"
                       }`}
                     >
-                      <span>🪸</span> <span>{entry.corals}</span> <span>Corals</span>
+                      <span>🪸</span> <span>{Number(entry.corals).toLocaleString()}</span> <span>Corals</span>
                     </div>
                   </div>
                 );
@@ -439,7 +439,7 @@ export default function DiveShopPage() {
                         <td className="py-3 px-4 text-center">{entry.dives}</td>
                         <td className="py-3 px-4 text-center text-purple-400">{entry.max_depth}</td>
                         <td className="py-3 px-4 text-right text-amber-400 font-bold">
-                          🪸 {entry.corals}
+                          🪸 {Number(entry.corals).toLocaleString()}
                         </td>
                       </tr>
                     ))}

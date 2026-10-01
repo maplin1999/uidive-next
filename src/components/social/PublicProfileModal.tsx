@@ -1,18 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Award, Grid, MapPin, MoreVertical, Flag, Ban, UserPlus, MessageSquare } from "lucide-react";
+import {
+  X,
+  Award,
+  Grid,
+  MapPin,
+  MoreVertical,
+  Flag,
+  Ban,
+  UserPlus,
+  MessageSquare,
+  Compass,
+  Store,
+  BadgeCheck,
+} from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import {
   PublicProfile,
   PublicPost,
+  PublicHostBadge,
   FriendshipStatus,
   fetchPublicProfile,
   fetchPublicProfilePosts,
   fetchBuddiesCount,
   fetchFriendshipStatus,
+  fetchPublicHostBadge,
   isUserBlocked,
   toggleBlockUser,
 } from "@/lib/social";
@@ -30,6 +45,7 @@ export function PublicProfileModal() {
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [posts, setPosts] = useState<PublicPost[]>([]);
   const [buddiesCount, setBuddiesCount] = useState(0);
+  const [hostBadge, setHostBadge] = useState<PublicHostBadge | null>(null);
   const [friendship, setFriendship] = useState<FriendshipStatus>("none");
   const [blocked, setBlocked] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -46,13 +62,15 @@ export function PublicProfileModal() {
       fetchPublicProfile(profileUserId),
       fetchPublicProfilePosts(profileUserId),
       fetchBuddiesCount(profileUserId),
+      fetchPublicHostBadge(profileUserId),
       user ? fetchFriendshipStatus(user.id, profileUserId) : Promise.resolve<FriendshipStatus>("none"),
       user ? isUserBlocked(user.id, profileUserId) : Promise.resolve(false),
     ])
-      .then(([p, posts, count, fs, isBlocked]) => {
+      .then(([p, posts, count, badge, fs, isBlocked]) => {
         setProfile(p);
         setPosts(posts);
         setBuddiesCount(count);
+        setHostBadge(badge);
         setFriendship(fs);
         setBlocked(isBlocked);
         setStatus("ready");
@@ -155,7 +173,29 @@ export function PublicProfileModal() {
                   )}`}
                 />
                 <div className="space-y-1">
-                  <h2 className="text-xl sm:text-2xl font-black text-white">{profile.name}</h2>
+                  <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                    <h2 className="text-xl sm:text-2xl font-black text-white">{profile.name}</h2>
+                    {hostBadge && (
+                      <div
+                        className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center"
+                        title={
+                          hostBadge.host_type === "shop"
+                            ? "Verified Dive Shop"
+                            : hostBadge.host_type === "both"
+                              ? "Verified Dive Shop & Divemaster"
+                              : "Verified Divemaster"
+                        }
+                      >
+                        {hostBadge.host_type === "shop" ? (
+                          <Store className="w-3.5 h-3.5 text-emerald-300" />
+                        ) : hostBadge.host_type === "both" ? (
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                        ) : (
+                          <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
                     <Award className="w-4 h-4" />
                     {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
@@ -299,7 +339,7 @@ function StatTile({ label, value, accent }: { label: string; value: number; acce
       }`}
     >
       <div className={`text-base sm:text-lg font-black ${accent === "amber" ? "text-amber-400" : "text-white"}`}>
-        {value}
+        {Number(value).toLocaleString()}
       </div>
       <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">{label}</div>
     </div>
