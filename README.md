@@ -26,7 +26,7 @@ Variables before the first deploy.
 ## Status
 
 - [x] Project scaffold (this file's siblings)
-- [ ] Legal tab
+- [x] Legal tab (`/legal`)
 - [ ] Home (trip browse/search)
 - [ ] Community feed
 - [ ] Inbox / messaging
