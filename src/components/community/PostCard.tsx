@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, MessageCircle, MapPin, ChevronRight, MoreVertical, Pencil, Trash2, Flag, Ban } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  MapPin,
+  ChevronRight,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Flag,
+  Ban,
+  Maximize2,
+} from "lucide-react";
 import { CommunityPost, PostComment } from "@/lib/posts";
 import { useSocial } from "@/components/social/SocialContext";
 import { toggleBlockUser } from "@/lib/social";
@@ -105,13 +116,13 @@ export function PostCard({
         <div className="relative">
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors"
+            className="w-7 h-7 rounded-full text-slate-500 hover:text-slate-300 hover:bg-slate-800 flex items-center justify-center transition-colors"
             aria-label="Post options"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-40 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-10">
+            <div className="absolute right-0 top-full mt-1 w-40 bg-slate-900 border border-slate-700 rounded-xl shadow-xl overflow-hidden py-1 z-30 text-left">
               {isOwnPost ? (
                 <>
                   <button
@@ -119,7 +130,7 @@ export function PostCard({
                       setMenuOpen(false);
                       onEdit();
                     }}
-                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                   >
                     <Pencil className="w-3.5 h-3.5" /> Edit
                   </button>
@@ -128,7 +139,7 @@ export function PostCard({
                       setMenuOpen(false);
                       onDelete();
                     }}
-                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="w-3.5 h-3.5" /> Delete
                   </button>
@@ -139,9 +150,9 @@ export function PostCard({
                     onClick={() => {
                       setMenuOpen(false);
                       if (!onRequireAuth()) return;
-                      openReport("post", post.id, "post");
+                      openReport("post", post.id, "Post");
                     }}
-                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                   >
                     <Flag className="w-3.5 h-3.5" /> Report post
                   </button>
@@ -163,7 +174,7 @@ export function PostCard({
                         console.error("Could not block user:", err);
                       }
                     }}
-                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                   >
                     <Ban className="w-3.5 h-3.5" /> Block user
                   </button>
@@ -177,12 +188,16 @@ export function PostCard({
       {post.image_url && (
         <div className="relative rounded-2xl overflow-hidden max-h-96">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.image_url}
-            alt=""
-            onClick={() => setLightboxOpen(true)}
-            className="w-full h-full object-cover cursor-zoom-in"
-          />
+          <img src={post.image_url} alt="" className="w-full h-full object-cover" />
+          <div className="absolute top-3 right-3 z-10">
+            <button
+              onClick={() => setLightboxOpen(true)}
+              aria-label="View full-size photo"
+              className="w-8 h-8 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center transition-colors"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
           {post.location_name && (
             <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-3 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
               <div className="flex items-center space-x-3 min-w-0">
@@ -236,12 +251,24 @@ export function PostCard({
         {comments.length > 0 && (
           <div className="space-y-2 pl-3 border-l-2 border-slate-800">
             {comments.map((c) => (
-              <p key={c.id} className="text-slate-400">
-                <strong className="font-bold text-slate-200">
-                  {c.profiles?.name || "A diver"}:
-                </strong>{" "}
-                {c.content}
-              </p>
+              <div key={c.id} className="flex items-start justify-between gap-2">
+                <p className="text-slate-400">
+                  <strong className="font-bold text-slate-200">
+                    {c.profiles?.name || "A diver"}:
+                  </strong>{" "}
+                  {c.content}
+                </p>
+                <button
+                  onClick={() => {
+                    if (!onRequireAuth()) return;
+                    openReport("comment", c.id, "comment");
+                  }}
+                  aria-label="Report comment"
+                  className="text-slate-600 hover:text-rose-400 transition-colors shrink-0 mt-0.5"
+                >
+                  <Flag className="w-3 h-3" />
+                </button>
+              </div>
             ))}
           </div>
         )}
