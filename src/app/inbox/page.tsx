@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { UserPlus, Users, Inbox as InboxIcon, MessageSquare } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useSocial } from "@/components/social/SocialContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import {
   BuddyRequest,
@@ -28,6 +29,7 @@ type Tab = "requests" | "messages" | "groups";
 // messages) are left out, same as everywhere else in this rewrite.
 export default function InboxPage() {
   const { user, requireAuth } = useAuth();
+  const { openProfile } = useSocial();
   const [tab, setTab] = useState<Tab>("requests");
 
   const [requests, setRequests] = useState<BuddyRequest[]>([]);
@@ -146,7 +148,10 @@ export default function InboxPage() {
                   key={req.id}
                   className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900 border border-slate-800"
                 >
-                  <div className="flex items-center space-x-3 min-w-0">
+                  <button
+                    onClick={() => openProfile(req.requester_id)}
+                    className="flex items-center space-x-3 min-w-0 text-left"
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={person.avatar_url || DEFAULT_AVATAR}
@@ -154,10 +159,10 @@ export default function InboxPage() {
                       className="w-10 h-10 rounded-full object-cover border border-slate-700"
                     />
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white truncate">{person.name}</p>
+                      <p className="text-sm font-bold text-white truncate hover:underline">{person.name}</p>
                       <p className="text-[11px] text-slate-500">wants to be your dive buddy</p>
                     </div>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleRespond(req.id, true)}
@@ -187,29 +192,36 @@ export default function InboxPage() {
               />
             )}
             {conversations.map((c) => (
-              <button
+              <div
                 key={c.partner.id}
-                onClick={() =>
-                  setActiveChat({ id: c.partner.id, name: c.partner.name, avatar: c.partner.avatar_url })
-                }
-                className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800/80 transition-colors border border-slate-800 text-left"
+                className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800/80 transition-colors border border-slate-800"
               >
-                <div className="flex items-center space-x-3 min-w-0">
+                <button
+                  onClick={() => openProfile(c.partner.id)}
+                  className="flex items-center space-x-3 min-w-0 text-left shrink-0"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={c.partner.avatar_url || DEFAULT_AVATAR}
                     alt=""
                     className="w-9 h-9 rounded-full object-cover border border-slate-700"
                   />
+                </button>
+                <button
+                  onClick={() =>
+                    setActiveChat({ id: c.partner.id, name: c.partner.name, avatar: c.partner.avatar_url })
+                  }
+                  className="flex-1 flex items-center justify-between min-w-0 text-left ml-3"
+                >
                   <div className="truncate">
                     <h4 className="text-xs font-bold text-white truncate">{c.partner.name}</h4>
                     <p className="text-[11px] text-slate-400 truncate">
                       {c.lastMessage.sender_id === user.id ? `You: ${c.lastMessage.content}` : c.lastMessage.content}
                     </p>
                   </div>
-                </div>
-                {c.unread && <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />}
-              </button>
+                  {c.unread && <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 ml-2" />}
+                </button>
+              </div>
             ))}
 
             {buddies.length > 0 && (
@@ -220,25 +232,32 @@ export default function InboxPage() {
                 {buddies
                   .filter((b) => !conversations.some((c) => c.partner.id === b.id))
                   .map((b) => (
-                    <button
+                    <div
                       key={b.id}
-                      onClick={() => setActiveChat({ id: b.id, name: b.name, avatar: b.avatar_url })}
-                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800/80 transition-colors border border-slate-800 text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800/80 transition-colors border border-slate-800"
                     >
-                      <div className="flex items-center space-x-3 min-w-0">
+                      <button
+                        onClick={() => openProfile(b.id)}
+                        className="shrink-0"
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={b.avatar_url || DEFAULT_AVATAR}
                           alt=""
                           className="w-9 h-9 rounded-full object-cover border border-slate-700"
                         />
+                      </button>
+                      <button
+                        onClick={() => setActiveChat({ id: b.id, name: b.name, avatar: b.avatar_url })}
+                        className="flex-1 flex items-center justify-between min-w-0 text-left ml-3"
+                      >
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-white truncate">{b.name}</h4>
+                          <h4 className="text-xs font-bold text-white truncate hover:underline">{b.name}</h4>
                           <p className="text-[11px] text-slate-500">Start a conversation</p>
                         </div>
-                      </div>
-                      <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0" />
-                    </button>
+                        <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0" />
+                      </button>
+                    </div>
                   ))}
               </div>
             )}

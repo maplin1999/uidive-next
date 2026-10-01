@@ -28,9 +28,12 @@ Variables before the first deploy.
 - [x] Project scaffold (this file's siblings)
 - [x] Legal tab (`/legal`)
 - [x] Home (trip browse/search) (`/`)
-- [x] Community feed (`/community`)
+- [x] Community feed (`/community`) -- real posting/edit/delete, like, comment; blocked users filtered out
 - [x] Auth (sign in / sign up / sign out, shared header across all pages)
-- [x] Inbox / messaging (buddy requests, add buddy, direct messages, trip group chats) (`/inbox`)
+- [x] Inbox / messaging (buddy requests, add buddy, direct messages, trip group chats) (`/inbox`) -- buddy/partner avatars open their public profile
 - [x] Dive Shop (vouchers, offers, leaderboard) (`/diveshop`) -- Treasure Chests stubbed
 - [x] Profile (header, bookings, dive logs, edit cert/location/bio) (`/profile`) -- cosmetics/treasure chest stubbed
 - [x] Host Dashboard (application flow, analytics, trips, create/edit/cancel, roster) (`/host-dashboard`)
+- [x] Trip detail + booking flow (conditions, host rating, equipment checklist, real `book_trip` RPC, Corals celebration)
+- [x] Booking detail (fellow-diver roster, group chat, cancel, star-rating review) (`/profile` -> booking row)
+- [x] Public profiles, reporting & blocking (click any avatar/name site-wide to view a diver's public profile, add/message them, report or block)

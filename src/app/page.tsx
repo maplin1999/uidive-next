@@ -310,11 +310,6 @@ export default function HomePage() {
             setSelectedTrip(null);
             load();
           }}
-          onViewHost={() => {
-            // The public profile modal hasn't been migrated yet -- stubbed
-            // for now (see Task: Public profiles, reporting & blocking).
-            showToast("Viewing diver profiles is coming in a future update.");
-          }}
         />
       )}
 

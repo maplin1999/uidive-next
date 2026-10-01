@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, Star, Pencil, BadgeCheck, Users, MessageSquare } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useSocial } from "@/components/social/SocialContext";
 import { EQUIPMENT_ITEMS, formatRelativeTime } from "@/lib/trips";
 import {
   MyBooking,
@@ -30,6 +31,7 @@ export function BookingDetailModal({
   onChanged: () => void;
 }) {
   const { requireAuth } = useAuth();
+  const { openProfile } = useSocial();
   const trip = booking.dive_trips;
   const isConfirmed = booking.status === "confirmed";
   const hasPassed = tripHasPassed(trip);
@@ -143,7 +145,10 @@ export function BookingDetailModal({
             <h3 className="font-bold text-white text-base">{trip?.title || "Dive trip"}</h3>
             <p className="text-xs text-slate-400">{trip?.location}</p>
             {trip?.host_id && trip.profiles && (
-              <p className="text-xs text-slate-400 flex items-center gap-1.5">
+              <button
+                onClick={() => openProfile(trip.host_id!)}
+                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
+              >
                 <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
                 Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
                 {hostStats && hostStats.review_count > 0 && (
@@ -152,7 +157,7 @@ export function BookingDetailModal({
                     <span className="text-slate-500">({hostStats.review_count})</span>
                   </>
                 )}
-              </p>
+              </button>
             )}
           </div>
           <button

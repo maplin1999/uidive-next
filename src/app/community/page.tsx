@@ -1,45 +1,132 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
-import { CommunityPost, PostComment, fetchCommunityPosts } from "@/lib/posts";
+import {
+  CommunityPost,
+  PostComment,
+  fetchCommunityPosts,
+  fetchMyLikedPostIds,
+  toggleLike,
+  submitComment,
+  deletePost,
+} from "@/lib/posts";
+import { DiveTrip, HostReviewStats, effectiveTripRating, fetchTrips } from "@/lib/trips";
 import { PostCard } from "@/components/community/PostCard";
+import { PostFormModal } from "@/components/community/PostFormModal";
+import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
+import { CoralsCelebration } from "@/components/CoralsCelebration";
 import { useAuth } from "@/components/auth/AuthContext";
 
 // The Community tab (#tab-community in the old site): the Diver Feed.
-// Posting, liking, and commenting all require a signed-in user in the old
-// site (requireAuth() gates every one of them) -- now a real gate via
-// useAuth()'s requireAuth(), which opens the actual sign-in modal. The
-// underlying actions themselves (creating a post, liking, commenting) are
-// still stubbed with a toast once signed in, since post creation/likes
-// haven't been wired up yet -- reading the feed needs no sign-in at all
-// (posts/post_comments are both publicly readable), so that part is fully
-// real, live Supabase data.
+// Posting, liking, and commenting are all real now (create_post/
+// toggle_post_like/post_comments) -- gated by requireAuth() same as the old
+// site. "Book Site" opens the real trip detail/booking modal when a post is
+// linked to an actual bookable trip.
 export default function CommunityPage() {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [commentsByPost, setCommentsByPost] = useState<Map<string, PostComment[]>>(new Map());
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const { message, showToast } = useToast();
-  const { requireAuth } = useAuth();
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchCommunityPosts()
-      .then(({ posts, commentsByPost }) => {
-        if (cancelled) return;
+  const [trips, setTrips] = useState<DiveTrip[]>([]);
+  const [reviewStats, setReviewStats] = useState<Record<string, { avg_rating: number; review_count: number }>>({});
+  const [hostReviewStats, setHostReviewStats] = useState<Record<string, HostReviewStats>>({});
+  const [selectedTrip, setSelectedTrip] = useState<DiveTrip | null>(null);
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<CommunityPost | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+
+  const { message, showToast } = useToast();
+  const { user, requireAuth } = useAuth();
+
+  const load = useCallback(() => {
+    fetchCommunityPosts(user?.id)
+      .then(async ({ posts, commentsByPost }) => {
         setPosts(posts);
         setCommentsByPost(commentsByPost);
+        if (user) {
+          const liked = await fetchMyLikedPostIds(
+            user.id,
+            posts.map((p) => p.id)
+          );
+          setLikedPostIds(liked);
+        }
         setStatus("ready");
       })
       .catch((err) => {
         console.error("Could not load posts:", err);
-        if (!cancelled) setStatus("error");
+        setStatus("error");
       });
-    return () => {
-      cancelled = true;
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    fetchTrips()
+      .then(({ trips, tripReviewStatsById, hostReviewStatsById }) => {
+        setTrips(trips);
+        setReviewStats(tripReviewStatsById);
+        setHostReviewStats(hostReviewStatsById);
+      })
+      .catch((err) => console.error("Could not load trips for Community:", err));
   }, []);
+
+  async function handleToggleLike(post: CommunityPost) {
+    const wasLiked = likedPostIds.has(post.id);
+    // Optimistic update, same spirit as the old site's immediate UI flip.
+    setLikedPostIds((prev) => {
+      const next = new Set(prev);
+      wasLiked ? next.delete(post.id) : next.add(post.id);
+      return next;
+    });
+    setPosts((prev) =>
+      prev.map((p) => (p.id === post.id ? { ...p, likes: p.likes + (wasLiked ? -1 : 1) } : p))
+    );
+    try {
+      const { liked, likesCount } = await toggleLike(post.id);
+      setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, likes: likesCount } : p)));
+      setLikedPostIds((prev) => {
+        const next = new Set(prev);
+        liked ? next.add(post.id) : next.delete(post.id);
+        return next;
+      });
+    } catch (err) {
+      console.error("Could not toggle like:", err);
+      load();
+    }
+  }
+
+  async function handleSubmitComment(post: CommunityPost, content: string) {
+    if (!user) return;
+    try {
+      const comment = await submitComment(post.id, user.id, content);
+      setCommentsByPost((prev) => {
+        const next = new Map(prev);
+        next.set(post.id, [...(next.get(post.id) || []), comment]);
+        return next;
+      });
+    } catch (err) {
+      console.error("Could not post comment:", err);
+      showToast("Could not post your comment -- please try again.");
+    }
+  }
+
+  async function handleDelete(post: CommunityPost) {
+    if (!window.confirm("Delete this dive log? This can't be undone.")) return;
+    try {
+      await deletePost(post.id);
+      setPosts((prev) => prev.filter((p) => p.id !== post.id));
+    } catch (err) {
+      console.error("Could not delete post:", err);
+      showToast("Could not delete that post -- please try again.");
+    }
+  }
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">
@@ -54,7 +141,8 @@ export default function CommunityPage() {
           <button
             onClick={() => {
               if (!requireAuth()) return;
-              showToast("Posting a dive log is coming in a future update.");
+              setEditingPost(null);
+              setFormOpen(true);
             }}
             className="w-full sm:w-auto shrink-0 whitespace-nowrap bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20"
           >
@@ -107,18 +195,55 @@ export default function CommunityPage() {
                 key={post.id}
                 post={post}
                 comments={commentsByPost.get(post.id) || []}
-                onBookTrip={() =>
-                  showToast("🤿 Trip details are coming in a future update.")
-                }
-                onRequireAuth={() => {
-                  if (!requireAuth()) return;
-                  showToast("That's coming in a future update.");
+                liked={likedPostIds.has(post.id)}
+                isOwnPost={!!user && user.id === post.user_id}
+                onToggleLike={() => handleToggleLike(post)}
+                onSubmitComment={(content) => handleSubmitComment(post, content)}
+                onBookTrip={(tripId) => {
+                  const trip = trips.find((t) => t.id === tripId);
+                  if (trip) setSelectedTrip(trip);
+                  else showToast("Could not find that dive trip -- try refreshing.");
                 }}
+                onEdit={() => {
+                  setEditingPost(post);
+                  setFormOpen(true);
+                }}
+                onDelete={() => handleDelete(post)}
+                onRequireAuth={() => requireAuth()}
+                onBlocked={load}
               />
             ))}
           </div>
         )}
       </div>
+
+      {formOpen && (
+        <PostFormModal
+          trips={trips}
+          editingPost={editingPost}
+          onClose={() => setFormOpen(false)}
+          onSaved={({ coralsAwarded }) => {
+            setFormOpen(false);
+            load();
+            if (coralsAwarded) setCelebrating(true);
+            else showToast(editingPost ? "✅ Dive log updated!" : "📸 Dive log posted!");
+          }}
+        />
+      )}
+
+      {celebrating && (
+        <CoralsCelebration amount={10} title="🎉 Dive Log Posted!" onDone={() => setCelebrating(false)} />
+      )}
+
+      {selectedTrip && (
+        <DiveDetailModal
+          trip={selectedTrip}
+          rating={effectiveTripRating(selectedTrip, reviewStats)}
+          hostStats={selectedTrip.host_id ? hostReviewStats[selectedTrip.host_id] || null : null}
+          onClose={() => setSelectedTrip(null)}
+          onBooked={() => setSelectedTrip(null)}
+        />
+      )}
 
       <Toast message={message} />
     </main>

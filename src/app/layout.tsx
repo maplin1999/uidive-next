@@ -3,6 +3,9 @@ import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Header } from "@/components/Header";
+import { SocialProvider } from "@/components/social/SocialContext";
+import { PublicProfileModal } from "@/components/social/PublicProfileModal";
+import { ReportModal } from "@/components/social/ReportModal";
 
 export const metadata: Metadata = {
   title: "UiDive",
@@ -26,9 +29,13 @@ export default function RootLayout({
     <html lang="en" data-theme="dark">
       <body>
         <AuthProvider>
-          <Header />
-          {children}
-          <AuthModal />
+          <SocialProvider>
+            <Header />
+            {children}
+            <AuthModal />
+            <PublicProfileModal />
+            <ReportModal />
+          </SocialProvider>
         </AuthProvider>
       </body>
     </html>

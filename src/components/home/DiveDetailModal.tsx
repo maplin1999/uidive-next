@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, BadgeCheck, Wind, Waves, Thermometer, Eye } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useSocial } from "@/components/social/SocialContext";
 import {
   DiveTrip,
   ReviewStats,
@@ -26,16 +27,15 @@ export function DiveDetailModal({
   hostStats,
   onClose,
   onBooked,
-  onViewHost,
 }: {
   trip: DiveTrip;
   rating: ReviewStats;
   hostStats: HostReviewStats | null;
   onClose: () => void;
   onBooked: () => void;
-  onViewHost: (hostId: string) => void;
 }) {
   const { user, requireAuth } = useAuth();
+  const { openProfile } = useSocial();
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [booking, setBooking] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
@@ -124,7 +124,7 @@ export function DiveDetailModal({
             <p className="text-sm text-slate-400">{trip.location}</p>
             {trip.host_id && trip.profiles && (
               <button
-                onClick={() => onViewHost(trip.host_id!)}
+                onClick={() => openProfile(trip.host_id!)}
                 className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
               >
                 <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />

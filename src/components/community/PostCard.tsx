@@ -1,27 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, MessageCircle, MapPin, ChevronRight } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ChevronRight, MoreVertical, Pencil, Trash2, Flag, Ban } from "lucide-react";
 import { CommunityPost, PostComment } from "@/lib/posts";
+import { useSocial } from "@/components/social/SocialContext";
+import { toggleBlockUser } from "@/lib/social";
 
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=300&q=80";
 
 // Migrated from renderRealPosts()'s per-post template string in app.js.
-// Liking, commenting, and "Post Log" are stubbed via onRequireAuth (sign-in
-// isn't migrated yet) -- same pattern as the Home page's trip-card stubs.
+// Liking and commenting are now real (toggle_post_like RPC, post_comments
+// insert); the post owner also gets an Edit/Delete menu, migrated from
+// togglePostMenu()/deletePost().
 export function PostCard({
   post,
   comments,
+  liked,
+  isOwnPost,
+  onToggleLike,
+  onSubmitComment,
   onBookTrip,
+  onEdit,
+  onDelete,
   onRequireAuth,
+  onBlocked,
 }: {
   post: CommunityPost;
   comments: PostComment[];
+  liked: boolean;
+  isOwnPost: boolean;
+  onToggleLike: () => void;
+  onSubmitComment: (content: string) => void;
   onBookTrip: (tripId: string) => void;
-  onRequireAuth: (message: string) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onRequireAuth: () => boolean;
+  onBlocked?: () => void;
 }) {
   const [commentDraft, setCommentDraft] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { openProfile, openReport } = useSocial();
   const author = post.profiles || { name: "A diver", avatar_url: "", cert: "" };
   const when = new Date(post.created_at).toLocaleDateString("en-US", {
     month: "short",
@@ -41,15 +60,25 @@ export function PostCard({
     </button>
   ) : null;
 
+  function handleLikeClick() {
+    if (!onRequireAuth()) return;
+    onToggleLike();
+  }
+
   function submitComment() {
     if (!commentDraft.trim()) return;
-    onRequireAuth("Sign in to post a comment.");
+    if (!onRequireAuth()) return;
+    onSubmitComment(commentDraft.trim());
+    setCommentDraft("");
   }
 
   return (
     <article className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl space-y-4 p-5 transition-all">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3 cursor-pointer">
+        <button
+          onClick={() => openProfile(post.user_id)}
+          className="flex items-center space-x-3 text-left"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element -- remote
               Supabase Storage URLs; see TripCard.tsx for the same note. */}
           <img
@@ -68,6 +97,77 @@ export function PostCard({
             </div>
             <p className="text-xs text-slate-400">Posted {when}</p>
           </div>
+        </button>
+
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors"
+            aria-label="Post options"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-40 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-10">
+              {isOwnPost ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onEdit();
+                    }}
+                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors flex items-center gap-2"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDelete();
+                    }}
+                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      if (!onRequireAuth()) return;
+                      openReport("post", post.id, "post");
+                    }}
+                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors flex items-center gap-2"
+                  >
+                    <Flag className="w-3.5 h-3.5" /> Report post
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setMenuOpen(false);
+                      if (!onRequireAuth()) return;
+                      const firstName = author.name.split(" ")[0];
+                      if (
+                        !window.confirm(
+                          `Block ${firstName}? You won't see their posts or comments, and they won't be able to message you. You can unblock them later.`
+                        )
+                      )
+                        return;
+                      try {
+                        await toggleBlockUser(post.user_id);
+                        onBlocked?.();
+                      } catch (err) {
+                        console.error("Could not block user:", err);
+                      }
+                    }}
+                    className="w-full text-left px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
+                  >
+                    <Ban className="w-3.5 h-3.5" /> Block user
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -99,10 +199,12 @@ export function PostCard({
       <div className="flex items-center justify-between text-slate-400 text-xs pb-3 border-b border-slate-800/80">
         <div className="flex items-center space-x-6">
           <button
-            onClick={() => onRequireAuth("Sign in to like this post.")}
-            className="flex items-center space-x-1.5 hover:text-rose-400 transition-colors"
+            onClick={handleLikeClick}
+            className={`flex items-center space-x-1.5 transition-colors ${
+              liked ? "text-rose-400" : "hover:text-rose-400"
+            }`}
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-5 h-5" fill={liked ? "currentColor" : "none"} />
             <span className="font-bold text-slate-200">{post.likes}</span>
           </button>
           <span className="flex items-center space-x-1.5">
