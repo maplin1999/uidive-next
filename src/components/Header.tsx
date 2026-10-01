@@ -7,6 +7,7 @@ import {
   Compass,
   Camera,
   ShoppingBag,
+  Anchor,
   ChevronDown,
   LogIn,
   LogOut,
@@ -65,6 +66,9 @@ export function Header() {
             <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" />
             <NavLink href="/community" icon={<Camera className="w-4 h-4" />} label="Community" />
             <NavLink href="/diveshop" icon={<ShoppingBag className="w-4 h-4" />} label="Dive Shop" />
+            {user && (
+              <NavLink href="/host-dashboard" icon={<Anchor className="w-4 h-4" />} label="Host" />
+            )}
           </nav>
 
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">

@@ -33,4 +33,4 @@ Variables before the first deploy.
 - [ ] Inbox / messaging
 - [x] Dive Shop (vouchers, offers, leaderboard) (`/diveshop`) -- Treasure Chests stubbed
 - [x] Profile (header, bookings, dive logs, edit cert/location/bio) (`/profile`) -- cosmetics/treasure chest stubbed
-- [ ] Host Dashboard
+- [x] Host Dashboard (application flow, analytics, trips, create/edit/cancel, roster) (`/host-dashboard`)
