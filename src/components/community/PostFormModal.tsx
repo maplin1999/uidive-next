@@ -59,6 +59,7 @@ export function PostFormModal({
   }
 
   async function handleSubmit() {
+    if (!user) return;
     const trimmedCaption = caption.trim();
     if (!trimmedCaption && !imageFile && !imagePreview) {
       setError("Add a caption or a photo before posting.");
