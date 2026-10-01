@@ -3,16 +3,8 @@
 import { useState } from "react";
 import { X, Waves, Eye, EyeOff, Zap } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { DEMO_ACCOUNT } from "@/lib/auth-types";
+import { DEMO_ACCOUNT, CERT_OPTIONS } from "@/lib/auth-types";
 import { useAuth } from "@/components/auth/AuthContext";
-
-const CERT_OPTIONS = [
-  "Open Water Diver",
-  "Advanced Open Water",
-  "Rescue Diver",
-  "Divemaster",
-  "Instructor",
-];
 
 // Migrated from the old site's #auth-modal: sign in / sign up tabs, demo
 // account autofill, forgot password, and the "check your email" wait state

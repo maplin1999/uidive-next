@@ -29,7 +29,7 @@ import { useToast, Toast } from "@/components/Toast";
 // just be a dead button. It comes back once that theme exists.
 export function Header() {
   const { user, openAuthModal, signOut } = useAuth();
-  const { message, showToast } = useToast();
+  const { message } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -116,26 +116,22 @@ export function Header() {
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                         Account
                       </span>
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          showToast("Profile editing is coming in a future update.");
-                        }}
+                      <Link
+                        href="/profile"
+                        onClick={() => setDropdownOpen(false)}
                         aria-label="Edit profile"
                         className="p-1.5 -mr-1.5 rounded-full text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
-                      </button>
+                      </Link>
                     </div>
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        showToast("Your Profile page is coming in a future update.");
-                      }}
+                    <Link
+                      href="/profile"
+                      onClick={() => setDropdownOpen(false)}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
                       <User className="w-3.5 h-3.5" /> Profile
-                    </button>
+                    </Link>
                     <div className="border-t border-slate-800" />
                     <button
                       onClick={() => {

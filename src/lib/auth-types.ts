@@ -21,3 +21,12 @@ export const DEFAULT_AVATAR =
 
 // Same demo credentials the old site's "Try Demo Account" button filled in.
 export const DEMO_ACCOUNT = { email: "joel@uidive.com", password: "demo1234" };
+
+// Shared between the sign-up form and Edit Profile.
+export const CERT_OPTIONS = [
+  "Open Water Diver",
+  "Advanced Open Water",
+  "Rescue Diver",
+  "Divemaster",
+  "Instructor",
+];

@@ -32,5 +32,5 @@ Variables before the first deploy.
 - [x] Auth (sign in / sign up / sign out, shared header across all pages)
 - [ ] Inbox / messaging
 - [x] Dive Shop (vouchers, offers, leaderboard) (`/diveshop`) -- Treasure Chests stubbed
-- [ ] Profile (cosmetics, treasure chest, bookings)
+- [x] Profile (header, bookings, dive logs, edit cert/location/bio) (`/profile`) -- cosmetics/treasure chest stubbed
 - [ ] Host Dashboard
