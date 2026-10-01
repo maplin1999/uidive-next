@@ -40,7 +40,7 @@ export async function fetchCommunityPosts(): Promise<{
   const { data: posts, error } = await supabase
     .from("posts")
     .select(
-      "id, caption, image_url, location_name, trip_id, likes, created_at, user_id, corals_awarded, profiles(name, avatar_url, cert)"
+      "id, caption, image_url, location_name, trip_id, likes, created_at, user_id, corals_awarded, profiles!posts_user_id_fkey(name, avatar_url, cert)"
     )
     .order("created_at", { ascending: false })
     .limit(20);
