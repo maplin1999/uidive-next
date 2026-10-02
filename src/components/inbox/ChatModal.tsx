@@ -97,7 +97,7 @@ export function ChatModal({
             return isYou ? (
               <div key={i} className="flex justify-end">
                 <div className="max-w-[75%]">
-                  <div className="bg-cyan-500 text-slate-950 px-4 py-2.5 rounded-2xl rounded-br-md shadow-md">
+                  <div className="bg-cyan-500 text-white px-4 py-2.5 rounded-2xl rounded-br-md shadow-md">
                     <p className="font-semibold text-xs leading-relaxed">{m.content}</p>
                   </div>
                   <p className="text-[10px] text-slate-500 mt-1 text-right">{timeStr}</p>

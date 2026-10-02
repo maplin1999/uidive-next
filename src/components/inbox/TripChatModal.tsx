@@ -90,7 +90,7 @@ export function TripChatModal({
               : resolveAvatarUrl(m.profiles?.avatar_url, m.profiles?.equipped_avatar_id);
             return isYou ? (
               <div key={i} className="flex justify-end">
-                <div className="bg-cyan-500 text-slate-950 px-4 py-2.5 rounded-2xl rounded-br-md max-w-[75%] shadow-md">
+                <div className="bg-cyan-500 text-white px-4 py-2.5 rounded-2xl rounded-br-md max-w-[75%] shadow-md">
                   <p className="font-semibold text-xs leading-relaxed">{m.content}</p>
                 </div>
               </div>
