@@ -239,7 +239,7 @@ export function BookingDetailModal({
 
         <div className="flex items-center justify-between bg-slate-950 p-4 rounded-2xl border border-slate-800">
           <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amount Paid</p>
-          <span className="text-lg font-black text-white">${Number(booking.price_paid)}</span>
+          <span className="text-lg font-black text-white">£{Number(booking.price_paid)}</span>
         </div>
 
         <div>

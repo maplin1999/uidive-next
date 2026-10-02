@@ -73,7 +73,7 @@ export function TripCard({
             </p>
           </div>
           <span className="text-xl font-black text-cyan-400 shrink-0">
-            ${Number(trip.price).toLocaleString()}
+            £{Number(trip.price).toLocaleString()}
           </span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 text-center">
@@ -134,7 +134,7 @@ export function TopPickCard({
       <div className="p-3">
         <h3 className="font-extrabold text-sm text-slate-100 truncate">{trip.title}</h3>
         <p className="text-[11px] text-slate-400 truncate">
-          {trip.location} • ${Number(trip.price).toLocaleString()}
+          {trip.location} • £{Number(trip.price).toLocaleString()}
         </p>
       </div>
     </div>

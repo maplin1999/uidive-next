@@ -280,7 +280,7 @@ export default function HostDashboardPage() {
               <Stat
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Revenue"
-                value={`$${totalRevenue.toFixed(2)}`}
+                value={`£${totalRevenue.toFixed(2)}`}
               />
               <Stat icon={<Gauge className="w-4 h-4" />} label="Fill Rate" value={`${fillRate}%`} />
               <Stat
@@ -345,7 +345,7 @@ export default function HostDashboardPage() {
                             {trip.location} • {dateStr}
                           </p>
                           <p className="text-[10px] text-slate-500">
-                            {trip.spots_booked || 0}/{trip.capacity || 0} booked • $
+                            {trip.spots_booked || 0}/{trip.capacity || 0} booked • £
                             {Number(trip.price || 0).toFixed(2)}/diver
                           </p>
                         </div>

@@ -185,19 +185,35 @@ export default function ProfilePage() {
           className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
         >
           {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
-              behind everything else in this header. object-cover on a
-              right-anchored half-width strip with a left-fade mask shows the
-              card art without a hard rectangle edge, same treatment as the
-              public-profile header. calling-card-drift gives the art a
-              slow, barely-perceptible zoom/pan so an equipped banner reads
-              as a premium living backdrop instead of a static cutout. */}
+              behind everything else in this header. On sm+ (row layout,
+              left-aligned text) it's a right-anchored half-width strip with
+              a left-fade mask so the art doesn't fight the name/stats. On
+              mobile (stacked, centered layout) that same strip would mostly
+              sit off to one side behind nothing, so instead the art fills
+              the whole card with a flat dark scrim for legibility -- still
+              a real banner instead of being hidden outright. calling-card-drift
+              gives the art a slow, barely-perceptible zoom/pan so an equipped
+              banner reads as a premium living backdrop instead of a static
+              cutout. */}
           {cardItem && (
-            <div className="hidden sm:block absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+              {/* Mobile: full-bleed art with a flat dark scrim behind the
+                  centered name/stats. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={cardItem.image}
                 alt=""
-                className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 object-cover"
+                className="calling-card-drift sm:hidden absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="sm:hidden absolute inset-0 bg-slate-950/55" />
+              {/* sm+: right-anchored half-width strip, left edge faded out
+                  so it reads as art bleeding into the card rather than a
+                  hard-edged rectangle. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cardItem.image}
+                alt=""
+                className="calling-card-drift hidden sm:block absolute inset-y-0 right-0 h-full w-1/2 object-cover"
                 style={{
                   maskImage: "linear-gradient(to right, transparent, black 45%)",
                   WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
@@ -473,7 +489,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm font-black text-cyan-400">
-                        ${Number(b.price_paid)}
+                        £{Number(b.price_paid)}
                       </span>
                       <ChevronRight className="w-4 h-4 text-slate-600" />
                     </div>

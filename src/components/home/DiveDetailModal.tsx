@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, BadgeCheck, Radio, CheckCircle, Info } from "lucide-react";
+import { X, BadgeCheck, Radio, CheckCircle, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import {
@@ -9,38 +9,37 @@ import {
   ReviewStats,
   HostReviewStats,
   difficultyAccent,
-  formatTripDate,
   formatRelativeTime,
-  bookTrip,
 } from "@/lib/trips";
+import { startCheckout } from "@/lib/checkout";
 import { EquipmentChecklistModal } from "@/components/home/EquipmentChecklistModal";
-import { CoralsCelebration } from "@/components/CoralsCelebration";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
 
-// Migrated from the old site's #dive-modal (openDiveDetail()/confirmBooking()).
-// Tapping "Confirm Booking" opens the equipment checklist first -- that
-// modal's own confirm is what actually calls book_trip().
+// Migrated from the old site's #dive-modal (openDiveDetail()/confirmBooking()),
+// now with real payment via Revolut instead of a free instant booking.
+// Tapping "Confirm & Pay" opens the equipment checklist first -- that
+// modal's own confirm is what calls startCheckout() (src/lib/checkout.ts),
+// which holds the spot and redirects to Revolut's hosted checkout page.
+// Whether the booking actually goes through is decided after this modal is
+// long gone -- see src/app/booking/complete/page.tsx and the webhook route.
 export function DiveDetailModal({
   trip,
   rating,
   hostStats,
   onClose,
-  onBooked,
 }: {
   trip: DiveTrip;
   rating: ReviewStats;
   hostStats: HostReviewStats | null;
   onClose: () => void;
-  onBooked: () => void;
 }) {
   const { user, requireAuth } = useAuth();
   const { openProfile } = useSocial();
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [celebrating, setCelebrating] = useState(false);
   const [error, setError] = useState("");
 
   useEscapeClose(onClose);
@@ -60,29 +59,18 @@ export function DiveDetailModal({
     setBooking(true);
     setError("");
     try {
-      await bookTrip(trip.id, trip.price, equipment);
-      setCelebrating(true);
+      const { checkoutUrl } = await startCheckout(trip.id, equipment);
+      // Full navigation, not a client-side route change -- checkoutUrl is a
+      // Revolut-hosted page on a different domain entirely. onBooked() is
+      // deliberately not called here: nothing about this trip is actually
+      // booked yet, only held, until the diver pays on Revolut's page and
+      // the webhook confirms it (see /booking/complete).
+      window.location.href = checkoutUrl;
     } catch (err) {
-      console.error("Could not complete booking:", err);
-      setError(
-        err instanceof Error ? err.message : "Could not complete booking -- please try again."
-      );
-    } finally {
+      console.error("Could not start checkout:", err);
+      setError(err instanceof Error ? err.message : "Could not start checkout -- please try again.");
       setBooking(false);
     }
-  }
-
-  if (celebrating) {
-    return (
-      <CoralsCelebration
-        amount={50}
-        title="🎉 Booking Confirmed!"
-        onDone={() => {
-          setCelebrating(false);
-          onBooked();
-        }}
-      />
-    );
   }
 
   return (
@@ -215,7 +203,7 @@ export function DiveDetailModal({
               </div>
             </div>
             <span className="text-lg font-black text-white shrink-0">
-              ${Number(trip.price).toLocaleString()} USD
+              £{Number(trip.price).toLocaleString()} GBP
             </span>
           </div>
 
@@ -224,12 +212,12 @@ export function DiveDetailModal({
             disabled={isFull || booking}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center space-x-2"
           >
-            <span>{isFull ? "Fully Booked" : booking ? "Booking…" : "Confirm Booking"}</span>
+            <span>{isFull ? "Fully Booked" : booking ? "Taking you to checkout…" : "Confirm & Pay"}</span>
             {!isFull && <CheckCircle className="w-4 h-4" />}
           </button>
           <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
-            <Info className="w-3 h-3 shrink-0" />
-            Online payments are coming soon -- this reserves your spot now, free of charge.
+            <ShieldCheck className="w-3 h-3 shrink-0" />
+            Secure payment via Revolut -- your spot is held while you pay.
           </p>
         </div>
       </div>

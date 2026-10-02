@@ -85,9 +85,12 @@ export async function fetchTrips(): Promise<{
   return { trips: (tripsRes.data || []) as DiveTrip[], tripReviewStatsById, hostReviewStatsById };
 }
 
-// Mirrors confirmBooking()'s RPC call in the old app.js -- books for free
-// right away (no real payment gateway is wired up), capacity-checked and
-// price-computed atomically on the server by book_trip().
+// Superseded by startCheckout() in src/lib/checkout.ts, which holds the
+// spot and sends the diver through real Revolut payment instead of booking
+// for free instantly (see add-revolut-payments.sql). Left here, unused, as
+// a reference for the old free-booking RPC shape rather than deleted --
+// book_trip() itself still exists in the DB too, just nothing calls it
+// anymore.
 export async function bookTrip(
   tripId: string,
   price: number,

@@ -6,9 +6,11 @@ import { EQUIPMENT_ITEMS } from "@/lib/trips";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #equipment-checklist-modal -- shown after
-// tapping "Confirm Booking" on a trip, so a diver can flag what gear
-// they're bringing before the spot is actually reserved. This modal's own
-// "Confirm Booking" is what finalizes the real booking.
+// tapping "Confirm & Pay" on a trip, so a diver can flag what gear they're
+// bringing before heading to checkout. This modal's own confirm hands off
+// to DiveDetailModal's handleFinalize(), which starts real Revolut
+// checkout (see src/lib/checkout.ts) -- the spot is only truly reserved
+// once that order is created, not yet at this step.
 export function EquipmentChecklistModal({
   onClose,
   onConfirm,
@@ -67,7 +69,7 @@ export function EquipmentChecklistModal({
           onClick={() => onConfirm(checked)}
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center space-x-2"
         >
-          <span>Confirm Booking</span>
+          <span>Continue to Payment</span>
           <CheckCircle className="w-4 h-4" />
         </button>
       </div>

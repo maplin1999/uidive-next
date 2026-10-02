@@ -116,6 +116,41 @@ export function HeroSearch({
                 placeholder="Search Destinations"
                 className="bg-transparent text-sm w-full focus:outline-none placeholder-slate-200 text-slate-200 truncate"
               />
+
+              {/* WHERE dropdown -- nested inside the Where segment itself
+                  (which is already position:relative) rather than the outer
+                  search-pill wrapper, so "top-full" anchors to this field.
+                  Anchoring it to the wrapper instead put it below the whole
+                  pill (including the Search button) on mobile, where the
+                  pill stacks Where/When/Activity/Search vertically. */}
+              {whereOpen && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute z-30 top-full mt-2 left-0 w-72 max-w-[85vw] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto"
+                >
+                  <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-2">
+                    Popular Destinations
+                  </div>
+                  <div className="space-y-0.5">
+                    {suggestions.length === 0 && (
+                      <p className="text-xs text-slate-500 px-2 py-1.5">No matching destinations yet.</p>
+                    )}
+                    {suggestions.map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => {
+                          onQueryChange(d);
+                          setWhereOpen(false);
+                        }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors truncate"
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* WHEN */}
@@ -175,36 +210,6 @@ export function HeroSearch({
             </button>
           </div>
         </div>
-
-        {/* WHERE dropdown */}
-        {whereOpen && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute z-30 top-full mt-2 left-0 w-72 max-w-[85vw] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto"
-          >
-            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-2">
-              Popular Destinations
-            </div>
-            <div className="space-y-0.5">
-              {suggestions.length === 0 && (
-                <p className="text-xs text-slate-500 px-2 py-1.5">No matching destinations yet.</p>
-              )}
-              {suggestions.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => {
-                    onQueryChange(d);
-                    setWhereOpen(false);
-                  }}
-                  className="w-full text-left px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors truncate"
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* WHEN dropdown */}
         {whenOpen && (

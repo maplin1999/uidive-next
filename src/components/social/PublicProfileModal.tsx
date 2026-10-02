@@ -217,14 +217,24 @@ export function PublicProfileModal() {
                   art so name/stats on top of it stay readable regardless of
                   how bright the artwork is. calling-card-drift gives the art
                   a slow, barely-perceptible zoom/pan, matching the signed-in
-                  Profile page's header treatment. */}
+                  Profile page's header treatment. On mobile (stacked,
+                  centered layout) the art goes full-bleed with a flat scrim
+                  instead of the sm+ right-anchored faded strip, so it still
+                  shows up rather than being hidden outright. */}
               {cardItem && (
-                <div className="hidden absolute inset-0 rounded-3xl overflow-hidden pointer-events-none sm:block" aria-hidden="true">
+                <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={cardItem.image}
                     alt=""
-                    className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 object-cover"
+                    className="calling-card-drift sm:hidden absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="sm:hidden absolute inset-0 bg-slate-950/55" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cardItem.image}
+                    alt=""
+                    className="calling-card-drift hidden sm:block absolute inset-y-0 right-0 h-full w-1/2 object-cover"
                     style={{
                       maskImage: "linear-gradient(to right, transparent, black 45%)",
                       WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",

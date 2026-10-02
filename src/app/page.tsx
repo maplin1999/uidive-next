@@ -326,10 +326,6 @@ export default function HomePage() {
           rating={effectiveTripRating(selectedTrip, reviewStats)}
           hostStats={selectedTrip.host_id ? hostReviewStats[selectedTrip.host_id] || null : null}
           onClose={() => setSelectedTrip(null)}
-          onBooked={() => {
-            setSelectedTrip(null);
-            load();
-          }}
         />
       )}
 
