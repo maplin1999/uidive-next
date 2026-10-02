@@ -246,7 +246,7 @@ export default function ProfilePage() {
                   leaderboard runner-up cards use, so it already has a
                   light-mode-safe background via globals.css instead of
                   needing a new always-dark hook). */}
-              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+              <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
                 <ProfileStatPill label="Dives" value={user.dives} />
                 <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
                 <ProfileStatPill label="Corals" value={user.corals} accent="amber" />

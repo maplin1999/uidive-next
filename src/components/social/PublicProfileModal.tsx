@@ -245,7 +245,7 @@ export function PublicProfileModal() {
                     )}
                   </div>
 
-                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                  <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
                     <ProfileStatPill label="Dives" value={profile.dives} />
                     <ProfileStatPill label="Buddies" value={buddiesCount} />
                     <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
