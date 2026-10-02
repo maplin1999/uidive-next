@@ -189,7 +189,7 @@ export default function ProfilePage() {
                 <Pencil className="w-6 h-6 text-white" />
               </button>
             </div>
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                 {/* Diver ID moved off its own line -- it's niche info most
                     visitors to this page (just the signed-in diver) never
@@ -251,11 +251,19 @@ export default function ProfilePage() {
                 <StatPill label="Corals" value={user.corals} accent="amber" />
               </div>
 
-              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
-                <Award className="w-4 h-4" /> {user.cert} • {user.location}
+              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                <Award className="w-4 h-4 shrink-0" /> {user.cert} • {user.location}
               </p>
 
-              {user.bio && <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>}
+              {/* Indented to sit flush under the cert line's text (icon
+                  width + its gap) rather than under the icon itself -- reads
+                  as a continuation of that line instead of a separate
+                  flush-left block. Only applied at sm+, where the header is
+                  actually left-aligned; centered on mobile, so padding there
+                  would just skew it off-center. */}
+              {user.bio && (
+                <p className="text-xs text-slate-400 max-w-md sm:pl-[22px]">{user.bio}</p>
+              )}
             </div>
           </div>
         </div>
