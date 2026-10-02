@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Anchor, X } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { HostApplicationFields, HostDocType, submitHostApplication } from "@/lib/host";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Values (not just labels) must match the old site's #host-app-type exactly --
 // host_profiles.host_type is a real stored enum, read back elsewhere (admin
@@ -37,6 +38,8 @@ export function HostApplicationForm({ onClose, onSubmitted }: { onClose: () => v
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  useEscapeClose(onClose);
+
   if (!user) return null;
 
   function update<K extends keyof HostApplicationFields>(key: K, value: HostApplicationFields[K]) {
@@ -62,7 +65,12 @@ export function HostApplicationForm({ onClose, onSubmitted }: { onClose: () => v
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>

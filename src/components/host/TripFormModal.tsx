@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Anchor, X } from "lucide-react";
 import { HostTrip, TripFormFields, createTrip, updateTrip } from "@/lib/host";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 const TRIP_TYPES = ["shore", "boat"];
 const ACTIVITY_TYPES = ["scuba", "freediving"];
@@ -78,6 +79,8 @@ export function TripFormModal({
   // banner above, and clear it again the moment they're edited.
   const [invalidFields, setInvalidFields] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+
+  useEscapeClose(onClose);
   const isEdit = !!trip;
 
   function update<K extends keyof TripFormFields>(key: K, value: TripFormFields[K]) {
@@ -117,7 +120,12 @@ export function TripFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>

@@ -50,6 +50,10 @@ export default function InboxPage() {
   const [addBuddyOpen, setAddBuddyOpen] = useState(false);
   const [activeChat, setActiveChat] = useState<{ id: string; name: string; avatar: string } | null>(null);
   const [activeGroupChat, setActiveGroupChat] = useState<{ id: string; title: string } | null>(null);
+  // Which single buddy-request row currently has an Accept/Decline round
+  // trip in flight, so a second click (or clicking the other button) during
+  // that trip can't fire a duplicate/contradictory response.
+  const [respondingId, setRespondingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -95,11 +99,15 @@ export default function InboxPage() {
   }
 
   async function handleRespond(requestId: string, accept: boolean) {
+    if (respondingId) return;
+    setRespondingId(requestId);
     try {
       await respondToBuddyRequest(requestId, accept);
       await load();
     } catch (err) {
       console.error("Could not respond to buddy request:", err);
+    } finally {
+      setRespondingId(null);
     }
   }
 
@@ -189,15 +197,17 @@ export default function InboxPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleRespond(req.id, true)}
-                      className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
+                      disabled={respondingId === req.id}
+                      className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
-                      Accept
+                      {respondingId === req.id ? "…" : "Accept"}
                     </button>
                     <button
                       onClick={() => handleRespond(req.id, false)}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
+                      disabled={respondingId === req.id}
+                      className="bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-slate-300 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
-                      Decline
+                      {respondingId === req.id ? "…" : "Decline"}
                     </button>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import { X, Send, Users } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { TripChatMessage, fetchTripChatMessages, sendTripChatMessage } from "@/lib/inbox";
 import { resolveAvatarUrl } from "@/lib/cosmetics";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #trip-chat-modal -- a shared group chat among
 // co-divers on a trip (no separate host-led channel; everyone with a
@@ -43,6 +44,8 @@ export function TripChatModal({
     if (boxRef.current) boxRef.current.scrollTop = boxRef.current.scrollHeight;
   }, [messages]);
 
+  useEscapeClose(onClose);
+
   if (!user) return null;
 
   async function handleSend() {
@@ -62,7 +65,12 @@ export function TripChatModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col h-[500px] max-h-[85dvh]">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 shrink-0">
           <div className="flex items-center space-x-2.5 min-w-0">

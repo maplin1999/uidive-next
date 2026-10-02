@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { CERT_OPTIONS } from "@/lib/auth-types";
 import { updateProfile, uploadAvatar } from "@/lib/profile";
 import { diverCertRingClass } from "@/lib/diverRing";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from #edit-profile-modal (handleProfileEditSubmit()).
 export function EditProfileModal({ onClose }: { onClose: () => void }) {
@@ -17,6 +18,8 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  useEscapeClose(onClose);
 
   if (!user) return null;
 
@@ -61,7 +64,12 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">

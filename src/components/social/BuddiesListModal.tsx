@@ -7,6 +7,7 @@ import { resolveAvatarUrl } from "@/lib/cosmetics";
 import { useSocial } from "@/components/social/SocialContext";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #buddies-list-modal (openBuddiesListModal()/
 // renderMyBuddies()) -- the Instagram-style "who's on your buddies list"
@@ -32,8 +33,15 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
       });
   }, [userId]);
 
+  useEscapeClose(onClose);
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-5 shadow-2xl max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 shrink-0">
           <h3 className="font-bold text-white text-base flex items-center gap-2">

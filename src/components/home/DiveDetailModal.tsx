@@ -15,6 +15,7 @@ import {
 } from "@/lib/trips";
 import { EquipmentChecklistModal } from "@/components/home/EquipmentChecklistModal";
 import { CoralsCelebration } from "@/components/CoralsCelebration";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
@@ -41,6 +42,8 @@ export function DiveDetailModal({
   const [booking, setBooking] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const [error, setError] = useState("");
+
+  useEscapeClose(onClose);
 
   const spotsLeft = trip.capacity - trip.spots_booked;
   const isFull = spotsLeft <= 0;
@@ -83,7 +86,12 @@ export function DiveDetailModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
         {trip.image_url && (
           <div className="relative h-44 shrink-0 bg-slate-800">

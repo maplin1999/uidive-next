@@ -13,6 +13,7 @@ import {
   unequipCosmetic,
   fetchMyCosmetics,
 } from "@/lib/cosmetics";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Ported from the old site's #cosmetics-locker-modal / renderCosmeticsLocker()
 // -- "My Locker", opened from the Dive Shop. Shows every catalog item split
@@ -25,6 +26,8 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
   const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  useEscapeClose(onClose);
 
   useEffect(() => {
     if (!user) return;

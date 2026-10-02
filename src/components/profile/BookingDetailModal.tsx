@@ -16,6 +16,7 @@ import { RosterDiver, fetchTripRoster } from "@/lib/host";
 import { supabase } from "@/lib/supabase";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -48,6 +49,8 @@ export function BookingDetailModal({
   const [editingReview, setEditingReview] = useState(!existingReview);
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [comment, setComment] = useState(existingReview?.comment || "");
+
+  useEscapeClose(onClose);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState("");
 
@@ -138,7 +141,12 @@ export function BookingDetailModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start">
           <div className="min-w-0">

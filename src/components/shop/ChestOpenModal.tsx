@@ -12,6 +12,7 @@ import {
   CosmeticTier,
   playChestSound,
 } from "@/lib/cosmetics";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 const TIER_RANK: Record<CosmeticTier, number> = { common: 0, rare: 1, epic: 2 };
 
@@ -39,6 +40,8 @@ export function ChestOpenModal({
     "common"
   );
   const glowRgb = CHEST_GLOW_RGB_BY_TIER[bestTier] || CHEST_GLOW_RGB_BY_TIER.epic;
+
+  useEscapeClose(onClose);
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -75,7 +78,12 @@ export function ChestOpenModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="relative bg-slate-900 border border-purple-500/30 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl text-center">
         <button
           type="button"

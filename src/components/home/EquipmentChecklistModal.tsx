@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, CheckCircle, Backpack } from "lucide-react";
 import { EQUIPMENT_ITEMS } from "@/lib/trips";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #equipment-checklist-modal -- shown after
 // tapping "Confirm Booking" on a trip, so a diver can flag what gear
@@ -17,8 +18,15 @@ export function EquipmentChecklistModal({
 }) {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
+  useEscapeClose(onClose);
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start">
           <h3 className="font-bold text-white text-base flex items-center gap-2">

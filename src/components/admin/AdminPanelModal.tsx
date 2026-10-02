@@ -15,6 +15,7 @@ import {
   reviewReport,
 } from "@/lib/admin";
 import { useToast, Toast } from "@/components/Toast";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 type AdminTab = "hosts" | "reports";
 
@@ -30,7 +31,15 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [openDocsFor, setOpenDocsFor] = useState<string | null>(null);
   const [docs, setDocs] = useState<Record<string, HostApplicationDocument[]>>({});
+  // Tracks whichever single application/report row currently has an
+  // approve/reject/dismiss/remove request in flight, so only that row's
+  // buttons disable -- these actions each take a round trip (and rejection
+  // pops a window.prompt first), so without this a second click while the
+  // first is still pending could fire the mutation twice.
+  const [busyId, setBusyId] = useState<string | null>(null);
   const { message, showToast } = useToast();
+
+  useEscapeClose(onClose);
 
   function load() {
     setStatus("loading");
@@ -67,6 +76,8 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
   }
 
   async function handleApprove(hostUserId: string) {
+    if (busyId) return;
+    setBusyId(hostUserId);
     try {
       await approveHostApplication(hostUserId);
       showToast("✅ Host approved.");
@@ -74,12 +85,16 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     } catch (err) {
       console.error("Could not approve this application:", err);
       showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not approve this application.");
+    } finally {
+      setBusyId(null);
     }
   }
 
   async function handleReject(hostUserId: string) {
+    if (busyId) return;
     const reason = window.prompt("Reason for rejection (shown to the applicant):", "");
     if (reason === null) return;
+    setBusyId(hostUserId);
     try {
       await rejectHostApplication(hostUserId, reason);
       showToast("Application rejected.");
@@ -87,14 +102,18 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     } catch (err) {
       console.error("Could not reject this application:", err);
       showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not reject this application.");
+    } finally {
+      setBusyId(null);
     }
   }
 
   async function handleReviewReport(reportId: string, action: "dismiss" | "remove", targetType: string) {
+    if (busyId) return;
     if (action === "remove") {
       const label = targetType === "user" ? "this user's report" : `this ${targetType}`;
       if (!window.confirm(`Permanently delete ${label}? This can't be undone.`)) return;
     }
+    setBusyId(reportId);
     try {
       await reviewReport(reportId, action);
       showToast(action === "remove" ? "🗑️ Content removed." : "Report dismissed.");
@@ -102,11 +121,18 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     } catch (err) {
       console.error("Could not review this report:", err);
       showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not review this report.");
+    } finally {
+      setBusyId(null);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
@@ -221,15 +247,17 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleApprove(app.user_id)}
-                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+                      disabled={busyId === app.user_id}
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                     >
-                      Approve
+                      {busyId === app.user_id ? "Approving…" : "Approve"}
                     </button>
                     <button
                       onClick={() => handleReject(app.user_id)}
-                      className="flex-1 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold rounded-xl text-xs transition-colors"
+                      disabled={busyId === app.user_id}
+                      className="flex-1 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 disabled:opacity-60 border border-rose-500/40 text-rose-300 font-bold rounded-xl text-xs transition-colors"
                     >
-                      Reject
+                      {busyId === app.user_id ? "Rejecting…" : "Reject"}
                     </button>
                   </div>
                 </div>
@@ -270,16 +298,18 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleReviewReport(r.id, "dismiss", r.target_type)}
-                      className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors"
+                      disabled={busyId === r.id}
+                      className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-slate-200 font-bold rounded-xl text-xs transition-colors"
                     >
-                      Dismiss
+                      {busyId === r.id ? "Dismissing…" : "Dismiss"}
                     </button>
                     {r.target_type !== "user" && (
                       <button
                         onClick={() => handleReviewReport(r.id, "remove", r.target_type)}
-                        className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+                        disabled={busyId === r.id}
+                        className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                       >
-                        Remove {targetLabel}
+                        {busyId === r.id ? "Removing…" : `Remove ${targetLabel}`}
                       </button>
                     )}
                   </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   X,
@@ -35,6 +35,8 @@ import { sendBuddyRequest } from "@/lib/inbox";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { COSMETIC_CATALOG, resolveAvatarUrl } from "@/lib/cosmetics";
+import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useClickOutside } from "@/lib/useClickOutside";
 
 // Migrated from the old site's #public-profile-modal (viewPublicProfile()),
 // including the equipped calling-card banner / avatar ring cosmetics.
@@ -53,6 +55,8 @@ export function PublicProfileModal() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(menuRef, () => setMenuOpen(false));
 
   useEffect(() => {
     if (!profileUserId) return;
@@ -81,6 +85,8 @@ export function PublicProfileModal() {
         setStatus("error");
       });
   }, [profileUserId, user]);
+
+  useEscapeClose(closeProfile);
 
   if (!profileUserId) return null;
 
@@ -115,10 +121,15 @@ export function PublicProfileModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) closeProfile();
+      }}
+    >
       <div className="bg-slate-950 border border-slate-800 w-full max-w-5xl rounded-3xl p-5 sm:p-8 space-y-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start -mt-1 -mr-1">
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             {user && (
               <>
                 <button

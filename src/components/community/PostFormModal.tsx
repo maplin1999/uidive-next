@@ -5,6 +5,7 @@ import { X, Camera, Pencil, MapPin } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { DiveTrip } from "@/lib/trips";
 import { createPost, updatePost, uploadPostImage } from "@/lib/posts";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 const CUSTOM_LOCATION = "__custom__";
 
@@ -54,6 +55,8 @@ export function PostFormModal({
   const [removeImage, setRemoveImage] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEscapeClose(onClose);
 
   if (!user) return null;
 
@@ -124,7 +127,12 @@ export function PostFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">

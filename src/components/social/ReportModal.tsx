@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Flag } from "lucide-react";
 import { useSocial } from "@/components/social/SocialContext";
 import { REPORT_REASONS, submitReport } from "@/lib/social";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's #report-modal (openReportModal()/
 // submitReport()) -- reusable from a post's safety menu, a comment, or a
@@ -15,6 +16,28 @@ export function ReportModal() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // This modal stays permanently mounted (gated only by `!reportTarget`)
+  // and is reused for whatever was last reported -- a post, a comment, a
+  // profile. Without this, closing early right after a successful submit
+  // (before the 1.4s auto-close timer fires) left `done`/`reason`/`details`
+  // stale, so reopening it for a DIFFERENT target could show "Report
+  // submitted" before the person had done anything, and the leftover timer
+  // would auto-close that unrelated report out from under them.
+  useEffect(() => {
+    setReason("");
+    setDetails("");
+    setError("");
+    setSubmitting(false);
+    setDone(false);
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, [reportTarget]);
+
+  useEscapeClose(closeReport);
 
   if (!reportTarget) return null;
 
@@ -28,7 +51,7 @@ export function ReportModal() {
     try {
       await submitReport(reportTarget!.targetType, reportTarget!.targetId, reason, details.trim());
       setDone(true);
-      setTimeout(() => {
+      closeTimerRef.current = setTimeout(() => {
         closeReport();
         setDone(false);
         setReason("");
@@ -43,7 +66,12 @@ export function ReportModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) closeReport();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">

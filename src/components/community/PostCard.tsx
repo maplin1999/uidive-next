@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Heart,
   MessageCircle,
@@ -18,6 +18,7 @@ import { useSocial } from "@/components/social/SocialContext";
 import { toggleBlockUser } from "@/lib/social";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { useClickOutside } from "@/lib/useClickOutside";
 
 // Migrated from renderRealPosts()'s per-post template string in app.js.
 // Liking and commenting are now real (toggle_post_like RPC, post_comments
@@ -51,6 +52,8 @@ export function PostCard({
   const [commentDraft, setCommentDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(menuRef, () => setMenuOpen(false));
   const { openProfile, openReport } = useSocial();
   const author = post.profiles || { name: "A diver", avatar_url: "", cert: "", equipped_avatar_id: null };
   const when = new Date(post.created_at).toLocaleDateString("en-US", {
@@ -110,7 +113,7 @@ export function PostCard({
           </div>
         </button>
 
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="w-7 h-7 rounded-full text-slate-500 hover:text-slate-300 hover:bg-slate-800 flex items-center justify-center transition-colors"

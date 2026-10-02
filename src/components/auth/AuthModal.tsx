@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { X, Waves, Eye, EyeOff, Zap } from "lucide-react";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 import { supabase } from "@/lib/supabase";
 import { DEMO_ACCOUNT, CERT_OPTIONS } from "@/lib/auth-types";
 import { useAuth } from "@/components/auth/AuthContext";
@@ -33,6 +34,8 @@ export function AuthModal() {
   const [signupShowPassword, setSignupShowPassword] = useState(false);
   const [signupError, setSignupError] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
+
+  useEscapeClose(handleClose);
 
   if (!isAuthModalOpen) return null;
 
@@ -146,7 +149,12 @@ export function AuthModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl modal-spring max-h-[90vh] overflow-y-auto">
         {view === "confirm" ? (
           <ConfirmEmailView email={pendingEmail} onClose={handleClose} />

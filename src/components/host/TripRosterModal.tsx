@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { X, Award, Users } from "lucide-react";
 import { HostTrip, RosterDiver, fetchTripRoster } from "@/lib/host";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Migrated from the old site's openHostTripRosterModal() -- lists the divers
 // booked on a trip via the get_trip_roster() RPC.
 export function TripRosterModal({ trip, onClose }: { trip: HostTrip; onClose: () => void }) {
   const [divers, setDivers] = useState<RosterDiver[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  useEscapeClose(onClose);
 
   useEffect(() => {
     fetchTripRoster(trip.id)
@@ -22,7 +25,12 @@ export function TripRosterModal({ trip, onClose }: { trip: HostTrip; onClose: ()
   }, [trip.id]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
