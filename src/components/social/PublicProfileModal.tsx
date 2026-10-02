@@ -34,6 +34,7 @@ import {
 import { sendBuddyRequest } from "@/lib/inbox";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { ProfileStatPill } from "@/components/ProfileStatPill";
 import { COSMETIC_CATALOG, resolveAvatarUrl } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { useClickOutside } from "@/lib/useClickOutside";
@@ -178,7 +179,7 @@ export function PublicProfileModal() {
         {status === "ready" && profile && (
           <>
             <div
-              className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl -mt-2 ${
+              className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl -mt-2 ${
                 cardItem ? "always-dark" : ""
               }`}
             >
@@ -209,9 +210,20 @@ export function PublicProfileModal() {
                   sizeClass="w-20 h-20 sm:w-24 sm:h-24"
                   borderClass="border-4 shadow-lg"
                 />
-                <div className="space-y-1">
+                <div className="space-y-3">
+                  {/* Same header layout as the signed-in Profile page: name
+                      row (Diver ID tucked behind a hover tooltip on the name
+                      instead of its own line), stat pills, cert/location,
+                      then bio indented to sit under the cert text -- kept
+                      identical on purpose so every profile (yours or anyone
+                      else's) looks the same. */}
                   <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                    <h2 className="text-xl sm:text-2xl font-black text-white">{profile.name}</h2>
+                    <div className="relative group">
+                      <h2 className="text-xl sm:text-2xl font-black text-white cursor-default">{profile.name}</h2>
+                      <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                        Diver ID: #{profile.diver_id}
+                      </div>
+                    </div>
                     {hostBadge && (
                       <div className="relative group">
                         <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
@@ -233,12 +245,21 @@ export function PublicProfileModal() {
                       </div>
                     )}
                   </div>
-                  <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
-                    <Award className="w-4 h-4" />
+
+                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <ProfileStatPill label="Dives" value={profile.dives} />
+                    <ProfileStatPill label="Buddies" value={buddiesCount} />
+                    <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
+                  </div>
+
+                  <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                    <Award className="w-4 h-4 shrink-0" />
                     {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
                   </p>
-                  {profile.bio && <p className="text-xs text-slate-400 max-w-md">{profile.bio}</p>}
-                  <p className="text-[10px] font-mono font-bold text-slate-500">Diver ID: #{profile.diver_id}</p>
+
+                  {profile.bio && (
+                    <p className="text-xs text-slate-400 max-w-md sm:pl-[22px]">{profile.bio}</p>
+                  )}
 
                   <div className="w-full sm:w-56 pt-1">
                     {!user ? (
@@ -272,12 +293,6 @@ export function PublicProfileModal() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              <div className="relative z-10 grid grid-cols-3 gap-1.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
-                <StatTile label="Dives" value={profile.dives} />
-                <StatTile label="Buddies" value={buddiesCount} />
-                <StatTile label="Corals" value={profile.corals} accent="amber" />
               </div>
             </div>
 
@@ -375,21 +390,6 @@ export function PublicProfileModal() {
           onClose={() => setChatOpen(false)}
         />
       )}
-    </div>
-  );
-}
-
-function StatTile({ label, value, accent }: { label: string; value: number; accent?: "amber" }) {
-  return (
-    <div
-      className={`p-2 sm:p-2.5 bg-slate-950 rounded-2xl border text-center sm:min-w-[74px] ${
-        accent === "amber" ? "border-amber-500/30" : "border-slate-800"
-      }`}
-    >
-      <div className={`text-base sm:text-lg font-black ${accent === "amber" ? "text-amber-400" : "text-white"}`}>
-        {Number(value).toLocaleString()}
-      </div>
-      <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">{label}</div>
     </div>
   );
 }

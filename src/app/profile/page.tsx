@@ -40,6 +40,7 @@ import { BuddiesListModal } from "@/components/social/BuddiesListModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { ProfileStatPill } from "@/components/ProfileStatPill";
 import { PostFormModal } from "@/components/community/PostFormModal";
 import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 
@@ -246,9 +247,9 @@ export default function ProfilePage() {
                   needing a new always-dark hook). Sits right under the name
                   row, above cert/location and the bio. */}
               <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                <StatPill label="Dives" value={user.dives} />
-                <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                <StatPill label="Corals" value={user.corals} accent="amber" />
+                <ProfileStatPill label="Dives" value={user.dives} />
+                <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
               </div>
 
               <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
@@ -634,45 +635,4 @@ export default function ProfilePage() {
       <Toast message={message} />
     </main>
   );
-}
-
-// Pill-shaped "frosted glass" stat chip for the Dives/Buddies/Corals row.
-// Reuses the same sunken-panel treatment (panel-sunken + bg-slate-950/60 +
-// backdrop-blur) as the hero search bar and leaderboard runner-up cards, so
-// it already has a light-mode-safe background via globals.css rather than
-// needing its own always-dark hook. Renders as a <button> when onClick is
-// given (Buddies, which opens the buddies list), a plain <div> otherwise.
-function StatPill({
-  label,
-  value,
-  accent,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  accent?: "cyan" | "amber";
-  onClick?: () => void;
-}) {
-  const valueClass =
-    accent === "amber" ? "text-amber-400" : accent === "cyan" ? "text-cyan-400" : "text-white";
-  const borderClass = accent === "amber" ? "border-amber-500/30" : "border-slate-800/80";
-  const className = `panel-sunken inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/60 backdrop-blur-md border ${borderClass} ${
-    onClick ? "hover:bg-slate-800/60 hover:border-cyan-500/40 transition-colors cursor-pointer" : ""
-  }`;
-
-  const content = (
-    <>
-      <span className={`text-xs font-black ${valueClass}`}>{Number(value).toLocaleString()}</span>
-      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wide">{label}</span>
-    </>
-  );
-
-  if (onClick) {
-    return (
-      <button onClick={onClick} className={className}>
-        {content}
-      </button>
-    );
-  }
-  return <div className={className}>{content}</div>;
 }
