@@ -183,13 +183,6 @@ export function PublicProfileModal() {
                 cardItem ? "always-dark" : ""
               }`}
             >
-              {/* Caustic light-ripple -- same slow drifting-gradient wash as
-                  the signed-in Profile page's header, standing in for light
-                  filtering through water. Only shown without an equipped
-                  Calling Card so it never competes with that art. */}
-              {!cardItem && (
-                <div className="profile-header-caustics absolute inset-0 rounded-3xl pointer-events-none" aria-hidden="true" />
-              )}
               {/* Equipped Calling Card banner (Treasure Chest cosmetics) --
                   a dark overlay (via always-dark above) is layered under the
                   art so name/stats on top of it stay readable regardless of

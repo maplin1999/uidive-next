@@ -143,13 +143,6 @@ export default function ProfilePage() {
         <div
           className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
         >
-          {/* Caustic light-ripple -- a slow, low-opacity wash of drifting
-              gradients standing in for light filtering through water. Only
-              shown without an equipped Calling Card so it never competes
-              with that art (which gets its own drift treatment below). */}
-          {!cardItem && (
-            <div className="profile-header-caustics absolute inset-0 rounded-3xl pointer-events-none" aria-hidden="true" />
-          )}
           {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
               behind everything else in this header. object-cover on a
               right-anchored half-width strip with a left-fade mask shows the
