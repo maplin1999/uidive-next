@@ -14,6 +14,20 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Hides a number input's native up/down spinner (Chrome/Safari and Firefox
+   use different properties for it) -- that spinner is OS-drawn and can't be
+   themed, so on a dark panel it shows up as a jarring light-grey widget.
+   Used on Price/Capacity in TripFormModal; typing and arrow-key stepping
+   still work without it, just without the visible OS control. */
+.no-spinner {
+  -moz-appearance: textfield;
+}
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 html {
   scroll-padding-top: env(safe-area-inset-top, 0px);
 }
