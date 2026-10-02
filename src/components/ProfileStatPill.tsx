@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Instagram-style stat for a profile header's Dives/Buddies/Corals row --
 // bold number on top, small muted label beneath, no pill/border/background.
 // Two bits of polish on top of the plain stacked layout:
-//  - the number counts up from 0 on mount (ease-out, ~700ms) instead of
-//    just appearing, so the header feels a little alive on first paint.
+//  - the number counts up (ease-out, ~700ms) every time its value prop
+//    changes, not just on mount. Several of these stats start at 0 while
+//    their real count is still loading (Buddies, Posts), so the count-up
+//    has to replay when the fetched number arrives -- a one-shot "only
+//    animate once" guard would otherwise freeze the display at that initial
+//    0 forever, which is exactly the stale-zero bug this fixes.
 //  - hovering a stat (via the shared "group" wrapper) gently scales it and
 //    adds a color-matched glow behind the number, whether or not it's
 //    clickable -- a cheap, low-risk bit of life for a mostly-static card.
@@ -44,11 +48,8 @@ export function ProfileStatPill({
       : "group-hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]";
 
   const [displayValue, setDisplayValue] = useState(0);
-  const animated = useRef(false);
 
   useEffect(() => {
-    if (animated.current) return;
-    animated.current = true;
     const target = Number(value) || 0;
     const duration = 700;
     const start = performance.now();

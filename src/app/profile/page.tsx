@@ -163,7 +163,7 @@ export default function ProfilePage() {
               <img
                 src={cardItem.image}
                 alt=""
-                className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
+                className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 object-cover"
                 style={{
                   maskImage: "linear-gradient(to right, transparent, black 45%)",
                   WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
@@ -256,10 +256,10 @@ export default function ProfilePage() {
                   light-mode-safe background via globals.css instead of
                   needing a new always-dark hook). */}
               <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
-                <ProfileStatPill label="Dives" value={user.dives} />
-                <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
                 <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
+                <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <ProfileStatPill label="Dives" value={user.dives} />
+                <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
               </div>
 
               {/* Depth-gauge accent -- a thin vertical line echoing a dive
