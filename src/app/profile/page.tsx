@@ -189,7 +189,7 @@ export default function ProfilePage() {
                 <Pencil className="w-6 h-6 text-white" />
               </button>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2.5">
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                 {/* Diver ID moved off its own line -- it's niche info most
                     visitors to this page (just the signed-in diver) never
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                   light-mode-safe background via globals.css instead of
                   needing a new always-dark hook). Sits on its own row right
                   under cert/location, above the bio. */}
-              <div className="flex items-center justify-center sm:justify-start gap-1.5 flex-wrap pt-0.5">
+              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
                 <StatPill label="Dives" value={user.dives} />
                 <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
                 <StatPill label="Corals" value={user.corals} accent="amber" />

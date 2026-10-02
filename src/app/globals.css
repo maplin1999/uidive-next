@@ -280,7 +280,7 @@ html[data-theme="light"] .bg-slate-900 {
 html[data-theme="light"] .bg-slate-900\/60 {
   background-color: var(--l-surface-muted) !important;
 }
-/* My Locker modal's header bar (CosmeticsLockerModal.tsx) -- the only
+/* My Dive Bag modal's header bar (CosmeticsLockerModal.tsx) -- the only
    bg-slate-900/95 usage in the app, so it's safe to flip it light here
    rather than needing a dedicated hook class. Without this it stayed a
    dark navy bar sitting on top of the now-white modal body in light mode. */

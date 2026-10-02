@@ -11,6 +11,7 @@ import { AddBuddyModal } from "@/components/inbox/AddBuddyModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
 import { ChestOpenModal } from "@/components/shop/ChestOpenModal";
+import { BagIcon } from "@/components/icons/BagIcon";
 import { TREASURE_CHEST_COST, ChestResult, openTreasureChest } from "@/lib/cosmetics";
 import Link from "next/link";
 
@@ -46,7 +47,7 @@ const OFFERS = [
 // Vouchers and offer redemption are fully real (see src/lib/shop.ts), and so
 // are Treasure Chests/Cosmetics now (see src/lib/cosmetics.ts,
 // CosmeticsLockerModal, ChestOpenModal) -- opening a chest calls the real
-// open_treasure_chest() RPC, and the Locker shows/equips whatever cosmetics
+// open_treasure_chest() RPC, and My Dive Bag shows/equips whatever cosmetics
 // that account actually owns.
 export default function DiveShopPage() {
   const { user, requireAuth, refreshProfile } = useAuth();
@@ -260,9 +261,9 @@ export default function DiveShopPage() {
             {user && (
               <button
                 onClick={() => setLockerOpen(true)}
-                className="text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-colors"
               >
-                My Locker
+                <BagIcon className="w-3.5 h-3.5 shrink-0" /> My Dive Bag
               </button>
             )}
           </div>

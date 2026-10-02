@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Lock } from "lucide-react";
+import { X } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import { CosmeticThumbnail } from "@/components/CosmeticThumbnail";
+import { BagIcon } from "@/components/icons/BagIcon";
 import {
   COSMETIC_CATALOG,
   COSMETIC_TIER_STYLES,
@@ -16,10 +17,11 @@ import {
 import { useEscapeClose } from "@/lib/useEscapeClose";
 
 // Ported from the old site's #cosmetics-locker-modal / renderCosmeticsLocker()
-// -- "My Locker", opened from the Dive Shop. Shows every catalog item split
-// into two grids (Avatars, Calling Cards); owned-but-not-equipped items get
-// an Equip button, the equipped one gets a disabled "Equipped" pill, and
-// anything not owned renders grayscale/dimmed with "Locked".
+// -- "My Dive Bag" (renamed from "My Locker"), opened from the Dive Shop and
+// the Header's account dropdown. Shows every catalog item split into two
+// grids (Avatars, Calling Cards); owned-but-not-equipped items get an Equip
+// button, the equipped one gets a disabled "Equipped" pill, and anything not
+// owned renders grayscale/dimmed with "Locked".
 export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
   const { user, refreshProfile } = useAuth();
   const { message, showToast } = useToast();
@@ -150,7 +152,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
             corners, so neither section needs its own rounded-t/b class. */}
         <div className="shrink-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-between border-b border-slate-800 px-6 py-4">
           <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Lock className="w-4 h-4 text-purple-400 shrink-0" /> My Locker
+            <BagIcon className="w-4 h-4 text-purple-400 shrink-0" /> My Dive Bag
           </h3>
           <button
             onClick={onClose}
@@ -166,7 +168,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
         {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">Loading…</p>}
         {status === "error" && (
           <p className="text-xs text-rose-400 text-center py-6">
-            Could not load your Locker -- please try again.
+            Could not load your Dive Bag -- please try again.
           </p>
         )}
         {status === "ready" && (

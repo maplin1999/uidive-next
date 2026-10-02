@@ -19,7 +19,6 @@ import {
   CalendarCheck,
   Sun,
   Moon,
-  Lock,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
@@ -27,6 +26,7 @@ import { useInboxBadge } from "@/lib/useInboxBadge";
 import { useVerifiedHost } from "@/lib/useVerifiedHost";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
+import { BagIcon } from "@/components/icons/BagIcon";
 import { Theme, applyTheme, readCurrentTheme, storeTheme } from "@/lib/theme";
 import { DiverAvatar } from "@/components/DiverAvatar";
 
@@ -234,7 +234,7 @@ export function Header() {
                       }}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
-                      <Lock className="w-3.5 h-3.5" /> My Dive Bag
+                      <BagIcon className="w-3.5 h-3.5" /> My Dive Bag
                     </button>
                     {!isVerifiedHost && (
                       <Link

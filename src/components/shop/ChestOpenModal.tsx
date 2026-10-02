@@ -187,7 +187,7 @@ export function ChestOpenModal({
             onClick={onClose}
             className="w-full py-2.5 bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold rounded-xl text-xs"
           >
-            Add to Locker
+            Add to Dive Bag
           </button>
         )}
       </div>
