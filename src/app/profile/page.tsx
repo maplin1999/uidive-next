@@ -35,8 +35,10 @@ import { fetchBuddiesCount } from "@/lib/social";
 import { fetchHostStatus, HostStatus } from "@/lib/host";
 import { deletePost } from "@/lib/posts";
 import { fetchTrips, DiveTrip } from "@/lib/trips";
+import { fetchDiveCount } from "@/lib/dive-log";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { BuddiesListModal } from "@/components/social/BuddiesListModal";
+import { DiveLogbookModal } from "@/components/profile/DiveLogbookModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
@@ -63,6 +65,8 @@ export default function ProfilePage() {
   const [postsStatus, setPostsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selectedBooking, setSelectedBooking] = useState<MyBooking | null>(null);
   const [buddiesCount, setBuddiesCount] = useState(0);
+  const [diveCount, setDiveCount] = useState(0);
+  const [logbookOpen, setLogbookOpen] = useState(false);
   const [hostStatus, setHostStatus] = useState<HostStatus | null | undefined>(undefined);
   const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
@@ -115,6 +119,9 @@ export default function ProfilePage() {
     fetchBuddiesCount(user.id)
       .then(setBuddiesCount)
       .catch((err) => console.error("Could not load your buddies count:", err));
+    fetchDiveCount(user.id)
+      .then(setDiveCount)
+      .catch((err) => console.error("Could not load your dive count:", err));
     fetchHostStatus(user.id)
       .then(setHostStatus)
       .catch((err) => console.error("Could not load host status:", err));
@@ -279,7 +286,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
                 <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
                 <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                <ProfileStatPill label="Dives" value={user.dives} />
+                <ProfileStatPill label="Dives" value={diveCount} onClick={() => setLogbookOpen(true)} />
                 <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
               </div>
 
@@ -642,6 +649,17 @@ export default function ProfilePage() {
       {adminPanelOpen && <AdminPanelModal onClose={() => setAdminPanelOpen(false)} />}
       {buddiesListOpen && user && (
         <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
+      )}
+      {logbookOpen && user && (
+        <DiveLogbookModal
+          userId={user.id}
+          onClose={() => {
+            setLogbookOpen(false);
+            fetchDiveCount(user.id)
+              .then(setDiveCount)
+              .catch((err) => console.error("Could not refresh your dive count:", err));
+          }}
+        />
       )}
       {editingPost && (
         <PostFormModal

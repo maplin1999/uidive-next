@@ -14,18 +14,23 @@ function startOfDay(d: Date): Date {
 
 // Replaces the old plain native <input type="date"> with a real styled
 // month-view grid -- previous/next month navigation, today's date ringed,
-// the selected day filled solid, and past days dimmed/disabled since dive
-// trips are always forward-looking (same assumption the "This Weekend"/
-// "Next Weekend" presets above this already make). Clicking a leading/
-// trailing day from an adjacent month both selects that date and jumps the
-// grid to its month, which is the behavior people expect from a calendar
-// picker.
+// the selected day filled solid, and out-of-range days dimmed/disabled.
+// Defaults to the original trip-scheduling behavior (past days disabled,
+// since dive trips are always forward-looking -- same assumption the "This
+// Weekend"/"Next Weekend" presets above this already make). Pass
+// maxDate="<today>" to flip that for backward-looking pickers instead (the
+// dive log form, where you can only log a dive that already happened).
+// Clicking a leading/trailing day from an adjacent month both selects that
+// date and jumps the grid to its month, which is the behavior people expect
+// from a calendar picker.
 export function DatePickerCalendar({
   selectedDate,
   onSelect,
+  maxDate,
 }: {
   selectedDate: string | null;
   onSelect: (isoDateStr: string, label: string) => void;
+  maxDate?: string;
 }) {
   const today = startOfDay(new Date());
   const initialMonth = selectedDate ? new Date(selectedDate + "T00:00:00") : today;
@@ -62,8 +67,16 @@ export function DatePickerCalendar({
     setViewMonth(next.getMonth());
   }
 
+  const maxDateObj = maxDate ? startOfDay(new Date(maxDate + "T00:00:00")) : null;
+
+  function isDisabled(date: Date): boolean {
+    const d = startOfDay(date);
+    if (maxDateObj) return d > maxDateObj;
+    return d < today;
+  }
+
   function handlePick(date: Date) {
-    if (startOfDay(date) < today) return;
+    if (isDisabled(date)) return;
     const iso = isoDate(date);
     const label = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     setViewYear(date.getFullYear());
@@ -101,19 +114,19 @@ export function DatePickerCalendar({
         ))}
         {cells.map(({ date, inCurrentMonth }, i) => {
           const iso = isoDate(date);
-          const isPast = startOfDay(date) < today;
+          const disabled = isDisabled(date);
           const isToday = iso === isoDate(today);
           const isSelected = selectedDate === iso;
           return (
             <button
               key={i}
               type="button"
-              disabled={isPast}
+              disabled={disabled}
               onClick={() => handlePick(date)}
               className={`aspect-square rounded-lg text-xs flex items-center justify-center transition-colors ${
                 isSelected
                   ? "bg-cyan-500 text-slate-950 font-bold"
-                  : isPast
+                  : disabled
                     ? "text-slate-700 cursor-not-allowed"
                     : inCurrentMonth
                       ? "text-slate-200 hover:bg-slate-800"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Star, Pencil, BadgeCheck, Users, MessageSquare, Backpack, Radio, XCircle } from "lucide-react";
+import { X, Star, Pencil, BadgeCheck, Users, MessageSquare, Backpack, Radio, XCircle, Anchor } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
 import { EQUIPMENT_ITEMS, formatRelativeTime } from "@/lib/trips";
@@ -18,6 +18,9 @@ import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { DiveLog, fetchDiveLogByBooking } from "@/lib/dive-log";
+import { DiveLogFormModal } from "@/components/profile/DiveLogFormModal";
+import { DiveLogDetailModal } from "@/components/profile/DiveLogDetailModal";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -32,7 +35,7 @@ export function BookingDetailModal({
   onClose: () => void;
   onChanged: () => void;
 }) {
-  const { requireAuth } = useAuth();
+  const { user, requireAuth } = useAuth();
   const { openProfile } = useSocial();
   const trip = booking.dive_trips;
   const isConfirmed = booking.status === "confirmed";
@@ -47,6 +50,13 @@ export function BookingDetailModal({
   const [chatOpen, setChatOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+
+  // Completed-trip "Add to Dive Log" -- null while checking, a DiveLog once
+  // this booking already has one (swaps the button to "View in Dive Log"),
+  // or undefined-ish (kept as null) if it never got one.
+  const [bookingDiveLog, setBookingDiveLog] = useState<DiveLog | null>(null);
+  const [diveLogFormOpen, setDiveLogFormOpen] = useState(false);
+  const [diveLogDetailOpen, setDiveLogDetailOpen] = useState(false);
 
   const [editingReview, setEditingReview] = useState(!existingReview);
   const [rating, setRating] = useState(existingReview?.rating || 0);
@@ -76,6 +86,13 @@ export function BookingDetailModal({
       .maybeSingle()
       .then(({ data }) => setHostStats(data));
   }, [trip?.host_id]);
+
+  useEffect(() => {
+    if (!(isConfirmed && hasPassed)) return;
+    fetchDiveLogByBooking(booking.id)
+      .then(setBookingDiveLog)
+      .catch((err) => console.error("Could not check your dive log for this booking:", err));
+  }, [booking.id, isConfirmed, hasPassed]);
 
   const dateStr = trip?.scheduled_date
     ? new Date(trip.scheduled_date + "T00:00:00").toLocaleDateString("en-US", {
@@ -344,6 +361,21 @@ export function BookingDetailModal({
                 </button>
               </div>
             )}
+
+            <button
+              onClick={() => {
+                if (!requireAuth()) return;
+                if (bookingDiveLog) {
+                  setDiveLogDetailOpen(true);
+                } else {
+                  setDiveLogFormOpen(true);
+                }
+              }}
+              className="mt-3 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
+            >
+              <Anchor className="w-3.5 h-3.5 text-cyan-400" />
+              {bookingDiveLog ? "View in Dive Log" : "Add to Dive Log"}
+            </button>
           </div>
         )}
 
@@ -383,6 +415,43 @@ export function BookingDetailModal({
           confirming={cancelling}
           onConfirm={handleCancel}
           onCancel={() => setConfirmCancelOpen(false)}
+        />
+      )}
+      {diveLogFormOpen && user && trip && (
+        <DiveLogFormModal
+          userId={user.id}
+          diveLog={bookingDiveLog}
+          prefill={
+            bookingDiveLog
+              ? null
+              : {
+                  dive_date: trip.scheduled_date || "",
+                  location: trip.location,
+                  dive_site: trip.title,
+                  booking_id: booking.id,
+                }
+          }
+          onClose={() => setDiveLogFormOpen(false)}
+          onSaved={(log) => {
+            setBookingDiveLog(log);
+            setDiveLogFormOpen(false);
+          }}
+        />
+      )}
+      {diveLogDetailOpen && bookingDiveLog && (
+        <DiveLogDetailModal
+          diveLog={bookingDiveLog}
+          onClose={() => setDiveLogDetailOpen(false)}
+          onEdit={() => {
+            setDiveLogDetailOpen(false);
+            setDiveLogFormOpen(true);
+          }}
+          onDelete={() => {
+            // Deleting from here would desync bookingDiveLog with no easy
+            // undo path from a booking's own modal -- deleting a logged
+            // dive stays a Dive Log action, done from the logbook itself.
+            setDiveLogDetailOpen(false);
+          }}
         />
       )}
     </div>

@@ -33,6 +33,7 @@ import {
   toggleBlockUser,
 } from "@/lib/social";
 import { sendBuddyRequest } from "@/lib/inbox";
+import { fetchDiveCount } from "@/lib/dive-log";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { ProfileStatPill } from "@/components/ProfileStatPill";
@@ -50,6 +51,7 @@ export function PublicProfileModal() {
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [posts, setPosts] = useState<PublicPost[]>([]);
   const [buddiesCount, setBuddiesCount] = useState(0);
+  const [diveCount, setDiveCount] = useState(0);
   const [hostBadge, setHostBadge] = useState<PublicHostBadge | null>(null);
   const [friendship, setFriendship] = useState<FriendshipStatus>("none");
   const [blocked, setBlocked] = useState(false);
@@ -86,14 +88,16 @@ export function PublicProfileModal() {
       fetchPublicProfile(profileUserId),
       fetchPublicProfilePosts(profileUserId),
       fetchBuddiesCount(profileUserId),
+      fetchDiveCount(profileUserId),
       fetchPublicHostBadge(profileUserId),
       user ? fetchFriendshipStatus(user.id, profileUserId) : Promise.resolve<FriendshipStatus>("none"),
       user ? isUserBlocked(user.id, profileUserId) : Promise.resolve(false),
     ])
-      .then(([p, posts, count, badge, fs, isBlocked]) => {
+      .then(([p, posts, count, dives, badge, fs, isBlocked]) => {
         setProfile(p);
         setPosts(posts);
         setBuddiesCount(count);
+        setDiveCount(dives);
         setHostBadge(badge);
         setFriendship(fs);
         setBlocked(isBlocked);
@@ -277,7 +281,7 @@ export function PublicProfileModal() {
                   <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
                     <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
                     <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" />
-                    <ProfileStatPill label="Dives" value={profile.dives} />
+                    <ProfileStatPill label="Dives" value={diveCount} />
                     <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
                   </div>
 
