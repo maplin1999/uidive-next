@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin";
 import { useToast, Toast } from "@/components/Toast";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 type AdminTab = "hosts" | "reports";
 
@@ -37,6 +38,7 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
   // pops a window.prompt first), so without this a second click while the
   // first is still pending could fire the mutation twice.
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState<{ reportId: string; targetType: string } | null>(null);
   const { message, showToast } = useToast();
 
   useEscapeClose(onClose);
@@ -110,13 +112,30 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
   async function handleReviewReport(reportId: string, action: "dismiss" | "remove", targetType: string) {
     if (busyId) return;
     if (action === "remove") {
-      const label = targetType === "user" ? "this user's report" : `this ${targetType}`;
-      if (!window.confirm(`Permanently delete ${label}? This can't be undone.`)) return;
+      setConfirmRemove({ reportId, targetType });
+      return;
     }
     setBusyId(reportId);
     try {
       await reviewReport(reportId, action);
-      showToast(action === "remove" ? "🗑️ Content removed." : "Report dismissed.");
+      showToast("Report dismissed.");
+      load();
+    } catch (err) {
+      console.error("Could not review this report:", err);
+      showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not review this report.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleConfirmRemove() {
+    if (!confirmRemove) return;
+    const { reportId } = confirmRemove;
+    setBusyId(reportId);
+    try {
+      await reviewReport(reportId, "remove");
+      showToast("🗑️ Content removed.");
+      setConfirmRemove(null);
       load();
     } catch (err) {
       console.error("Could not review this report:", err);
@@ -320,6 +339,17 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
         )}
       </div>
       <Toast message={message} />
+
+      {confirmRemove && (
+        <ConfirmModal
+          title={`Permanently delete this ${confirmRemove.targetType === "user" ? "user's report" : confirmRemove.targetType}?`}
+          message="This can't be undone."
+          confirmLabel="Delete"
+          confirming={busyId === confirmRemove.reportId}
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setConfirmRemove(null)}
+        />
+      )}
     </div>
   );
 }

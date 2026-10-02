@@ -19,6 +19,7 @@ import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
 import { CoralsCelebration } from "@/components/CoralsCelebration";
 import { useAuth } from "@/components/auth/AuthContext";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // The Community tab (#tab-community in the old site): the Diver Feed.
 // Posting, liking, and commenting are all real now (create_post/
@@ -50,6 +51,8 @@ function CommunityFeed() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<CommunityPost | null>(null);
   const [celebrating, setCelebrating] = useState(false);
+  const [deletingPost, setDeletingPost] = useState<CommunityPost | null>(null);
+  const [deletingBusy, setDeletingBusy] = useState(false);
 
   const { message, showToast } = useToast();
   const { user, requireAuth } = useAuth();
@@ -142,14 +145,18 @@ function CommunityFeed() {
     }
   }
 
-  async function handleDelete(post: CommunityPost) {
-    if (!window.confirm("Delete this dive log? This can't be undone.")) return;
+  async function handleConfirmDelete() {
+    if (!deletingPost) return;
+    setDeletingBusy(true);
     try {
-      await deletePost(post.id);
-      setPosts((prev) => prev.filter((p) => p.id !== post.id));
+      await deletePost(deletingPost.id);
+      setPosts((prev) => prev.filter((p) => p.id !== deletingPost.id));
+      setDeletingPost(null);
     } catch (err) {
       console.error("Could not delete post:", err);
       showToast("Could not delete that post -- please try again.");
+    } finally {
+      setDeletingBusy(false);
     }
   }
 
@@ -239,7 +246,7 @@ function CommunityFeed() {
                     setEditingPost(post);
                     setFormOpen(true);
                   }}
-                  onDelete={() => handleDelete(post)}
+                  onDelete={() => setDeletingPost(post)}
                   onRequireAuth={() => requireAuth()}
                   onBlocked={load}
                 />
@@ -274,6 +281,17 @@ function CommunityFeed() {
           hostStats={selectedTrip.host_id ? hostReviewStats[selectedTrip.host_id] || null : null}
           onClose={() => setSelectedTrip(null)}
           onBooked={() => setSelectedTrip(null)}
+        />
+      )}
+
+      {deletingPost && (
+        <ConfirmModal
+          title="Delete this dive log?"
+          message="This can't be undone."
+          confirmLabel="Delete"
+          confirming={deletingBusy}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeletingPost(null)}
         />
       )}
 

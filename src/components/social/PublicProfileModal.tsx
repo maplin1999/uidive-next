@@ -40,6 +40,7 @@ import { ProfileStatPill } from "@/components/ProfileStatPill";
 import { COSMETIC_CATALOG, resolveAvatarUrl } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { useClickOutside } from "@/lib/useClickOutside";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // Migrated from the old site's #public-profile-modal (viewPublicProfile()),
 // including the equipped calling-card banner / avatar ring cosmetics.
@@ -60,6 +61,8 @@ export function PublicProfileModal() {
   const [requestSent, setRequestSent] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [diverIdCopied, setDiverIdCopied] = useState(false);
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [blockBusy, setBlockBusy] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setMenuOpen(false));
   const { message, showToast } = useToast();
@@ -127,19 +130,23 @@ export function PublicProfileModal() {
   const equippedCard = profile?.equipped_calling_card_id ? COSMETIC_CATALOG[profile.equipped_calling_card_id] : null;
   const cardItem = equippedCard && equippedCard.type === "calling_card" ? equippedCard : null;
 
-  async function handleToggleBlock() {
+  function handleToggleBlock() {
     if (!profile) return;
-    const firstName = profile.name.split(" ")[0];
-    const msg = blocked
-      ? `Unblock ${firstName}?`
-      : `Block ${firstName}? You won't see their posts or comments, and they won't be able to message you. You can unblock them later.`;
-    if (!window.confirm(msg)) return;
+    setMenuOpen(false);
+    setConfirmBlockOpen(true);
+  }
+
+  async function handleConfirmToggleBlock() {
+    if (!profile) return;
+    setBlockBusy(true);
     try {
       const nowBlocked = await toggleBlockUser(profile.id);
       setBlocked(nowBlocked);
-      setMenuOpen(false);
+      setConfirmBlockOpen(false);
     } catch (err) {
       console.error("Could not update block status:", err);
+    } finally {
+      setBlockBusy(false);
     }
   }
 
@@ -429,6 +436,22 @@ export function PublicProfileModal() {
         />
       )}
       <Toast message={message} />
+
+      {confirmBlockOpen && profile && (
+        <ConfirmModal
+          title={blocked ? `Unblock ${profile.name.split(" ")[0]}?` : `Block ${profile.name.split(" ")[0]}?`}
+          message={
+            blocked
+              ? "You'll be able to see their posts and comments again, and they'll be able to message you."
+              : "You won't see their posts or comments, and they won't be able to message you. You can unblock them later."
+          }
+          confirmLabel={blocked ? "Unblock" : "Block"}
+          destructive={!blocked}
+          confirming={blockBusy}
+          onConfirm={handleConfirmToggleBlock}
+          onCancel={() => setConfirmBlockOpen(false)}
+        />
+      )}
     </div>
   );
 }

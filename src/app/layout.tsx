@@ -8,10 +8,29 @@ import { SocialProvider } from "@/components/social/SocialContext";
 import { PublicProfileModal } from "@/components/social/PublicProfileModal";
 import { ReportModal } from "@/components/social/ReportModal";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { SITE_URL } from "@/lib/site";
 
+// metadataBase turns every relative Open Graph/Twitter image URL below (and
+// on any page that doesn't set its own) into an absolute one -- without it
+// Next.js logs a warning and social-preview crawlers can't resolve the
+// image at all. Per-page metadata (title/description overrides) lives in
+// each route's own page.tsx via Next's metadata export, inheriting this
+// template and these OG defaults unless it says otherwise.
 export const metadata: Metadata = {
-  title: "UiDive",
+  metadataBase: new URL(SITE_URL),
+  title: { default: "UiDive", template: "%s · UiDive" },
   description: "Scuba dive trip booking and community",
+  openGraph: {
+    title: "UiDive",
+    description: "Find and book scuba dive trips, then share them with a community of divers.",
+    siteName: "UiDive",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "UiDive",
+    description: "Find and book scuba dive trips, then share them with a community of divers.",
+  },
 };
 
 export default function RootLayout({

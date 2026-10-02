@@ -25,6 +25,7 @@ import {
 import { HostApplicationForm } from "@/components/host/HostApplicationForm";
 import { TripFormModal } from "@/components/host/TripFormModal";
 import { TripRosterModal } from "@/components/host/TripRosterModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // The Host Dashboard tab (#tab-host-dashboard in the old site). Four states,
 // same as renderHostStatusCard() drove there: no application yet, pending
@@ -45,6 +46,8 @@ export default function HostDashboardPage() {
   const [tripFormOpen, setTripFormOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState<HostTrip | null>(null);
   const [rosterTrip, setRosterTrip] = useState<HostTrip | null>(null);
+  const [cancellingTrip, setCancellingTrip] = useState<HostTrip | null>(null);
+  const [cancellingBusy, setCancellingBusy] = useState(false);
 
   const loadStatus = useCallback(() => {
     if (!user) return;
@@ -73,6 +76,22 @@ export default function HostDashboardPage() {
         setDashStatus("error");
       });
   }, [user]);
+
+  async function handleConfirmCancelTrip() {
+    if (!cancellingTrip) return;
+    setCancellingBusy(true);
+    try {
+      await cancelTrip(cancellingTrip.id);
+      showToast("Trip cancelled.");
+      setCancellingTrip(null);
+      loadDashboard();
+    } catch (err) {
+      console.error("Could not cancel trip:", err);
+      showToast("Could not cancel this trip -- please try again.");
+    } finally {
+      setCancellingBusy(false);
+    }
+  }
 
   useEffect(() => {
     loadStatus();
@@ -351,17 +370,7 @@ export default function HostDashboardPage() {
                           )}
                           {!isCancelled && (
                             <button
-                              onClick={async () => {
-                                if (!window.confirm(`Cancel "${trip.title}"? This can't be undone.`)) return;
-                                try {
-                                  await cancelTrip(trip.id);
-                                  showToast("Trip cancelled.");
-                                  loadDashboard();
-                                } catch (err) {
-                                  console.error("Could not cancel trip:", err);
-                                  showToast("Could not cancel this trip -- please try again.");
-                                }
-                              }}
+                              onClick={() => setCancellingTrip(trip)}
                               className="text-[10px] font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 px-3 py-2 rounded-xl transition-colors"
                             >
                               Cancel
@@ -390,6 +399,17 @@ export default function HostDashboardPage() {
         />
       )}
       {rosterTrip && <TripRosterModal trip={rosterTrip} onClose={() => setRosterTrip(null)} />}
+      {cancellingTrip && (
+        <ConfirmModal
+          title={`Cancel "${cancellingTrip.title}"?`}
+          message="This can't be undone."
+          confirmLabel="Cancel Trip"
+          cancelLabel="Keep Trip"
+          confirming={cancellingBusy}
+          onConfirm={handleConfirmCancelTrip}
+          onCancel={() => setCancellingTrip(null)}
+        />
+      )}
       <Toast message={message} />
     </main>
   );

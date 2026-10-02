@@ -34,6 +34,7 @@ import {
 import { fetchBuddiesCount } from "@/lib/social";
 import { fetchHostStatus, HostStatus } from "@/lib/host";
 import { deletePost } from "@/lib/posts";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { fetchTrips, DiveTrip } from "@/lib/trips";
 import { fetchDiveCount } from "@/lib/dive-log";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
@@ -67,6 +68,8 @@ export default function ProfilePage() {
   const [buddiesCount, setBuddiesCount] = useState(0);
   const [diveCount, setDiveCount] = useState(0);
   const [logbookOpen, setLogbookOpen] = useState(false);
+  const [deletingPost, setDeletingPost] = useState<MyPost | null>(null);
+  const [deletingPostBusy, setDeletingPostBusy] = useState(false);
   const [hostStatus, setHostStatus] = useState<HostStatus | null | undefined>(undefined);
   const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
@@ -87,6 +90,21 @@ export default function ProfilePage() {
     } catch (err) {
       console.error("Could not copy Diver ID:", err);
       showToast("❌ Could not copy -- please try again.");
+    }
+  }
+
+  async function handleConfirmDeletePost() {
+    if (!deletingPost) return;
+    setDeletingPostBusy(true);
+    try {
+      await deletePost(deletingPost.id);
+      setPosts((prev) => prev.filter((p) => p.id !== deletingPost.id));
+      setDeletingPost(null);
+    } catch (err) {
+      console.error("Could not delete post:", err);
+      showToast("Could not delete that post -- please try again.");
+    } finally {
+      setDeletingPostBusy(false);
     }
   }
 
@@ -525,16 +543,9 @@ export default function ProfilePage() {
                   }
                 }
 
-                async function handleDelete() {
+                function handleDelete() {
                   setOpenPostMenuId(null);
-                  if (!window.confirm("Delete this dive log? This can't be undone.")) return;
-                  try {
-                    await deletePost(post.id);
-                    setPosts((prev) => prev.filter((p) => p.id !== post.id));
-                  } catch (err) {
-                    console.error("Could not delete post:", err);
-                    showToast("Could not delete that post -- please try again.");
-                  }
+                  setDeletingPost(post);
                 }
 
                 const menu = (
@@ -649,6 +660,16 @@ export default function ProfilePage() {
       {adminPanelOpen && <AdminPanelModal onClose={() => setAdminPanelOpen(false)} />}
       {buddiesListOpen && user && (
         <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
+      )}
+      {deletingPost && (
+        <ConfirmModal
+          title="Delete this dive log?"
+          message="This can't be undone."
+          confirmLabel="Delete"
+          confirming={deletingPostBusy}
+          onConfirm={handleConfirmDeletePost}
+          onCancel={() => setDeletingPost(null)}
+        />
       )}
       {logbookOpen && user && (
         <DiveLogbookModal

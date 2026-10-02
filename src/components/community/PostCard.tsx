@@ -19,6 +19,7 @@ import { toggleBlockUser } from "@/lib/social";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useClickOutside } from "@/lib/useClickOutside";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // Migrated from renderRealPosts()'s per-post template string in app.js.
 // Liking and commenting are now real (toggle_post_like RPC, post_comments
@@ -52,6 +53,8 @@ export function PostCard({
   const [commentDraft, setCommentDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [blocking, setBlocking] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setMenuOpen(false));
   const { openProfile, openReport } = useSocial();
@@ -84,6 +87,19 @@ export function PostCard({
     if (!onRequireAuth()) return;
     onSubmitComment(commentDraft.trim());
     setCommentDraft("");
+  }
+
+  async function handleConfirmBlock() {
+    setBlocking(true);
+    try {
+      await toggleBlockUser(post.user_id);
+      onBlocked?.();
+      setConfirmBlockOpen(false);
+    } catch (err) {
+      console.error("Could not block user:", err);
+    } finally {
+      setBlocking(false);
+    }
   }
 
   return (
@@ -157,22 +173,10 @@ export function PostCard({
                     <Flag className="w-3.5 h-3.5" /> Report post
                   </button>
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                       setMenuOpen(false);
                       if (!onRequireAuth()) return;
-                      const firstName = author.name.split(" ")[0];
-                      if (
-                        !window.confirm(
-                          `Block ${firstName}? You won't see their posts or comments, and they won't be able to message you. You can unblock them later.`
-                        )
-                      )
-                        return;
-                      try {
-                        await toggleBlockUser(post.user_id);
-                        onBlocked?.();
-                      } catch (err) {
-                        console.error("Could not block user:", err);
-                      }
+                      setConfirmBlockOpen(true);
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                   >
@@ -301,6 +305,17 @@ export function PostCard({
       </div>
 
       {lightboxOpen && <ImageLightbox src={post.image_url} onClose={() => setLightboxOpen(false)} />}
+
+      {confirmBlockOpen && (
+        <ConfirmModal
+          title={`Block ${author.name.split(" ")[0]}?`}
+          message="You won't see their posts or comments, and they won't be able to message you. You can unblock them later."
+          confirmLabel="Block"
+          confirming={blocking}
+          onConfirm={handleConfirmBlock}
+          onCancel={() => setConfirmBlockOpen(false)}
+        />
+      )}
     </article>
   );
 }
