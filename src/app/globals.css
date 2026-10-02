@@ -471,6 +471,16 @@ html[data-theme="light"] .nav-btn.active {
   color: var(--l-accent) !important;
   background-color: var(--l-surface-muted) !important;
 }
+/* Same active-tab treatment as the desktop header's .nav-btn, just missed
+   when MobileNav.tsx was built -- its buttons use .mobile-nav-btn instead of
+   .nav-btn, so the rule above never matched them, and the active tab (Feed,
+   Profile, etc.) was rendering with bg-slate-900/80 at full dark-navy
+   opacity directly on the light-mode nav bar instead of the themed muted
+   surface. */
+html[data-theme="light"] .mobile-nav-btn.active {
+  color: var(--l-accent) !important;
+  background-color: var(--l-surface-muted) !important;
+}
 
 /* Badge accents: darken the -400/-300 shades so text stays readable on
    light surfaces */
