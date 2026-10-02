@@ -143,18 +143,27 @@ export default function ProfilePage() {
         <div
           className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
         >
+          {/* Caustic light-ripple -- a slow, low-opacity wash of drifting
+              gradients standing in for light filtering through water. Only
+              shown without an equipped Calling Card so it never competes
+              with that art (which gets its own drift treatment below). */}
+          {!cardItem && (
+            <div className="profile-header-caustics absolute inset-0 rounded-3xl pointer-events-none" aria-hidden="true" />
+          )}
           {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
               behind everything else in this header. object-cover on a
               right-anchored half-width strip with a left-fade mask shows the
               card art without a hard rectangle edge, same treatment as the
-              public-profile header. */}
+              public-profile header. calling-card-drift gives the art a
+              slow, barely-perceptible zoom/pan so an equipped banner reads
+              as a premium living backdrop instead of a static cutout. */}
           {cardItem && (
             <div className="hidden sm:block absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={cardItem.image}
                 alt=""
-                className="absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
+                className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
                 style={{
                   maskImage: "linear-gradient(to right, transparent, black 45%)",
                   WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
@@ -250,9 +259,17 @@ export default function ProfilePage() {
                 <ProfileStatPill label="Dives" value={user.dives} />
                 <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
                 <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
+                <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
               </div>
 
+              {/* Depth-gauge accent -- a thin vertical line echoing a dive
+                  computer's depth readout, tucked right before the cert icon
+                  as a quiet nod to the diving theme (not a literal gauge). */}
               <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                <span
+                  aria-hidden="true"
+                  className="inline-block w-[3px] h-3.5 rounded-full bg-gradient-to-b from-cyan-300 via-cyan-500/70 to-transparent shrink-0"
+                />
                 <Award className="w-4 h-4 shrink-0" /> {user.cert} • {user.location}
               </p>
 

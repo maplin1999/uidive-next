@@ -183,17 +183,26 @@ export function PublicProfileModal() {
                 cardItem ? "always-dark" : ""
               }`}
             >
+              {/* Caustic light-ripple -- same slow drifting-gradient wash as
+                  the signed-in Profile page's header, standing in for light
+                  filtering through water. Only shown without an equipped
+                  Calling Card so it never competes with that art. */}
+              {!cardItem && (
+                <div className="profile-header-caustics absolute inset-0 rounded-3xl pointer-events-none" aria-hidden="true" />
+              )}
               {/* Equipped Calling Card banner (Treasure Chest cosmetics) --
                   a dark overlay (via always-dark above) is layered under the
                   art so name/stats on top of it stay readable regardless of
-                  how bright the artwork is. */}
+                  how bright the artwork is. calling-card-drift gives the art
+                  a slow, barely-perceptible zoom/pan, matching the signed-in
+                  Profile page's header treatment. */}
               {cardItem && (
                 <div className="hidden absolute inset-0 rounded-3xl overflow-hidden pointer-events-none sm:block" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={cardItem.image}
                     alt=""
-                    className="absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
+                    className="calling-card-drift absolute inset-y-0 right-0 h-full w-1/2 sm:w-2/5 object-cover"
                     style={{
                       maskImage: "linear-gradient(to right, transparent, black 45%)",
                       WebkitMaskImage: "linear-gradient(to right, transparent, black 45%)",
@@ -249,9 +258,17 @@ export function PublicProfileModal() {
                     <ProfileStatPill label="Dives" value={profile.dives} />
                     <ProfileStatPill label="Buddies" value={buddiesCount} />
                     <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
+                    <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
                   </div>
 
+                  {/* Depth-gauge accent -- matches the signed-in Profile
+                      page's header: a thin vertical line echoing a dive
+                      computer's depth readout, right before the cert icon. */}
                   <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block w-[3px] h-3.5 rounded-full bg-gradient-to-b from-cyan-300 via-cyan-500/70 to-transparent shrink-0"
+                    />
                     <Award className="w-4 h-4 shrink-0" />
                     {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
                   </p>

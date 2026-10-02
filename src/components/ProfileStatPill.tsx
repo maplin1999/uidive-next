@@ -23,16 +23,24 @@ export function ProfileStatPill({
 }: {
   label: string;
   value: number;
-  accent?: "cyan" | "amber";
+  accent?: "cyan" | "amber" | "violet";
   onClick?: () => void;
 }) {
   const valueClass =
-    accent === "amber" ? "text-amber-400" : accent === "cyan" ? "text-cyan-400" : "text-white";
+    accent === "amber"
+      ? "text-amber-400"
+      : accent === "cyan"
+      ? "text-cyan-400"
+      : accent === "violet"
+      ? "text-violet-400"
+      : "text-white";
   const glowClass =
     accent === "amber"
       ? "group-hover:drop-shadow-[0_0_6px_rgba(251,191,36,0.65)]"
       : accent === "cyan"
       ? "group-hover:drop-shadow-[0_0_6px_rgba(34,211,238,0.65)]"
+      : accent === "violet"
+      ? "group-hover:drop-shadow-[0_0_6px_rgba(167,139,250,0.65)]"
       : "group-hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]";
 
   const [displayValue, setDisplayValue] = useState(0);
