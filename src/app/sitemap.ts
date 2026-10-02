@@ -7,7 +7,7 @@ import { SITE_URL } from "@/lib/site";
 // neither of which belongs in a search index (see robots.ts, which disallows
 // crawling those same paths outright).
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/community", "/diveshop", "/legal"];
+  const routes = ["", "/community", "/diveshop", "/legal", "/about", "/faq"];
   const now = new Date();
 
   return routes.map((route) => ({
