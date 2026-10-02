@@ -52,7 +52,7 @@ export function CookieConsentBanner() {
             <button
               type="button"
               onClick={() => choose("declined")}
-              className="text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-full transition-colors"
+              className="text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-colors"
             >
               Decline
             </button>

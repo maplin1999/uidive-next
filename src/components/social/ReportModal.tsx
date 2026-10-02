@@ -84,7 +84,7 @@ export function ReportModal() {
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="bg-slate-950 w-full px-3 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 [color-scheme:dark]"
+                className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 [color-scheme:dark]"
               >
                 <option value="">Choose a reason…</option>
                 {REPORT_REASONS.map((r) => (

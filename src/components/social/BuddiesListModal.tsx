@@ -87,7 +87,7 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
                 </button>
                 <button
                   onClick={() => setChatWith(b)}
-                  className="shrink-0 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold px-3 py-2 rounded-lg text-[11px] flex items-center gap-1"
+                  className="shrink-0 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold px-3 py-2 rounded-xl text-[10px] flex items-center gap-1"
                 >
                   <MessageSquare className="w-3.5 h-3.5" /> Chat
                 </button>

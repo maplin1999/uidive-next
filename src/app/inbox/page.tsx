@@ -189,13 +189,13 @@ export default function InboxPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleRespond(req.id, true)}
-                      className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors"
+                      className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
                       Accept
                     </button>
                     <button
                       onClick={() => handleRespond(req.id, false)}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors"
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
                       Decline
                     </button>

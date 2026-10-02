@@ -123,7 +123,6 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
                       avatarUrl={person.avatar_url}
                       equippedAvatarId={person.equipped_avatar_id}
                       cert={person.cert}
-                      sizeClass="w-9 h-9"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-white truncate">{person.name}</p>

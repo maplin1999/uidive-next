@@ -260,7 +260,7 @@ export default function DiveShopPage() {
             {user && (
               <button
                 onClick={() => setLockerOpen(true)}
-                className="text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-xl hover:bg-purple-500/20 transition-colors"
+                className="text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-colors"
               >
                 My Locker
               </button>
@@ -309,7 +309,7 @@ export default function DiveShopPage() {
               >
                 <div className="space-y-2">
                   <div
-                    className={`w-12 h-12 rounded-2xl border flex items-center justify-center font-black text-lg ${offer.badgeClass}`}
+                    className={`inline-flex items-center justify-center h-11 min-w-[2.75rem] px-3 rounded-2xl border font-black text-base whitespace-nowrap ${offer.badgeClass}`}
                   >
                     {offer.badge}
                   </div>

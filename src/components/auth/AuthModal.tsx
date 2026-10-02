@@ -243,7 +243,7 @@ export function AuthModal() {
                       type="button"
                       onClick={() => setSigninShowPassword((v) => !v)}
                       tabIndex={-1}
-                      aria-label="Show password"
+                      aria-label={signinShowPassword ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                     >
                       {signinShowPassword ? (
@@ -311,7 +311,7 @@ export function AuthModal() {
                         type="button"
                         onClick={() => setSignupShowPassword((v) => !v)}
                         tabIndex={-1}
-                        aria-label="Show password"
+                        aria-label={signupShowPassword ? "Hide password" : "Show password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                       >
                         {signupShowPassword ? (

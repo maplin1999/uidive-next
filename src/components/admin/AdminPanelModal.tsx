@@ -221,13 +221,13 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleApprove(app.user_id)}
-                      className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                     >
                       Approve
                     </button>
                     <button
                       onClick={() => handleReject(app.user_id)}
-                      className="flex-1 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold rounded-xl text-xs transition-colors"
+                      className="flex-1 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold rounded-xl text-xs transition-colors"
                     >
                       Reject
                     </button>
@@ -270,14 +270,14 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleReviewReport(r.id, "dismiss", r.target_type)}
-                      className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors"
+                      className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors"
                     >
                       Dismiss
                     </button>
                     {r.target_type !== "user" && (
                       <button
                         onClick={() => handleReviewReport(r.id, "remove", r.target_type)}
-                        className="flex-1 py-2 bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+                        className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                       >
                         Remove {targetLabel}
                       </button>

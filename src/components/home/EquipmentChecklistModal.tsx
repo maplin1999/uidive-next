@@ -21,15 +21,15 @@ export function EquipmentChecklistModal({
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start">
-          <h3 className="font-black text-white text-xl flex items-center gap-2">
-            <Backpack className="w-5 h-5 text-cyan-400" /> Gear Checklist
+          <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <Backpack className="w-4 h-4 text-cyan-400" /> Gear Checklist
           </h3>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white"
+            className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 

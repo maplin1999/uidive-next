@@ -241,7 +241,7 @@ export function PostCard({
           </span>
         </div>
         {post.corals_awarded && (
-          <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20 shrink-0">
+          <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 shrink-0">
             +10 🪸 Corals Earned
           </span>
         )}
