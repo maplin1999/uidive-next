@@ -1,19 +1,18 @@
-// Scuba-diver silhouette for the Ocean Conservation progress banner --
-// not one of lucide-react's bundled icons, so hand-drawn as simple
-// primitives (circle head, tapered body, two angled fins) rather than
-// forcing a lookalike. fill="currentColor" so it sizes/colors like any
-// lucide icon it sits next to. See DiveBoatIcon for its paired end-of-track
-// icon.
+// Scuba-diver icon for the Ocean Conservation progress banner -- hand-ported
+// from the user-supplied SVG (scuba-diving-svgrepo-com.svg) rather than the
+// earlier placeholder shapes, same "port the real source" treatment as
+// BagIcon. The source's hardcoded fill="#231F20" is swapped for
+// fill="currentColor" so it inherits text-color classes (text-cyan-300 in
+// ConservationBanner) and sizes via w-*/h-* like every other icon it sits
+// next to. Original viewBox (0 0 50 50) is kept as-is -- it scales fine at
+// any rendered size regardless of the coordinate system it's defined in.
 export function DiverIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <circle cx="12" cy="5.5" r="2.75" fill="currentColor" />
+    <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" className={className}>
       <path
-        d="M12 8.25c-2.6 0-4.6 1.9-4.6 5.1v3.1c0 .62.5 1.12 1.12 1.12.55 0 1.02-.4 1.11-.94l.57-3.38h3.6l.57 3.38c.09.55.56.94 1.11.94.62 0 1.12-.5 1.12-1.12v-3.1c0-3.2-2-5.1-4.6-5.1z"
+        d="M1 5l7.617 7.893 2.927-2.664-2.65-5.205zm34.336 22.108c1.439.402 2.988-.424 3.396-1.909.395-1.458-.445-2.991-1.898-3.405l-1.127-.315-1.463 5.302 1.092.327zm-.887-5.97l-9.115-2.603c-.6-.158-1.205.208-1.374.815l-.852 3.089c-.167.608.156 1.228.768 1.411l9.122 2.579 1.451-5.291zm1.438 8.781c-.695-.669-1.559-1.204-2.564-1.484l-11.053-3.137-6.79-12.21c-.36-.632-.936-1.131-1.68-1.338-1.488-.425-3.036.462-3.443 1.97-.204.718-.108 1.447.216 2.067l8.494 15.104s.696 1.131 2.447 1.716l15.442 4.391 7.162 7.369c.24.255.553.449.924.56 1.08.304 2.207-.354 2.52-1.437.205-.765-.035-1.568-.576-2.067l-11.099-11.504zm8.244 3.053l1.605 2.128 3.264-3.613-2.758-1.558c.262-1.958-.938-3.854-2.857-4.401-2.111-.597-4.307.644-4.893 2.785-.602 2.153.635 4.365 2.746 4.962 1.008.291 2.028.133 2.893-.303z"
         fill="currentColor"
       />
-      <path d="M6.3 14.8 2.4 16.6a1 1 0 1 0 .84 1.82L7.3 16.5z" fill="currentColor" />
-      <path d="M17.7 14.8 21.6 16.6a1 1 0 1 1-.84 1.82L16.7 16.5z" fill="currentColor" />
     </svg>
   );
 }
