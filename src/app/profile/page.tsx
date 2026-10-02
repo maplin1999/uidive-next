@@ -238,22 +238,22 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
-                <Award className="w-4 h-4" /> {user.cert} • {user.location}
-              </p>
-
               {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
                   chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
                   same sunken-panel treatment the hero search bar and
                   leaderboard runner-up cards use, so it already has a
                   light-mode-safe background via globals.css instead of
-                  needing a new always-dark hook). Sits on its own row right
-                  under cert/location, above the bio. */}
+                  needing a new always-dark hook). Sits right under the name
+                  row, above cert/location and the bio. */}
               <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
                 <StatPill label="Dives" value={user.dives} />
                 <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
                 <StatPill label="Corals" value={user.corals} accent="amber" />
               </div>
+
+              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
+                <Award className="w-4 h-4" /> {user.cert} • {user.location}
+              </p>
 
               {user.bio && <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>}
             </div>
