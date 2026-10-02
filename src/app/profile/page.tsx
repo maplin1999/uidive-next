@@ -191,7 +191,17 @@ export default function ProfilePage() {
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-black text-white">{user.name}</h1>
+                {/* Diver ID moved off its own line -- it's niche info most
+                    visitors to this page (just the signed-in diver) never
+                    need visible by default, so it's tucked behind a hover
+                    tooltip on the name instead, same pattern as the
+                    admin/verified-host badge tooltips right next to it. */}
+                <div className="relative group">
+                  <h1 className="text-xl sm:text-2xl font-black text-white cursor-default">{user.name}</h1>
+                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                    Diver ID: #{diverIdFromUserId(user.id)}
+                  </div>
+                </div>
                 <div className="flex items-center gap-1.5">
                   {user.is_admin && (
                     <div className="relative group">
@@ -228,33 +238,24 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              {/* Cert/location shares its row with the stat pills instead of
-                  each detail getting its own full-width line -- cuts the
-                  header from 5 stacked rows to 3, and puts Dives/Buddies/
-                  Corals above the bio/Diver ID line as asked. Wraps under
-                  the cert line on narrow screens instead of forcing it. */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-between gap-x-4 gap-y-1.5">
-                <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
-                  <Award className="w-4 h-4" /> {user.cert} • {user.location}
-                </p>
-                <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                  <StatPill label="Dives" value={user.dives} />
-                  <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                  <StatPill label="Corals" value={user.corals} accent="amber" />
-                </div>
+              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
+                <Award className="w-4 h-4" /> {user.cert} • {user.location}
+              </p>
+
+              {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
+                  chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
+                  same sunken-panel treatment the hero search bar and
+                  leaderboard runner-up cards use, so it already has a
+                  light-mode-safe background via globals.css instead of
+                  needing a new always-dark hook). Sits on its own row right
+                  under cert/location, above the bio. */}
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 flex-wrap pt-0.5">
+                <StatPill label="Dives" value={user.dives} />
+                <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <StatPill label="Corals" value={user.corals} accent="amber" />
               </div>
 
-              {/* Bio and Diver ID condensed onto one line (instead of a full
-                  row each) -- the ID is de-emphasized in the same muted
-                  monospace treatment it always had, just folded in rather
-                  than stacked below. */}
-              <p className="text-xs text-slate-400 max-w-md">
-                {user.bio}
-                {user.bio ? " " : ""}
-                <span className="font-mono font-bold text-slate-500">
-                  {user.bio ? "· " : ""}Diver ID: #{diverIdFromUserId(user.id)}
-                </span>
-              </p>
+              {user.bio && <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>}
             </div>
           </div>
         </div>
