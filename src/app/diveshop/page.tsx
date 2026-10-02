@@ -363,7 +363,7 @@ export default function DiveShopPage() {
 
           {leaderboardStatus === "ready" && podiumOrder.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-              {podiumOrder.map((entry, i) => {
+              {podiumOrder.map((entry) => {
                 const rank = top3.indexOf(entry) + 1;
                 const isFirst = rank === 1;
                 const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
@@ -372,10 +372,11 @@ export default function DiveShopPage() {
                     key={entry.id}
                     className={`p-5 rounded-3xl text-center space-y-3 relative shadow-lg ${
                       isFirst
-                        ? "p-6 bg-gradient-to-b from-amber-500/10 via-slate-900 to-slate-900 border-2 border-amber-400/60 shadow-2xl md:-translate-y-2 order-1 md:order-none"
-                        : "bg-slate-900 border border-slate-800"
+                        ? "p-6 bg-gradient-to-b from-amber-500/10 via-slate-900 to-slate-900 border-2 border-amber-400/60 shadow-2xl md:-translate-y-2 order-1 md:order-2"
+                        : rank === 2
+                          ? "bg-slate-900 border border-slate-800 order-2 md:order-1"
+                          : "bg-slate-900 border border-slate-800 order-3"
                     }`}
-                    style={!isFirst ? { order: i === 0 ? 2 : 3 } : undefined}
                   >
                     <span
                       className={`absolute top-3 right-3 text-xs font-bold px-2.5 py-0.5 rounded-full border ${

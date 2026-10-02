@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, Lock } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
 import { CosmeticThumbnail } from "@/components/CosmeticThumbnail";
@@ -147,12 +147,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
             corners, so neither section needs its own rounded-t/b class. */}
         <div className="shrink-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-between border-b border-slate-800 px-6 py-4">
           <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <svg viewBox="0 0 512 512" fill="currentColor" className="w-4 h-4 text-purple-400 shrink-0">
-              <path d="M385.723,84.402H126.277C56.647,84.402,0,141.05,0,210.679v216.919h259.446H512V210.679C512,141.05,455.352,84.402,385.723,84.402z M30.417,271.209h54.186v37.008h120.655v-37.008h54.186v47.777H30.417V271.209z M115.021,277.8v-43.598h59.82V277.8H115.021z M259.446,397.181H30.417v-47.777h229.029V397.181z M259.446,210.679v30.112H205.26v-37.008H84.604v37.008H30.417v-30.113c0-6.034,0.567-11.937,1.637-17.664h228.632C259.875,198.789,259.446,204.685,259.446,210.679z M43.376,162.596c16.621-28.547,47.556-47.778,82.901-47.778h177.341c-15.019,12.882-26.983,29.224-34.652,47.778H43.376z M481.583,397.181h-191.72V271.209h191.72V397.181z M481.583,240.792h-191.72V210.68c0-52.857,43.003-95.86,95.86-95.86c2.478,0,4.934,0.094,7.365,0.28c2.43,0.186,4.837,0.462,7.214,0.826c1.585,0.243,3.157,0.525,4.716,0.845c43.641,8.954,76.565,47.659,76.565,93.909V240.792z" />
-              <path d="M385.723,135.097v30.417c24.905,0,45.164,20.261,45.164,45.164h30.417C461.305,169.003,427.399,135.097,385.723,135.097z" />
-              <rect x="129.719" y="242.486" width="30.417" height="27.038" />
-            </svg>{" "}
-            My Locker
+            <Lock className="w-4 h-4 text-purple-400 shrink-0" /> My Locker
           </h3>
           <button
             onClick={onClose}
