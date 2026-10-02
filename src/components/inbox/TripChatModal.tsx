@@ -118,7 +118,7 @@ export function TripChatModal({
               if (e.key === "Enter") handleSend();
             }}
             placeholder="Message everyone on this trip…"
-            className="bg-slate-950 text-xs px-4 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500"
+            className="bg-slate-950 text-xs px-4 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500 text-slate-200"
           />
           <button
             onClick={handleSend}
