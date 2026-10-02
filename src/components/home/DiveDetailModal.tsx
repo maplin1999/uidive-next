@@ -8,6 +8,7 @@ import {
   DiveTrip,
   ReviewStats,
   HostReviewStats,
+  difficultyAccent,
   formatTripDate,
   formatRelativeTime,
   bookTrip,
@@ -102,8 +103,10 @@ export function DiveDetailModal({
         <div className="p-6 space-y-4 overflow-y-auto">
           <div className="flex justify-between items-start gap-3">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded-md">
-                {trip.difficulty}
+              <span
+                className={`${difficultyAccent(trip.difficulty).tag} border text-[10px] px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap`}
+              >
+                {difficultyAccent(trip.difficulty).label}
               </span>
               <h2 className="text-2xl font-black text-white mt-1">{trip.title}</h2>
               <p className="text-xs text-slate-400">{trip.location}</p>

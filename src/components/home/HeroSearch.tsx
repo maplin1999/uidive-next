@@ -107,7 +107,11 @@ export function HeroSearch({
                 autoComplete="off"
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
-                onFocus={() => setWhereOpen(true)}
+                onFocus={() => {
+                  setWhereOpen(true);
+                  setWhenOpen(false);
+                  setActivityOpen(false);
+                }}
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Search Destinations"
                 className="bg-transparent text-sm w-full focus:outline-none placeholder-slate-200 text-slate-200 truncate"
