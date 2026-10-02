@@ -833,3 +833,19 @@ html[data-theme="light"] .always-dark .bg-slate-950\/60 {
     animation: none;
   }
 }
+
+/* Ocean Conservation progress banner -- a small bob on the diver icon so it
+   reads as "swimming" along the track rather than a static pin. */
+.diver-bob {
+  animation: diver-bob 2.4s ease-in-out infinite;
+}
+@keyframes diver-bob {
+  0%, 100% { transform: translateY(-50%); }
+  50% { transform: translateY(calc(-50% - 2px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diver-bob {
+    animation: none;
+  }
+}

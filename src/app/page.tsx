@@ -15,6 +15,7 @@ import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
 import { useAuth } from "@/components/auth/AuthContext";
 import { CoralsCelebration } from "@/components/CoralsCelebration";
+import { ConservationBanner } from "@/components/home/ConservationBanner";
 import { claimDailyReward, alreadyClaimedDailyToday } from "@/lib/shop";
 
 type TripTypeFilter = "all" | "shore" | "boat";
@@ -202,6 +203,9 @@ export default function HomePage() {
             {!alreadyClaimedToday && <span>🪸</span>}
           </button>
         </div>
+
+        {/* OCEAN CONSERVATION */}
+        <ConservationBanner onToast={showToast} />
 
         {/* TRIPS GRID */}
         <div id="trips-section" className="space-y-4">
