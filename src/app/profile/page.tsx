@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
+import { DailyStreakCard } from "@/components/DailyStreakCard";
 import {
   MyBooking,
   MyPost,
@@ -341,6 +342,10 @@ export default function ProfilePage() {
         </div>
           );
         })()}
+
+        {/* DAILY STREAK -- moved here from the Explore page so it sits with
+            the rest of a diver's own stats/rewards. */}
+        <DailyStreakCard onToast={showToast} />
 
         {/* HOST STATUS -- verified hosts just get the badge above; this card
             only covers the states that need an action: apply, pending,
