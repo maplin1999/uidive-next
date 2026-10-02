@@ -257,9 +257,10 @@ export function PublicProfileModal() {
                     {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
                   </p>
 
-                  {profile.bio && (
-                    <p className="text-xs text-slate-400 max-w-md sm:pl-[22px]">{profile.bio}</p>
-                  )}
+                  {/* Flush with the cert row's left edge -- i.e. directly
+                      under the Award icon, not under the cert text next to
+                      it. */}
+                  {profile.bio && <p className="text-xs text-slate-400 max-w-md">{profile.bio}</p>}
 
                   <div className="w-full sm:w-56 pt-1">
                     {!user ? (

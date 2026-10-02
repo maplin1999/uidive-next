@@ -256,15 +256,9 @@ export default function ProfilePage() {
                 <Award className="w-4 h-4 shrink-0" /> {user.cert} • {user.location}
               </p>
 
-              {/* Indented to sit flush under the cert line's text (icon
-                  width + its gap) rather than under the icon itself -- reads
-                  as a continuation of that line instead of a separate
-                  flush-left block. Only applied at sm+, where the header is
-                  actually left-aligned; centered on mobile, so padding there
-                  would just skew it off-center. */}
-              {user.bio && (
-                <p className="text-xs text-slate-400 max-w-md sm:pl-[22px]">{user.bio}</p>
-              )}
+              {/* Flush with the cert row's left edge -- i.e. directly under
+                  the Award icon, not under the cert text next to it. */}
+              {user.bio && <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>}
             </div>
           </div>
         </div>
