@@ -18,7 +18,7 @@ export function ProfileStatPill({
 }) {
   const valueClass =
     accent === "amber" ? "text-amber-400" : accent === "cyan" ? "text-cyan-400" : "text-white";
-  const className = `flex flex-col items-center sm:items-start leading-tight ${
+  const className = `flex flex-col items-center text-center leading-tight ${
     onClick ? "hover:opacity-80 transition-opacity cursor-pointer" : ""
   }`;
 
