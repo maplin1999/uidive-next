@@ -6,6 +6,7 @@ import { HostTrip, TripFormFields, createTrip, updateTrip } from "@/lib/host";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { useClickOutside } from "@/lib/useClickOutside";
 import { ThemedSelect } from "@/components/ui/ThemedSelect";
+import { ThemedTimeSelect } from "@/components/ui/ThemedTimeSelect";
 import { DatePickerCalendar } from "@/components/home/DatePickerCalendar";
 
 const TRIP_TYPE_OPTIONS = [
@@ -74,14 +75,14 @@ function tripToFields(trip?: HostTrip | null): TripFormFields {
 // Migrated from the old site's #host-trip-form-modal (submitHostTripForm()).
 // The old site's custom calendar/time-picker widgets and max-depth live
 // formatter are replaced with a themed calendar popover (DatePickerCalendar,
-// shared with HeroSearch's "When" filter) for the date, a native
-// <input type="time"> for the time, and a plain text field for max depth.
-// Trip Type/Activity/Difficulty use ThemedSelect instead of native <select>
-// for the same reason: a native select's open dropdown panel is OS-drawn
-// and can't be themed, so on Windows it renders as an unstyled light popup
-// no matter what color-scheme is set on the closed control. Lat/lng
-// geocoding is dropped entirely -- both create_trip/update_trip default
-// those params to null.
+// shared with HeroSearch's "When" filter) for the date, a themed
+// ThemedTimeSelect for the time, and a plain text field for max depth.
+// Trip Type/Activity/Difficulty use ThemedSelect instead of native <select>.
+// All of these swaps exist for the same reason: a native select/date/time
+// input's open dropdown/picker panel is OS-drawn and can't be themed, so on
+// Windows it renders as an unstyled light popup no matter what color-scheme
+// is set on the closed control. Lat/lng geocoding is dropped entirely --
+// both create_trip/update_trip default those params to null.
 export function TripFormModal({
   trip,
   onClose,
@@ -278,12 +279,7 @@ export function TripFormModal({
             </div>
           </Field>
           <Field label="Time">
-            <input
-              type="time"
-              value={fields.scheduledTime}
-              onChange={(e) => update("scheduledTime", e.target.value)}
-              className={`${inputCls} [color-scheme:dark]`}
-            />
+            <ThemedTimeSelect value={fields.scheduledTime} onChange={(v) => update("scheduledTime", v)} />
           </Field>
         </div>
 

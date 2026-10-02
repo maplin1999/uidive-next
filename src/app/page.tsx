@@ -9,6 +9,7 @@ import {
   fetchTrips,
 } from "@/lib/trips";
 import { HeroSearch, ActivityFilter } from "@/components/home/HeroSearch";
+import { TrustStat } from "@/components/home/TrustStat";
 import { TripCard, TopPickCard } from "@/components/home/TripCard";
 import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
@@ -152,24 +153,17 @@ export default function HomePage() {
             />
 
             {/* Trust stats -- placeholder figures, same as the old site
-                (no live aggregate-stats source wired up yet). */}
+                (no live aggregate-stats source wired up yet). TrustStat
+                gives each tile the same count-up-on-mount + hover-glow
+                treatment as the profile header's Dives/Buddies/Corals/Posts
+                stats, for a consistent feel across the site. */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-1">
               {[
                 ["2,400+", "Dive Trips Booked"],
                 ["180+", "Dive Sites"],
                 ["9,000+", "Divers on UiDive"],
               ].map(([stat, label]) => (
-                <div
-                  key={label}
-                  className="panel-sunken bg-slate-950/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl px-2 py-2 sm:px-4 sm:py-2.5 text-center sm:text-left min-w-0"
-                >
-                  <div className="text-base sm:text-xl md:text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-amber-300 bg-clip-text text-transparent">
-                    {stat}
-                  </div>
-                  <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-normal sm:tracking-wider leading-tight">
-                    {label}
-                  </div>
-                </div>
+                <TrustStat key={label} value={stat} label={label} />
               ))}
             </div>
           </div>

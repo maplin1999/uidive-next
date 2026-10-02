@@ -14,10 +14,11 @@ import {
   MessageSquare,
   Compass,
   Store,
-  BadgeCheck,
+  CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
+import { useToast, Toast } from "@/components/Toast";
 import {
   PublicProfile,
   PublicPost,
@@ -56,8 +57,25 @@ export function PublicProfileModal() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [diverIdCopied, setDiverIdCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setMenuOpen(false));
+  const { message, showToast } = useToast();
+
+  // Matches the signed-in Profile page: the name is clickable to copy this
+  // diver's ID to the clipboard, so it doubles as the "share their Diver ID"
+  // action without a separate button.
+  async function copyDiverId(id: string | number) {
+    try {
+      await navigator.clipboard.writeText(String(id));
+      setDiverIdCopied(true);
+      showToast("📋 Diver ID copied to clipboard!");
+      window.setTimeout(() => setDiverIdCopied(false), 1500);
+    } catch (err) {
+      console.error("Could not copy Diver ID:", err);
+      showToast("❌ Could not copy -- please try again.");
+    }
+  }
 
   useEffect(() => {
     if (!profileUserId) return;
@@ -220,18 +238,30 @@ export function PublicProfileModal() {
                       (yours or anyone else's) looks the same. */}
                   <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                     <div className="relative group">
-                      <h2 className="text-xl sm:text-2xl font-black text-white cursor-default">{profile.name}</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-white m-0">
+                        <button
+                          type="button"
+                          onClick={() => copyDiverId(profile.diver_id)}
+                          className="hover:text-cyan-300 transition-colors cursor-pointer"
+                          title={`Click to copy ${profile.name.split(" ")[0]}'s Diver ID`}
+                        >
+                          {profile.name}
+                        </button>
+                      </h2>
                       <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                        Diver ID: #{profile.diver_id}
+                        {diverIdCopied ? "Copied!" : `Diver ID: #${profile.diver_id} • Click to copy`}
                       </div>
                     </div>
                     {hostBadge && (
                       <div className="relative group">
+                        {/* CheckCircle instead of BadgeCheck for "both" --
+                            matches the signed-in Profile page's header; see
+                            the comment there for why. */}
                         <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
                           {hostBadge.host_type === "shop" ? (
                             <Store className="w-3.5 h-3.5 text-emerald-300" />
                           ) : hostBadge.host_type === "both" ? (
-                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-300" />
                           ) : (
                             <Compass className="w-3.5 h-3.5 text-emerald-300" />
                           )}
@@ -397,6 +427,7 @@ export function PublicProfileModal() {
           onClose={() => setChatOpen(false)}
         />
       )}
+      <Toast message={message} />
     </div>
   );
 }

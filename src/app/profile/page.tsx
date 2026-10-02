@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Compass,
   Store,
-  BadgeCheck,
+  CheckCircle,
   Anchor,
   Clock,
   XCircle,
@@ -69,6 +69,22 @@ export default function ProfilePage() {
   const [buddiesListOpen, setBuddiesListOpen] = useState(false);
   const [trips, setTrips] = useState<DiveTrip[]>([]);
   const [editingPost, setEditingPost] = useState<MyPost | null>(null);
+  const [diverIdCopied, setDiverIdCopied] = useState(false);
+
+  // Diver ID lives behind the name's hover tooltip (see the header below),
+  // so clicking the name to copy it is the only way to grab it -- useful
+  // for sharing with a buddy without having to screenshot/retype it.
+  async function copyDiverId(id: string | number) {
+    try {
+      await navigator.clipboard.writeText(String(id));
+      setDiverIdCopied(true);
+      showToast("📋 Diver ID copied to clipboard!");
+      window.setTimeout(() => setDiverIdCopied(false), 1500);
+    } catch (err) {
+      console.error("Could not copy Diver ID:", err);
+      showToast("❌ Could not copy -- please try again.");
+    }
+  }
 
   function loadPosts() {
     if (!user) return;
@@ -198,11 +214,23 @@ export default function ProfilePage() {
                     visitors to this page (just the signed-in diver) never
                     need visible by default, so it's tucked behind a hover
                     tooltip on the name instead, same pattern as the
-                    admin/verified-host badge tooltips right next to it. */}
+                    admin/verified-host badge tooltips right next to it. The
+                    name itself is clickable to copy that ID straight to the
+                    clipboard, so it doubles as the "share my Diver ID"
+                    action without needing a separate button. */}
                 <div className="relative group">
-                  <h1 className="text-xl sm:text-2xl font-black text-white cursor-default">{user.name}</h1>
+                  <h1 className="text-xl sm:text-2xl font-black text-white m-0">
+                    <button
+                      type="button"
+                      onClick={() => copyDiverId(diverIdFromUserId(user.id))}
+                      className="hover:text-cyan-300 transition-colors cursor-pointer"
+                      title="Click to copy your Diver ID"
+                    >
+                      {user.name}
+                    </button>
+                  </h1>
                   <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                    Diver ID: #{diverIdFromUserId(user.id)}
+                    {diverIdCopied ? "Copied!" : `Diver ID: #${diverIdFromUserId(user.id)} • Click to copy`}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -221,11 +249,17 @@ export default function ProfilePage() {
                   )}
                   {hostStatus?.verification_status === "verified" && (
                     <div className="relative group">
+                      {/* CheckCircle (plain ring + checkmark) instead of
+                          BadgeCheck for "both" -- BadgeCheck's scalloped
+                          seal outline isn't a circle, so at 14px its ink
+                          doesn't fill this round chip symmetrically and can
+                          read as "off-center" even though it's correctly
+                          centered. A perfect circle sidesteps that. */}
                       <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
                         {hostStatus.host_type === "shop" ? (
                           <Store className="w-3.5 h-3.5 text-emerald-300" />
                         ) : hostStatus.host_type === "both" ? (
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-300" />
                         ) : (
                           <Compass className="w-3.5 h-3.5 text-emerald-300" />
                         )}

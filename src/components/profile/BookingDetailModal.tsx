@@ -17,6 +17,7 @@ import { supabase } from "@/lib/supabase";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -45,6 +46,7 @@ export function BookingDetailModal({
   );
   const [chatOpen, setChatOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
   const [editingReview, setEditingReview] = useState(!existingReview);
   const [rating, setRating] = useState(existingReview?.rating || 0);
@@ -107,7 +109,6 @@ export function BookingDetailModal({
   const ownedEquipment = EQUIPMENT_ITEMS.filter((item) => booking.equipment && booking.equipment[item.id]);
 
   async function handleCancel() {
-    if (!window.confirm("Cancel this booking? Your spot will be released back to other divers.")) return;
     setCancelling(true);
     try {
       await cancelBooking(booking.id);
@@ -116,6 +117,7 @@ export function BookingDetailModal({
     } catch (err) {
       console.error("Could not cancel booking:", err);
       setCancelling(false);
+      setConfirmCancelOpen(false);
     }
   }
 
@@ -358,7 +360,7 @@ export function BookingDetailModal({
               <span>Open Group Chat</span>
             </button>
             <button
-              onClick={handleCancel}
+              onClick={() => setConfirmCancelOpen(true)}
               disabled={cancelling}
               className="w-full py-3 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
@@ -371,6 +373,17 @@ export function BookingDetailModal({
 
       {chatOpen && trip && (
         <TripChatModal tripId={booking.trip_id} tripTitle={trip.title} onClose={() => setChatOpen(false)} />
+      )}
+      {confirmCancelOpen && (
+        <ConfirmModal
+          title="Cancel this booking?"
+          message="Your spot will be released back to other divers. This can't be undone."
+          confirmLabel="Cancel Booking"
+          cancelLabel="Keep Booking"
+          confirming={cancelling}
+          onConfirm={handleCancel}
+          onCancel={() => setConfirmCancelOpen(false)}
+        />
       )}
     </div>
   );
