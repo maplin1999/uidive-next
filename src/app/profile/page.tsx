@@ -20,7 +20,6 @@ import {
   Share2,
   Trash2,
   MapPin,
-  Lock,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast, Toast } from "@/components/Toast";
@@ -41,17 +40,16 @@ import { BuddiesListModal } from "@/components/social/BuddiesListModal";
 import { BookingDetailModal } from "@/components/profile/BookingDetailModal";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
-import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
 import { PostFormModal } from "@/components/community/PostFormModal";
 import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 
 // The Profile tab (#tab-profile in the old site), including Treasure Chest
-// cosmetics (the equipped calling-card banner behind the header, the
-// equipped avatar via DiverAvatar, and the "Locker" launcher next to the
-// name -- see src/lib/cosmetics.ts and CosmeticsLockerModal) alongside the
+// cosmetics (the equipped calling-card banner behind the header and the
+// equipped avatar via DiverAvatar -- see src/lib/cosmetics.ts) alongside the
 // real header info (admin/verified-host badges, real buddies count),
 // bookings list + full booking detail (roster/cancel/review), and dive-log
-// grid.
+// grid. The Locker launcher itself now lives in the site Header's account
+// dropdown as "My Dive Bag" so it's reachable from every page, not just here.
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
@@ -68,7 +66,6 @@ export default function ProfilePage() {
   const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [buddiesListOpen, setBuddiesListOpen] = useState(false);
-  const [lockerOpen, setLockerOpen] = useState(false);
   const [trips, setTrips] = useState<DiveTrip[]>([]);
   const [editingPost, setEditingPost] = useState<MyPost | null>(null);
 
@@ -143,7 +140,7 @@ export default function ProfilePage() {
           const cardItem = equippedCard && equippedCard.type === "calling_card" ? equippedCard : null;
           return (
         <div
-          className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
+          className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
         >
           {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
               behind everything else in this header. object-cover on a
@@ -230,13 +227,6 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={() => setLockerOpen(true)}
-                  className="text-[10px] font-bold text-purple-300 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-full hover:bg-purple-500/20 transition-colors inline-flex items-center gap-1 leading-none"
-                >
-                  <Lock className="w-3 h-3 shrink-0" />
-                  <span>Locker</span>
-                </button>
               </div>
               <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
                 <Award className="w-4 h-4" /> {user.cert} • {user.location}
@@ -245,30 +235,20 @@ export default function ProfilePage() {
               <p className="text-[10px] font-mono font-bold text-slate-500">
                 Diver ID: #{diverIdFromUserId(user.id)}
               </p>
-            </div>
-          </div>
 
-          <div className="relative z-10 grid grid-cols-3 gap-1.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
-            <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-slate-800 text-center sm:min-w-[74px]">
-              <div className="text-base sm:text-lg font-black text-white">
-                {Number(user.dives).toLocaleString()}
+              {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
+                  chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
+                  same sunken-panel treatment the hero search bar and
+                  leaderboard runner-up cards use, so it already has a
+                  light-mode-safe background via globals.css instead of
+                  needing a new always-dark hook). Kept in the left info
+                  column next to the rest of the profile details instead of
+                  being pushed to the far side of the header. */}
+              <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 flex-wrap">
+                <StatPill label="Dives" value={user.dives} />
+                <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <StatPill label="Corals" value={user.corals} accent="amber" />
               </div>
-              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Dives</div>
-            </div>
-            <button
-              onClick={() => setBuddiesListOpen(true)}
-              className="p-2 sm:p-2.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 hover:border-cyan-500/40 text-center sm:min-w-[74px] transition-colors"
-            >
-              <div className="text-base sm:text-lg font-black text-cyan-400">
-                {Number(buddiesCount).toLocaleString()}
-              </div>
-              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Buddies</div>
-            </button>
-            <div className="p-2 sm:p-2.5 bg-slate-950 rounded-2xl border border-amber-500/30 text-center sm:min-w-[74px]">
-              <div className="text-base sm:text-lg font-black text-amber-400">
-                {Number(user.corals).toLocaleString()}
-              </div>
-              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Corals</div>
             </div>
           </div>
         </div>
@@ -617,7 +597,6 @@ export default function ProfilePage() {
       {buddiesListOpen && user && (
         <BuddiesListModal userId={user.id} onClose={() => setBuddiesListOpen(false)} />
       )}
-      {lockerOpen && <CosmeticsLockerModal onClose={() => setLockerOpen(false)} />}
       {editingPost && (
         <PostFormModal
           trips={trips}
@@ -640,4 +619,45 @@ export default function ProfilePage() {
       <Toast message={message} />
     </main>
   );
+}
+
+// Pill-shaped "frosted glass" stat chip for the Dives/Buddies/Corals row.
+// Reuses the same sunken-panel treatment (panel-sunken + bg-slate-950/60 +
+// backdrop-blur) as the hero search bar and leaderboard runner-up cards, so
+// it already has a light-mode-safe background via globals.css rather than
+// needing its own always-dark hook. Renders as a <button> when onClick is
+// given (Buddies, which opens the buddies list), a plain <div> otherwise.
+function StatPill({
+  label,
+  value,
+  accent,
+  onClick,
+}: {
+  label: string;
+  value: number;
+  accent?: "cyan" | "amber";
+  onClick?: () => void;
+}) {
+  const valueClass =
+    accent === "amber" ? "text-amber-400" : accent === "cyan" ? "text-cyan-400" : "text-white";
+  const borderClass = accent === "amber" ? "border-amber-500/30" : "border-slate-800/80";
+  const className = `panel-sunken inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/60 backdrop-blur-md border ${borderClass} ${
+    onClick ? "hover:bg-slate-800/60 hover:border-cyan-500/40 transition-colors cursor-pointer" : ""
+  }`;
+
+  const content = (
+    <>
+      <span className={`text-xs font-black ${valueClass}`}>{Number(value).toLocaleString()}</span>
+      <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wide">{label}</span>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={className}>
+        {content}
+      </button>
+    );
+  }
+  return <div className={className}>{content}</div>;
 }
