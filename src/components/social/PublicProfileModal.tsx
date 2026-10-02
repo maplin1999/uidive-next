@@ -14,7 +14,7 @@ import {
   MessageSquare,
   Compass,
   Store,
-  CheckCircle,
+  BadgeCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useSocial } from "@/components/social/SocialContext";
@@ -254,14 +254,11 @@ export function PublicProfileModal() {
                     </div>
                     {hostBadge && (
                       <div className="relative group">
-                        {/* CheckCircle instead of BadgeCheck for "both" --
-                            matches the signed-in Profile page's header; see
-                            the comment there for why. */}
                         <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
                           {hostBadge.host_type === "shop" ? (
                             <Store className="w-3.5 h-3.5 text-emerald-300" />
                           ) : hostBadge.host_type === "both" ? (
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-300" />
+                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
                           ) : (
                             <Compass className="w-3.5 h-3.5 text-emerald-300" />
                           )}

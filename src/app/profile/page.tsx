@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Compass,
   Store,
-  CheckCircle,
+  BadgeCheck,
   Anchor,
   Clock,
   XCircle,
@@ -249,17 +249,11 @@ export default function ProfilePage() {
                   )}
                   {hostStatus?.verification_status === "verified" && (
                     <div className="relative group">
-                      {/* CheckCircle (plain ring + checkmark) instead of
-                          BadgeCheck for "both" -- BadgeCheck's scalloped
-                          seal outline isn't a circle, so at 14px its ink
-                          doesn't fill this round chip symmetrically and can
-                          read as "off-center" even though it's correctly
-                          centered. A perfect circle sidesteps that. */}
                       <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
                         {hostStatus.host_type === "shop" ? (
                           <Store className="w-3.5 h-3.5 text-emerald-300" />
                         ) : hostStatus.host_type === "both" ? (
-                          <CheckCircle className="w-3.5 h-3.5 text-emerald-300" />
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
                         ) : (
                           <Compass className="w-3.5 h-3.5 text-emerald-300" />
                         )}
