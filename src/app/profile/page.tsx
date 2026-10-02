@@ -141,7 +141,7 @@ export default function ProfilePage() {
           const cardItem = equippedCard && equippedCard.type === "calling_card" ? equippedCard : null;
           return (
         <div
-          className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl ${cardItem ? "always-dark" : ""}`}
+          className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl ${cardItem ? "always-dark" : ""}`}
         >
           {/* Equipped Calling Card banner (Treasure Chest cosmetics) -- sits
               behind everything else in this header. object-cover on a
@@ -163,17 +163,8 @@ export default function ProfilePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
             </div>
           )}
-          {/* Grid instead of a flex row: the avatar is placed in column 1
-              spanning only the name + stat-pill rows (row-span-2) and
-              self-centers within that span. That keeps its vertical center
-              locked to the name/pills cluster -- specifically the pills row,
-              since it and the name row are near enough in height -- instead
-              of drifting toward the middle of the whole (now taller) block
-              once cert/location and bio got added below. Cert/location and
-              bio are pinned to column 2 (sm:col-start-2) so they stay under
-              the name/pills text rather than under the avatar. */}
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-x-5 gap-y-3 text-center sm:text-left">
-            <div className="relative shrink-0 group justify-self-center sm:col-start-1 sm:row-start-1 sm:row-span-2 sm:self-center">
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
+            <div className="relative shrink-0 group">
               <DiverAvatar
                 avatarUrl={user.avatar}
                 equippedAvatarId={user.equipped_avatar_id}
@@ -199,78 +190,74 @@ export default function ProfilePage() {
                 <Pencil className="w-6 h-6 text-white" />
               </button>
             </div>
-
-            <div className="sm:col-start-2 sm:row-start-1 flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-              {/* Diver ID moved off its own line -- it's niche info most
-                  visitors to this page (just the signed-in diver) never
-                  need visible by default, so it's tucked behind a hover
-                  tooltip on the name instead, same pattern as the
-                  admin/verified-host badge tooltips right next to it. */}
-              <div className="relative group">
-                <h1 className="text-xl sm:text-2xl font-black text-white cursor-default">{user.name}</h1>
-                <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                  Diver ID: #{diverIdFromUserId(user.id)}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                {/* Diver ID moved off its own line -- it's niche info most
+                    visitors to this page (just the signed-in diver) never
+                    need visible by default, so it's tucked behind a hover
+                    tooltip on the name instead, same pattern as the
+                    admin/verified-host badge tooltips right next to it. */}
+                <div className="relative group">
+                  <h1 className="text-xl sm:text-2xl font-black text-white cursor-default">{user.name}</h1>
+                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                    Diver ID: #{diverIdFromUserId(user.id)}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {user.is_admin && (
+                    <div className="relative group">
+                      <button
+                        onClick={() => setAdminPanelOpen(true)}
+                        className="w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/40 flex items-center justify-center hover:bg-violet-500/25 transition-colors"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
+                      </button>
+                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                        Site Admin -- Review Host Applications
+                      </div>
+                    </div>
+                  )}
+                  {hostStatus?.verification_status === "verified" && (
+                    <div className="relative group">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
+                        {hostStatus.host_type === "shop" ? (
+                          <Store className="w-3.5 h-3.5 text-emerald-300" />
+                        ) : hostStatus.host_type === "both" ? (
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                        ) : (
+                          <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                        )}
+                      </div>
+                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                        {hostStatus.host_type === "shop"
+                          ? "Verified Dive Shop"
+                          : hostStatus.host_type === "both"
+                            ? "Verified Dive Shop & Divemaster"
+                            : "Verified Divemaster"}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                {user.is_admin && (
-                  <div className="relative group">
-                    <button
-                      onClick={() => setAdminPanelOpen(true)}
-                      className="w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/40 flex items-center justify-center hover:bg-violet-500/25 transition-colors"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
-                    </button>
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                      Site Admin -- Review Host Applications
-                    </div>
-                  </div>
-                )}
-                {hostStatus?.verification_status === "verified" && (
-                  <div className="relative group">
-                    <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
-                      {hostStatus.host_type === "shop" ? (
-                        <Store className="w-3.5 h-3.5 text-emerald-300" />
-                      ) : hostStatus.host_type === "both" ? (
-                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
-                      ) : (
-                        <Compass className="w-3.5 h-3.5 text-emerald-300" />
-                      )}
-                    </div>
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                      {hostStatus.host_type === "shop"
-                        ? "Verified Dive Shop"
-                        : hostStatus.host_type === "both"
-                          ? "Verified Dive Shop & Divemaster"
-                          : "Verified Divemaster"}
-                    </div>
-                  </div>
-                )}
+
+              {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
+                  chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
+                  same sunken-panel treatment the hero search bar and
+                  leaderboard runner-up cards use, so it already has a
+                  light-mode-safe background via globals.css instead of
+                  needing a new always-dark hook). */}
+              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                <ProfileStatPill label="Dives" value={user.dives} />
+                <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
               </div>
+
+              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                <Award className="w-4 h-4 shrink-0" /> {user.cert} • {user.location}
+              </p>
+
+              {user.bio && <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>}
             </div>
-
-            {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
-                chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
-                same sunken-panel treatment the hero search bar and
-                leaderboard runner-up cards use, so it already has a
-                light-mode-safe background via globals.css instead of
-                needing a new always-dark hook). This is the row the avatar
-                is centered against. */}
-            <div className="sm:col-start-2 sm:row-start-2 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-              <ProfileStatPill label="Dives" value={user.dives} />
-              <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-              <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
-            </div>
-
-            <p className="sm:col-start-2 text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
-              <Award className="w-4 h-4 shrink-0" /> {user.cert} • {user.location}
-            </p>
-
-            {/* Flush with the cert row's left edge -- i.e. directly under
-                the Award icon, not under the cert text next to it. */}
-            {user.bio && (
-              <p className="sm:col-start-2 text-xs text-slate-400 max-w-md">{user.bio}</p>
-            )}
           </div>
         </div>
           );

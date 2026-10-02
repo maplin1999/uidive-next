@@ -179,7 +179,7 @@ export function PublicProfileModal() {
         {status === "ready" && profile && (
           <>
             <div
-              className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl -mt-2 ${
+              className={`relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 shadow-xl -mt-2 ${
                 cardItem ? "always-dark" : ""
               }`}
             >
@@ -201,17 +201,7 @@ export function PublicProfileModal() {
                   />
                 </div>
               )}
-              {/* Grid instead of a flex row: the avatar is placed in column 1
-                  spanning only the name + stat-pill rows (row-span-2) and
-                  self-centers within that span, so its vertical center stays
-                  locked to the pills row instead of drifting toward the
-                  middle of the whole (taller) block below. Cert/location,
-                  bio and the buddy-action button are pinned to column 2
-                  (sm:col-start-2) so they stay under the name/pills text
-                  rather than under the avatar. Identical layout to the
-                  signed-in Profile page on purpose, so every profile (yours
-                  or anyone else's) looks the same. */}
-              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-x-5 gap-y-3 text-center sm:text-left">
+              <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
                 <DiverAvatar
                   avatarUrl={profile.avatar_url}
                   equippedAvatarId={profile.equipped_avatar_id}
@@ -219,85 +209,86 @@ export function PublicProfileModal() {
                   isVerifiedHost={!!hostBadge}
                   sizeClass="w-20 h-20 sm:w-24 sm:h-24"
                   borderClass="border-4 shadow-lg"
-                  className="justify-self-center sm:col-start-1 sm:row-start-1 sm:row-span-2 sm:self-center"
                 />
-                <div className="sm:col-start-2 sm:row-start-1 flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                  <div className="relative group">
-                    <h2 className="text-xl sm:text-2xl font-black text-white cursor-default">{profile.name}</h2>
-                    <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                      Diver ID: #{profile.diver_id}
-                    </div>
-                  </div>
-                  {hostBadge && (
+                <div className="space-y-3">
+                  {/* Same header layout as the signed-in Profile page: name
+                      row (Diver ID tucked behind a hover tooltip on the name
+                      instead of its own line), stat pills, cert/location,
+                      then bio -- kept identical on purpose so every profile
+                      (yours or anyone else's) looks the same. */}
+                  <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                     <div className="relative group">
-                      <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
-                        {hostBadge.host_type === "shop" ? (
-                          <Store className="w-3.5 h-3.5 text-emerald-300" />
-                        ) : hostBadge.host_type === "both" ? (
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
-                        ) : (
-                          <Compass className="w-3.5 h-3.5 text-emerald-300" />
-                        )}
-                      </div>
-                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                        {hostBadge.host_type === "shop"
-                          ? "Verified Dive Shop"
-                          : hostBadge.host_type === "both"
-                            ? "Verified Dive Shop & Divemaster"
-                            : "Verified Divemaster"}
+                      <h2 className="text-xl sm:text-2xl font-black text-white cursor-default">{profile.name}</h2>
+                      <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                        Diver ID: #{profile.diver_id}
                       </div>
                     </div>
-                  )}
-                </div>
+                    {hostBadge && (
+                      <div className="relative group">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center cursor-default">
+                          {hostBadge.host_type === "shop" ? (
+                            <Store className="w-3.5 h-3.5 text-emerald-300" />
+                          ) : hostBadge.host_type === "both" ? (
+                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-300" />
+                          ) : (
+                            <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                          )}
+                        </div>
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
+                          {hostBadge.host_type === "shop"
+                            ? "Verified Dive Shop"
+                            : hostBadge.host_type === "both"
+                              ? "Verified Dive Shop & Divemaster"
+                              : "Verified Divemaster"}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                <div className="sm:col-start-2 sm:row-start-2 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                  <ProfileStatPill label="Dives" value={profile.dives} />
-                  <ProfileStatPill label="Buddies" value={buddiesCount} />
-                  <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
-                </div>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <ProfileStatPill label="Dives" value={profile.dives} />
+                    <ProfileStatPill label="Buddies" value={buddiesCount} />
+                    <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
+                  </div>
 
-                <p className="sm:col-start-2 text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
-                  <Award className="w-4 h-4 shrink-0" />
-                  {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
-                </p>
+                  <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1.5">
+                    <Award className="w-4 h-4 shrink-0" />
+                    {profile.location ? `${profile.cert} • ${profile.location}` : profile.cert}
+                  </p>
 
-                {/* Flush with the cert row's left edge -- i.e. directly
-                    under the Award icon, not under the cert text next to
-                    it. */}
-                {profile.bio && (
-                  <p className="sm:col-start-2 text-xs text-slate-400 max-w-md">{profile.bio}</p>
-                )}
+                  {profile.bio && <p className="text-xs text-slate-400 max-w-md">{profile.bio}</p>}
 
-                <div className="sm:col-start-2 w-full sm:w-56 pt-1 mx-auto sm:mx-0">
-                  {!user ? (
-                    <p className="text-xs text-slate-500">
-                      Sign in to add {profile.name.split(" ")[0]} as a buddy.
-                    </p>
-                  ) : friendship === "accepted" ? (
-                    <button
-                      onClick={() => setChatOpen(true)}
-                      className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
-                    >
-                      <MessageSquare className="w-4 h-4" /> Message
-                    </button>
-                  ) : friendship === "pending" || requestSent ? (
-                    <button
-                      disabled
-                      className="w-full py-2.5 bg-slate-800 text-slate-400 font-bold rounded-xl text-xs"
-                    >
-                      Request Pending
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        if (!requireAuth()) return;
-                        handleSendRequest();
-                      }}
-                      className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
-                    >
-                      <UserPlus className="w-4 h-4" /> Add Buddy
-                    </button>
-                  )}
+                  <div className="w-full sm:w-56 pt-1">
+                    {!user ? (
+                      <p className="text-xs text-slate-500">
+                        Sign in to add {profile.name.split(" ")[0]} as a buddy.
+                      </p>
+                    ) : friendship === "accepted" ? (
+                      <button
+                        onClick={() => setChatOpen(true)}
+                        className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
+                      >
+                        <MessageSquare className="w-4 h-4" /> Message
+                      </button>
+                    ) : friendship === "pending" || requestSent ? (
+                      <button
+                        disabled
+                        className="w-full py-2.5 bg-slate-800 text-slate-400 font-bold rounded-xl text-xs"
+                      >
+                        Request Pending
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (!requireAuth()) return;
+                          handleSendRequest();
+                        }}
+                        className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
+                      >
+                        <UserPlus className="w-4 h-4" /> Add Buddy
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
