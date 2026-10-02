@@ -564,6 +564,12 @@ html[data-theme="light"] .from-slate-900.via-amber-950\/20.to-slate-900 {
 html[data-theme="light"] .from-slate-900.via-purple-950\/20.to-slate-900 {
   background-image: linear-gradient(to bottom right, #ffffff, rgba(168, 85, 247, 0.12), #ffffff) !important;
 }
+/* Ocean Conservation banner (Explore page) -- same "light gradient with a
+   themed tint" treatment as the amber Daily Streak / purple Treasure Chest
+   cards above, cyan-to-emerald to match the banner's own accent colors. */
+html[data-theme="light"] .from-cyan-950\/50.via-slate-900.to-emerald-950\/40 {
+  background-image: linear-gradient(to right, rgba(14, 143, 166, 0.12), #ffffff, rgba(4, 120, 87, 0.1)) !important;
+}
 
 /* "Always dark" elements: photo badges, the photo caption bar, profile-grid
    photo captions all sit on top of imagery, so they keep their original
