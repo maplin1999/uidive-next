@@ -228,27 +228,33 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
-                <Award className="w-4 h-4" /> {user.cert} • {user.location}
-              </p>
-              <p className="text-xs text-slate-400 max-w-md">{user.bio}</p>
-              <p className="text-[10px] font-mono font-bold text-slate-500">
-                Diver ID: #{diverIdFromUserId(user.id)}
-              </p>
-
-              {/* Dives/Buddies/Corals -- pill-shaped "frosted glass" stat
-                  chips (panel-sunken + bg-slate-950/60 + backdrop-blur is the
-                  same sunken-panel treatment the hero search bar and
-                  leaderboard runner-up cards use, so it already has a
-                  light-mode-safe background via globals.css instead of
-                  needing a new always-dark hook). Kept in the left info
-                  column next to the rest of the profile details instead of
-                  being pushed to the far side of the header. */}
-              <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 flex-wrap">
-                <StatPill label="Dives" value={user.dives} />
-                <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                <StatPill label="Corals" value={user.corals} accent="amber" />
+              {/* Cert/location shares its row with the stat pills instead of
+                  each detail getting its own full-width line -- cuts the
+                  header from 5 stacked rows to 3, and puts Dives/Buddies/
+                  Corals above the bio/Diver ID line as asked. Wraps under
+                  the cert line on narrow screens instead of forcing it. */}
+              <div className="flex flex-wrap items-center justify-center sm:justify-between gap-x-4 gap-y-1.5">
+                <p className="text-xs font-bold text-cyan-400 flex items-center justify-center sm:justify-start gap-1">
+                  <Award className="w-4 h-4" /> {user.cert} • {user.location}
+                </p>
+                <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                  <StatPill label="Dives" value={user.dives} />
+                  <StatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                  <StatPill label="Corals" value={user.corals} accent="amber" />
+                </div>
               </div>
+
+              {/* Bio and Diver ID condensed onto one line (instead of a full
+                  row each) -- the ID is de-emphasized in the same muted
+                  monospace treatment it always had, just folded in rather
+                  than stacked below. */}
+              <p className="text-xs text-slate-400 max-w-md">
+                {user.bio}
+                {user.bio ? " " : ""}
+                <span className="font-mono font-bold text-slate-500">
+                  {user.bio ? "· " : ""}Diver ID: #{diverIdFromUserId(user.id)}
+                </span>
+              </p>
             </div>
           </div>
         </div>
