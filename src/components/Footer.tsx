@@ -44,14 +44,14 @@ export function Footer() {
             <FooterLink href="/about-us">{t.footer.aboutUs}</FooterLink>
             <FooterLink href="/faqs">{t.footer.faqs}</FooterLink>
             <FooterLink href="/contact-us">{t.footer.contactUs}</FooterLink>
-            <FooterLink href="/dive-safe">{t.footer.diveSafe}</FooterLink>
+            <FooterLink href="/sitemaps">{t.footer.sitemaps}</FooterLink>
           </FooterColumn>
 
           {/* LEGAL */}
           <FooterColumn title={t.footer.legal}>
             <FooterLink href="/terms-of-service">{t.footer.termsOfService}</FooterLink>
             <FooterLink href="/privacy-polcy">{t.footer.privacyPolicy}</FooterLink>
-            <FooterLink href="/sitemaps">{t.footer.sitemaps}</FooterLink>
+            <FooterLink href="/dive-safe">{t.footer.diveSafe}</FooterLink>
           </FooterColumn>
         </div>
 
