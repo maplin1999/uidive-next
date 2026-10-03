@@ -90,9 +90,6 @@ export function Header() {
               <span className="font-black text-xl sm:text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent block pb-1 truncate">
                 UiDive
               </span>
-              <span className="hidden sm:block text-[9px] font-bold text-slate-400 tracking-widest uppercase leading-none">
-                Scuba &amp; Ocean Travel
-              </span>
             </div>
           </Link>
 
