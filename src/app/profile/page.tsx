@@ -48,6 +48,7 @@ import { ProfileStatPill } from "@/components/ProfileStatPill";
 import { PostFormModal } from "@/components/community/PostFormModal";
 import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 import { useCurrency } from "@/components/currency/CurrencyContext";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // The Profile tab (#tab-profile in the old site), including Treasure Chest
 // cosmetics (the equipped calling-card banner behind the header and the
@@ -60,6 +61,7 @@ export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
   const { formatPrice } = useCurrency();
+  const { t } = useLocale();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
@@ -93,11 +95,11 @@ export default function ProfilePage() {
     try {
       await navigator.clipboard.writeText(String(id));
       setDiverIdCopied(true);
-      showToast("📋 Diver ID copied to clipboard!");
+      showToast(t.profile.diverIdCopiedToast);
       window.setTimeout(() => setDiverIdCopied(false), 1500);
     } catch (err) {
       console.error("Could not copy Diver ID:", err);
-      showToast("❌ Could not copy -- please try again.");
+      showToast(t.profile.couldNotCopy);
     }
   }
 
@@ -110,7 +112,7 @@ export default function ProfilePage() {
       setDeletingPost(null);
     } catch (err) {
       console.error("Could not delete post:", err);
-      showToast("Could not delete that post -- please try again.");
+      showToast(t.profile.couldNotDeletePost);
     } finally {
       setDeletingPostBusy(false);
     }
@@ -164,15 +166,13 @@ export default function ProfilePage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-4">
           <div className="text-3xl">🤿</div>
-          <h1 className="text-lg font-bold text-white">Sign in to view your profile</h1>
-          <p className="text-xs text-slate-400">
-            Track your dives, Corals, and bookings once you&apos;re signed in.
-          </p>
+          <h1 className="text-lg font-bold text-white">{t.profile.signInTitle}</h1>
+          <p className="text-xs text-slate-400">{t.profile.signInBody}</p>
           <button
             onClick={() => requireAuth()}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
           >
-            Sign In
+            {t.profile.signIn}
           </button>
         </div>
       </main>
@@ -237,7 +237,7 @@ export default function ProfilePage() {
                 equippedAvatarId={user.equipped_avatar_id}
                 cert={user.cert}
                 isVerifiedHost={hostStatus?.verification_status === "verified"}
-                alt="Your profile photo"
+                alt={t.profile.yourProfilePhoto}
                 sizeClass="w-20 h-20 sm:w-24 sm:h-24"
                 borderClass="border-4 shadow-lg"
               />
@@ -250,8 +250,8 @@ export default function ProfilePage() {
                   breaking the guaranteed contrast this scrim exists for. */}
               <button
                 onClick={() => setEditOpen(true)}
-                aria-label="Edit profile photo"
-                title="Edit profile"
+                aria-label={t.profile.editProfilePhoto}
+                title={t.profile.editProfile}
                 className="always-dark absolute inset-0 rounded-full bg-slate-950/60 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
               >
                 <Pencil className="w-6 h-6 text-white" />
@@ -273,13 +273,15 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => copyDiverId(diverIdFromUserId(user.id))}
                       className="hover:text-cyan-300 transition-colors cursor-pointer"
-                      title="Click to copy your Diver ID"
+                      title={t.profile.clickToCopyDiverId}
                     >
                       {user.name}
                     </button>
                   </h1>
                   <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                    {diverIdCopied ? "Copied!" : `Diver ID: #${diverIdFromUserId(user.id)} • Click to copy`}
+                    {diverIdCopied
+                      ? t.profile.copied
+                      : `${t.profile.diverIdPrefix}${diverIdFromUserId(user.id)} ${t.profile.diverIdSuffix}`}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -292,7 +294,7 @@ export default function ProfilePage() {
                         <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
                       </button>
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                        Site Admin -- Review Host Applications
+                        {t.profile.siteAdminTooltip}
                       </div>
                     </div>
                   )}
@@ -309,10 +311,10 @@ export default function ProfilePage() {
                       </div>
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
                         {hostStatus.host_type === "shop"
-                          ? "Verified Dive Shop"
+                          ? t.profile.verifiedDiveShop
                           : hostStatus.host_type === "both"
-                            ? "Verified Dive Shop & Divemaster"
-                            : "Verified Divemaster"}
+                            ? t.profile.verifiedDiveShopDivemaster
+                            : t.profile.verifiedDivemaster}
                       </div>
                     </div>
                   )}
@@ -326,10 +328,10 @@ export default function ProfilePage() {
                   light-mode-safe background via globals.css instead of
                   needing a new always-dark hook). */}
               <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
-                <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
-                <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
-                <ProfileStatPill label="Dives" value={diveCount} onClick={() => setLogbookOpen(true)} />
-                <ProfileStatPill label="Corals" value={user.corals} accent="amber" />
+                <ProfileStatPill label={t.profile.statsPosts} value={posts.length} accent="violet" />
+                <ProfileStatPill label={t.profile.statsBuddies} value={buddiesCount} accent="cyan" onClick={() => setBuddiesListOpen(true)} />
+                <ProfileStatPill label={t.profile.statsDives} value={diveCount} onClick={() => setLogbookOpen(true)} />
+                <ProfileStatPill label={t.header.corals} value={user.corals} accent="amber" />
               </div>
 
               {/* Depth-gauge accent -- a thin vertical line echoing a dive
@@ -364,17 +366,15 @@ export default function ProfilePage() {
                 <Anchor className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">Run dive trips of your own?</p>
-                <p className="text-xs text-slate-400">
-                  Apply as a Dive Shop or Divemaster host once verified.
-                </p>
+                <p className="text-sm font-bold text-white">{t.profile.becomeHostPromptTitle}</p>
+                <p className="text-xs text-slate-400">{t.profile.becomeHostPromptBody}</p>
               </div>
             </div>
             <button
               onClick={() => router.push("/host-dashboard")}
               className="shrink-0 text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-4 py-2.5 rounded-xl transition-colors"
             >
-              Become a Host
+              {t.header.becomeHost}
             </button>
           </div>
         )}
@@ -384,10 +384,8 @@ export default function ProfilePage() {
               <Clock className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-sm font-bold text-amber-300">Host Application Under Review</p>
-              <p className="text-xs text-amber-200/80">
-                We&apos;re verifying your details -- this usually doesn&apos;t take long.
-              </p>
+              <p className="text-sm font-bold text-amber-300">{t.profile.hostPendingTitle}</p>
+              <p className="text-xs text-amber-200/80">{t.profile.hostPendingBody}</p>
             </div>
           </div>
         )}
@@ -398,9 +396,9 @@ export default function ProfilePage() {
                 <XCircle className="w-5 h-5 text-rose-400" />
               </div>
               <div>
-                <p className="text-sm font-bold text-rose-300">Host Application Not Approved</p>
+                <p className="text-sm font-bold text-rose-300">{t.profile.hostRejectedTitle}</p>
                 <p className="text-xs text-rose-200/80">
-                  {hostStatus.rejection_reason || "No reason was given."}
+                  {hostStatus.rejection_reason || t.profile.hostRejectedNoReason}
                 </p>
               </div>
             </div>
@@ -408,7 +406,7 @@ export default function ProfilePage() {
               onClick={() => router.push("/host-dashboard")}
               className="text-xs font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 px-4 py-2 rounded-xl transition-colors"
             >
-              Reapply
+              {t.profile.reapply}
             </button>
           </div>
         )}
@@ -418,8 +416,8 @@ export default function ProfilePage() {
               <Ban className="w-5 h-5 text-rose-400" />
             </div>
             <div>
-              <p className="text-sm font-bold text-rose-300">Host Account Suspended</p>
-              <p className="text-xs text-rose-200/80">Contact support if you believe this is a mistake.</p>
+              <p className="text-sm font-bold text-rose-300">{t.profile.hostSuspendedTitle}</p>
+              <p className="text-xs text-rose-200/80">{t.profile.hostSuspendedBody}</p>
             </div>
           </div>
         )}
@@ -427,31 +425,27 @@ export default function ProfilePage() {
         {/* MY BOOKINGS */}
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <CalendarCheck className="w-5 h-5 text-emerald-400" /> My Bookings
+            <CalendarCheck className="w-5 h-5 text-emerald-400" /> {t.profile.myBookings}
           </h2>
 
           {bookingsStatus === "loading" && (
-            <p className="text-xs text-slate-500 text-center py-6">Loading…</p>
+            <p className="text-xs text-slate-500 text-center py-6">{t.profile.loading}</p>
           )}
           {bookingsStatus === "error" && (
-            <p className="text-xs text-rose-400 text-center py-6">
-              Could not load your bookings -- please refresh.
-            </p>
+            <p className="text-xs text-rose-400 text-center py-6">{t.profile.bookingsLoadError}</p>
           )}
           {bookingsStatus === "ready" && visibleBookings.length === 0 && (
             <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
               <div className="text-3xl">🤿</div>
-              <p className="text-sm font-bold text-slate-300">No bookings yet</p>
-              <p className="text-xs text-slate-500">
-                Book a dive trip and it&apos;ll show up here once payment&apos;s confirmed.
-              </p>
+              <p className="text-sm font-bold text-slate-300">{t.profile.noBookingsTitle}</p>
+              <p className="text-xs text-slate-500">{t.profile.noBookingsBody}</p>
             </div>
           )}
           {bookingsStatus === "ready" && visibleBookings.length > 0 && (
             <div className="space-y-3">
               {visibleBookings.map((b) => {
                 const trip = b.dive_trips || {
-                  title: "Dive trip",
+                  title: t.profile.fallbackTripTitle,
                   location: "",
                   scheduled_date: null,
                   scheduled_time: "",
@@ -466,19 +460,19 @@ export default function ProfilePage() {
                 const statusBadge =
                   b.status === "refunded" ? (
                     <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full">
-                      Refunded
+                      {t.profile.statusRefunded}
                     </span>
                   ) : b.status === "cancelled" ? (
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/30 px-2 py-0.5 rounded-full">
-                      Cancelled
+                      {t.profile.statusCancelled}
                     </span>
                   ) : b.status === "confirmed" && tripHasPassed(b.dive_trips) ? (
                     <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded-full">
-                      Completed
+                      {t.profile.statusCompleted}
                     </span>
                   ) : (
                     <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                      Confirmed
+                      {t.profile.statusConfirmed}
                     </span>
                   );
 
@@ -515,24 +509,20 @@ export default function ProfilePage() {
         {/* MY DIVE LOGS */}
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Grid className="w-5 h-5 text-cyan-400" /> My Dive Logs &amp; Photos
+            <Grid className="w-5 h-5 text-cyan-400" /> {t.profile.myDiveLogs}
           </h2>
 
           {postsStatus === "loading" && (
-            <p className="text-xs text-slate-500 text-center py-6">Loading…</p>
+            <p className="text-xs text-slate-500 text-center py-6">{t.profile.loading}</p>
           )}
           {postsStatus === "error" && (
-            <p className="text-xs text-rose-400 text-center py-6">
-              Could not load your posts -- please refresh.
-            </p>
+            <p className="text-xs text-rose-400 text-center py-6">{t.profile.postsLoadError}</p>
           )}
           {postsStatus === "ready" && posts.length === 0 && (
             <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
               <div className="text-3xl">📸</div>
-              <p className="text-sm font-bold text-slate-300">No dive logs yet</p>
-              <p className="text-xs text-slate-500">
-                Share a photo or dive log from the Community tab and it&apos;ll show up here.
-              </p>
+              <p className="text-sm font-bold text-slate-300">{t.profile.noDiveLogsTitle}</p>
+              <p className="text-xs text-slate-500">{t.profile.noDiveLogsBody}</p>
             </div>
           )}
           {postsStatus === "ready" && posts.length > 0 && (
@@ -542,7 +532,7 @@ export default function ProfilePage() {
                   month: "short",
                   day: "numeric",
                 });
-                const headline = post.caption || post.location_name || "Dive log";
+                const headline = post.caption || post.location_name || t.profile.fallbackHeadline;
 
                 function goToPost() {
                   router.push(`/community?post=${post.id}`);
@@ -553,11 +543,11 @@ export default function ProfilePage() {
                   const parts: string[] = [];
                   if (post.caption) parts.push(post.caption);
                   if (post.location_name) parts.push(`📍 ${post.location_name}`);
-                  const shareText = parts.length ? parts.join(" — ") : "Check out my dive log on UiDive!";
+                  const shareText = parts.length ? parts.join(" — ") : t.profile.shareDefaultText;
                   const shareUrl = `${window.location.origin}/community?post=${post.id}`;
                   if (navigator.share) {
                     try {
-                      await navigator.share({ title: "UiDive Dive Log", text: shareText, url: shareUrl });
+                      await navigator.share({ title: t.profile.shareDialogTitle, text: shareText, url: shareUrl });
                     } catch {
                       // AbortError just means the share sheet was closed -- not worth surfacing.
                     }
@@ -565,9 +555,9 @@ export default function ProfilePage() {
                   }
                   try {
                     await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-                    showToast("🔗 Copied to clipboard -- paste it anywhere to share!");
+                    showToast(t.profile.copiedToClipboardShare);
                   } catch {
-                    showToast("❌ Could not share -- try copying the link manually.");
+                    showToast(t.profile.couldNotShare);
                   }
                 }
 
@@ -586,7 +576,7 @@ export default function ProfilePage() {
                       className={`w-7 h-7 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center backdrop-blur-sm transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 ${
                         openPostMenuId === post.id ? "sm:opacity-100" : ""
                       }`}
-                      aria-label="Post options"
+                      aria-label={t.profile.postOptions}
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
@@ -599,19 +589,19 @@ export default function ProfilePage() {
                           }}
                           className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
                         >
-                          <Pencil className="w-3.5 h-3.5" /> Edit
+                          <Pencil className="w-3.5 h-3.5" /> {t.profile.edit}
                         </button>
                         <button
                           onClick={handleShare}
                           className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
                         >
-                          <Share2 className="w-3.5 h-3.5" /> Share
+                          <Share2 className="w-3.5 h-3.5" /> {t.profile.share}
                         </button>
                         <button
                           onClick={handleDelete}
                           className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2"
                         >
-                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                          <Trash2 className="w-3.5 h-3.5" /> {t.profile.delete}
                         </button>
                       </div>
                     )}
@@ -645,7 +635,7 @@ export default function ProfilePage() {
                       <div className="always-dark absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
                         <p className="text-xs font-bold text-white truncate">{headline}</p>
                         <p className="text-[10px] text-slate-300">
-                          Logged {when}
+                          {t.profile.loggedPrefix} {when}
                           {post.location_name && post.caption ? ` • ${post.location_name}` : ""}
                         </p>
                       </div>
@@ -668,7 +658,7 @@ export default function ProfilePage() {
                         </p>
                       )}
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[10px] text-slate-500">Logged {when}</p>
+                        <p className="text-[10px] text-slate-500">{t.profile.loggedPrefix} {when}</p>
                         {post.corals_awarded && (
                           <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 shrink-0">
                             +10 🪸
@@ -691,9 +681,9 @@ export default function ProfilePage() {
       )}
       {deletingPost && (
         <ConfirmModal
-          title="Delete this dive log?"
-          message="This can't be undone."
-          confirmLabel="Delete"
+          title={t.profile.deleteDiveLogTitle}
+          message={t.profile.cannotBeUndone}
+          confirmLabel={t.profile.delete}
           confirming={deletingPostBusy}
           onConfirm={handleConfirmDeletePost}
           onCancel={() => setDeletingPost(null)}
@@ -718,7 +708,7 @@ export default function ProfilePage() {
           onSaved={() => {
             setEditingPost(null);
             loadPosts();
-            showToast("✅ Dive log updated!");
+            showToast(t.profile.diveLogUpdated);
           }}
         />
       )}
