@@ -88,7 +88,7 @@ export function Header() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <Link href="/" className="flex items-center space-x-3 group text-left min-w-0" aria-label="uiDive home">
             <Image
-              src="/images/uidive-logo.svg"
+              src="/assets/images/uidive-logo.svg"
               alt="UiDive"
               width={48}
               height={48}
