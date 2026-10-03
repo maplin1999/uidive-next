@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { DiveTrip } from "@/lib/trips";
 import { createPost, updatePost, uploadPostImage } from "@/lib/posts";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const CUSTOM_LOCATION = "__custom__";
 
@@ -37,6 +38,7 @@ export function PostFormModal({
   onSaved: (opts: { coralsAwarded: boolean }) => void;
 }) {
   const { user } = useAuth();
+  const { t } = useLocale();
   const isEditing = !!editingPost;
 
   const initialLocationSelect = editingPost?.trip_id
@@ -77,7 +79,7 @@ export function PostFormModal({
     if (!user) return;
     const trimmedCaption = caption.trim();
     if (!trimmedCaption && !imageFile && !imagePreview) {
-      setError("Add a caption or a photo before posting.");
+      setError(t.postForm.captionOrPhotoRequired);
       return;
     }
 
@@ -120,7 +122,7 @@ export function PostFormModal({
       }
     } catch (err) {
       console.error("Could not save post:", err);
-      setError(err instanceof Error ? err.message : "Could not save your post -- please try again.");
+      setError(err instanceof Error ? err.message : t.postForm.saveError);
     } finally {
       setSubmitting(false);
     }
@@ -141,11 +143,11 @@ export function PostFormModal({
             ) : (
               <Camera className="w-4 h-4 text-cyan-400" />
             )}
-            {isEditing ? "Edit Dive Log" : "Post a Dive Log"}
+            {isEditing ? t.postForm.editTitle : t.postForm.newTitle}
           </h3>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.postForm.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -160,7 +162,7 @@ export function PostFormModal({
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Location (optional)
+            {t.postForm.locationLabel}
           </label>
           <div className="flex items-center space-x-3 px-3.5 py-3 bg-slate-950 rounded-xl border border-slate-800 focus-within:border-cyan-500">
             <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
@@ -169,13 +171,13 @@ export function PostFormModal({
               onChange={(e) => setLocationSelect(e.target.value)}
               className="bg-transparent text-sm w-full focus:outline-none text-slate-200 [color-scheme:dark]"
             >
-              <option value="">No location tag</option>
-              {trips.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.location} — {t.title}
+              <option value="">{t.postForm.noLocationTag}</option>
+              {trips.map((trip) => (
+                <option key={trip.id} value={trip.id}>
+                  {trip.location} — {trip.title}
                 </option>
               ))}
-              <option value={CUSTOM_LOCATION}>Somewhere else…</option>
+              <option value={CUSTOM_LOCATION}>{t.postForm.somewhereElse}</option>
             </select>
           </div>
           {locationSelect === CUSTOM_LOCATION && (
@@ -183,7 +185,7 @@ export function PostFormModal({
               type="text"
               value={customLocation}
               onChange={(e) => setCustomLocation(e.target.value)}
-              placeholder="e.g. Bondi, Sydney"
+              placeholder={t.postForm.customLocationPlaceholder}
               className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
             />
           )}
@@ -191,21 +193,21 @@ export function PostFormModal({
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Caption
+            {t.postForm.captionLabel}
           </label>
           <textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value.slice(0, 280))}
             rows={3}
             maxLength={280}
-            placeholder="What did you see down there?"
+            placeholder={t.postForm.captionPlaceholder}
             className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"
           />
         </div>
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Photo (optional)
+            {t.postForm.photoLabel}
           </label>
           <input
             type="file"
@@ -217,7 +219,7 @@ export function PostFormModal({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={imagePreview}
-              alt="Selected dive photo preview"
+              alt={t.postForm.selectedPhotoAlt}
               className="w-full h-40 object-cover rounded-xl border border-slate-800 mt-2"
             />
           )}
@@ -228,7 +230,7 @@ export function PostFormModal({
                 onClick={handleRemoveImage}
                 className="text-[10px] font-bold text-rose-400 hover:text-rose-300"
               >
-                Remove photo
+                {t.postForm.removePhoto}
               </button>
             </div>
           )}
@@ -239,7 +241,9 @@ export function PostFormModal({
           disabled={submitting}
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
         >
-          {submitting ? (isEditing ? "Saving…" : "Posting…") : isEditing ? "Save Changes" : "Share Post"}
+          {submitting
+            ? isEditing ? t.postForm.saving : t.postForm.posting
+            : isEditing ? t.postForm.saveChanges : t.postForm.sharePost}
         </button>
       </div>
     </div>
