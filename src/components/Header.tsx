@@ -187,7 +187,7 @@ export function Header() {
                     cert={user.cert}
                     isVerifiedHost={isVerifiedHost}
                     sizeClass="w-8 h-8"
-                    alt="Your profile photo"
+                    alt={t.profile.yourProfilePhoto}
                   />
                   <span className="text-xs font-bold text-slate-200 hidden sm:inline">
                     {user.name.split(" ")[0]}

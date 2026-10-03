@@ -13,6 +13,7 @@ import {
   playChestSound,
 } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const TIER_RANK: Record<CosmeticTier, number> = { common: 0, rare: 1, epic: 2 };
 
@@ -28,6 +29,7 @@ export function ChestOpenModal({
   results: ChestResult[];
   onClose: () => void;
 }) {
+  const { t } = useLocale();
   const [frameIdx, setFrameIdx] = useState(0);
   const [anticipating, setAnticipating] = useState(true);
   const [framePop, setFramePop] = useState(false);
@@ -88,12 +90,12 @@ export function ChestOpenModal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t.common.close}
           className="absolute top-4 right-4 p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
         >
           <X className="w-4 h-4" />
         </button>
-        <h3 className="text-base font-black text-white">Opening your Reef Chest…</h3>
+        <h3 className="text-base font-black text-white">{t.chestOpenModal.openingChest}</h3>
 
         {/* Everything except the chest image itself is pure showmanship
             layered around the real chest artwork -- an idle ambient glow,
@@ -112,7 +114,7 @@ export function ChestOpenModal({
           <img
             id="chest-anim-img"
             src={CHEST_ANIM_FRAMES[frameIdx].src}
-            alt="Treasure chest"
+            alt={t.chestOpenModal.treasureChestAlt}
             className={`max-h-36 w-auto object-contain drop-shadow-xl ${
               anticipating ? "chest-anticipate" : ""
             } ${framePop ? "chest-frame-pop" : ""}`}
@@ -171,10 +173,10 @@ export function ChestOpenModal({
                   </span>
                   {r.is_duplicate ? (
                     <p className="text-[9px] text-amber-300 font-bold mt-1">
-                      Duplicate -- +{r.corals_refunded} 🪸
+                      {t.chestOpenModal.duplicatePrefix}{r.corals_refunded} 🪸
                     </p>
                   ) : (
-                    <p className="text-[9px] text-emerald-400 font-bold mt-1">New!</p>
+                    <p className="text-[9px] text-emerald-400 font-bold mt-1">{t.chestOpenModal.newItem}</p>
                   )}
                 </div>
               );
@@ -187,7 +189,7 @@ export function ChestOpenModal({
             onClick={onClose}
             className="w-full py-2.5 bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold rounded-xl text-xs"
           >
-            Add to Dive Bag
+            {t.chestOpenModal.addToDiveBag}
           </button>
         )}
       </div>

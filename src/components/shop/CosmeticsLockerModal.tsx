@@ -15,6 +15,7 @@ import {
   fetchMyCosmetics,
 } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Ported from the old site's #cosmetics-locker-modal / renderCosmeticsLocker()
 // -- "My Dive Bag" (renamed from "My Locker"), opened from the Dive Shop and
@@ -23,6 +24,7 @@ import { useEscapeClose } from "@/lib/useEscapeClose";
 // button, the equipped one gets a disabled "Equipped" pill, and anything not
 // owned renders grayscale/dimmed with "Locked".
 export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
+  const { t } = useLocale();
   const { user, refreshProfile } = useAuth();
   const { message, showToast } = useToast();
   const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
@@ -51,10 +53,10 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
     try {
       await equipCosmetic(itemId);
       await refreshProfile();
-      showToast(`✅ Equipped ${COSMETIC_CATALOG[itemId].name}.`);
+      showToast(`${t.cosmeticsLockerModal.equippedToastPrefix} ${COSMETIC_CATALOG[itemId].name}.`);
     } catch (err) {
       console.error("Could not equip that item:", err);
-      showToast("❌ Could not equip that item -- please try again.");
+      showToast(t.cosmeticsLockerModal.equipError);
     } finally {
       setBusyId(null);
     }
@@ -67,7 +69,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
       await refreshProfile();
     } catch (err) {
       console.error("Could not unequip that item:", err);
-      showToast("❌ Could not unequip that item -- please try again.");
+      showToast(t.cosmeticsLockerModal.unequipError);
     } finally {
       setBusyId(null);
     }
@@ -108,14 +110,14 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
               </span>
               <div>
                 {!owned ? (
-                  <span className="text-[9px] text-slate-500 font-bold uppercase">Locked</span>
+                  <span className="text-[9px] text-slate-500 font-bold uppercase">{t.cosmeticsLockerModal.locked}</span>
                 ) : equipped ? (
                   <button
                     onClick={() => handleUnequip(item.type)}
                     disabled={busyId === item.type}
                     className="text-[9px] font-bold text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded-full disabled:opacity-60"
                   >
-                    Equipped
+                    {t.cosmeticsLockerModal.equipped}
                   </button>
                 ) : (
                   <button
@@ -123,7 +125,7 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
                     disabled={busyId === id}
                     className="text-[9px] font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2 py-0.5 rounded-full disabled:opacity-60"
                   >
-                    Equip
+                    {t.cosmeticsLockerModal.equip}
                   </button>
                 )}
               </div>
@@ -152,11 +154,11 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
             corners, so neither section needs its own rounded-t/b class. */}
         <div className="shrink-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-between border-b border-slate-800 px-6 py-4">
           <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <BagIcon className="w-4 h-4 text-purple-400 shrink-0" /> My Dive Bag
+            <BagIcon className="w-4 h-4 text-purple-400 shrink-0" /> {t.cosmeticsLockerModal.title}
           </h3>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -165,20 +167,20 @@ export function CosmeticsLockerModal({ onClose }: { onClose: () => void }) {
 
         <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-5">
 
-        {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">Loading…</p>}
+        {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">{t.cosmeticsLockerModal.loading}</p>}
         {status === "error" && (
           <p className="text-xs text-rose-400 text-center py-6">
-            Could not load your Dive Bag -- please try again.
+            {t.cosmeticsLockerModal.loadError}
           </p>
         )}
         {status === "ready" && (
           <>
             <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Avatars</h4>
+              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">{t.cosmeticsLockerModal.avatars}</h4>
               {renderGrid(avatars)}
             </div>
             <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Calling Cards</h4>
+              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">{t.cosmeticsLockerModal.callingCards}</h4>
               {renderGrid(cards)}
             </div>
           </>

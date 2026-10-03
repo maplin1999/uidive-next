@@ -7,9 +7,11 @@ import { CERT_OPTIONS } from "@/lib/auth-types";
 import { updateProfile, uploadAvatar } from "@/lib/profile";
 import { diverCertRingClass } from "@/lib/diverRing";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from #edit-profile-modal (handleProfileEditSubmit()).
 export function EditProfileModal({ onClose }: { onClose: () => void }) {
+  const { t } = useLocale();
   const { user, refreshProfile } = useAuth();
   const [cert, setCert] = useState(user?.cert || CERT_OPTIONS[0]);
   const [location, setLocation] = useState(user?.location || "");
@@ -42,7 +44,7 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
           avatarUrl = await uploadAvatar(user!.id, avatarFile);
         } catch (err) {
           console.error("Could not upload photo:", err);
-          setError(err instanceof Error ? `Could not upload photo: ${err.message}` : "Could not upload photo.");
+          setError(err instanceof Error ? `${t.editProfileModal.uploadPhotoErrorPrefix}: ${err.message}` : t.editProfileModal.uploadPhotoError);
           setSaving(false);
           return;
         }
@@ -57,7 +59,7 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Could not save your profile -- please try again.");
+      setError(t.editProfileModal.saveError);
     } finally {
       setSaving(false);
     }
@@ -73,11 +75,11 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">
-            <UserCog className="w-4 h-4 text-cyan-400" /> Edit Profile
+            <UserCog className="w-4 h-4 text-cyan-400" /> {t.editProfileModal.title}
           </h3>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -94,12 +96,12 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={avatarPreview}
-            alt="Your profile photo"
+            alt={t.editProfileModal.yourProfilePhotoAlt}
             className={`w-16 h-16 rounded-full object-cover border-2 shrink-0 ${diverCertRingClass(cert)}`}
           />
           <div className="flex-1 space-y-1.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-              Profile Photo
+              {t.editProfileModal.profilePhoto}
             </label>
             <input
               type="file"
@@ -111,13 +113,12 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="text-[10.5px] text-slate-500 leading-relaxed -mt-1">
-          Your name is set from your account and can&apos;t be changed here. Update your photo,
-          certification, location, and bio below.
+          {t.editProfileModal.nameNotEditableNote}
         </p>
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Certification
+            {t.editProfileModal.certification}
           </label>
           <select
             value={cert}
@@ -132,27 +133,27 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Location
+            {t.editProfileModal.location}
           </label>
           <input
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Sydney, NSW"
+            placeholder={t.editProfileModal.locationPlaceholder}
             className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
           />
         </div>
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            Bio
+            {t.editProfileModal.bio}
           </label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, 200))}
             rows={3}
             maxLength={200}
-            placeholder="Tell other divers about yourself…"
+            placeholder={t.editProfileModal.bioPlaceholder}
             className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"
           />
         </div>
@@ -162,7 +163,7 @@ export function EditProfileModal({ onClose }: { onClose: () => void }) {
           disabled={saving}
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
         >
-          {saving ? "Saving…" : "Save Changes"}
+          {saving ? t.editProfileModal.saving : t.editProfileModal.saveChanges}
         </button>
       </div>
     </div>

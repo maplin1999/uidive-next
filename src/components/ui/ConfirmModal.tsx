@@ -2,6 +2,7 @@
 
 import { AlertTriangle } from "lucide-react";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // A themed stand-in for window.confirm(), which renders as the browser's
 // own unstyled system dialog (title bar showing the raw URL, plain OS
@@ -15,8 +16,8 @@ import { useEscapeClose } from "@/lib/useEscapeClose";
 export function ConfirmModal({
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   destructive = true,
   confirming = false,
   onConfirm,
@@ -31,6 +32,7 @@ export function ConfirmModal({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useLocale();
   useEscapeClose(onCancel);
 
   return (
@@ -61,7 +63,7 @@ export function ConfirmModal({
             disabled={confirming}
             className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors disabled:opacity-60"
           >
-            {cancelLabel}
+            {cancelLabel ?? t.common.cancel}
           </button>
           <button
             type="button"
@@ -73,7 +75,7 @@ export function ConfirmModal({
                 : "bg-cyan-500 hover:bg-cyan-400 text-slate-950"
             }`}
           >
-            {confirming ? "Working…" : confirmLabel}
+            {confirming ? t.common.working : (confirmLabel ?? t.common.confirm)}
           </button>
         </div>
       </div>

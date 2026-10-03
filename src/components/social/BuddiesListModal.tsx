@@ -8,6 +8,7 @@ import { useSocial } from "@/components/social/SocialContext";
 import { ChatModal } from "@/components/inbox/ChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's #buddies-list-modal (openBuddiesListModal()/
 // renderMyBuddies()) -- the Instagram-style "who's on your buddies list"
@@ -15,6 +16,7 @@ import { useEscapeClose } from "@/lib/useEscapeClose";
 // (equipped avatar ring/calling card) are left out, same as everywhere else
 // in this rewrite.
 export function BuddiesListModal({ userId, onClose }: { userId: string; onClose: () => void }) {
+  const { t } = useLocale();
   const [buddies, setBuddies] = useState<Buddy[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [chatWith, setChatWith] = useState<Buddy | null>(null);
@@ -45,11 +47,11 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
       <div className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-5 shadow-2xl max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 shrink-0">
           <h3 className="font-bold text-white text-base flex items-center gap-2">
-            <Users className="w-4 h-4 text-cyan-400" /> Dive Buddies
+            <Users className="w-4 h-4 text-cyan-400" /> {t.buddiesListModal.title}
           </h3>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -58,14 +60,14 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
 
         <div className="overflow-y-auto pt-2 space-y-1 -mx-1 px-1">
           {status === "loading" && (
-            <p className="text-xs text-slate-500 text-center py-10">Loading…</p>
+            <p className="text-xs text-slate-500 text-center py-10">{t.buddiesListModal.loading}</p>
           )}
           {status === "error" && (
-            <p className="text-xs text-rose-400 text-center py-10">Could not load your buddies.</p>
+            <p className="text-xs text-rose-400 text-center py-10">{t.buddiesListModal.loadError}</p>
           )}
           {status === "ready" && buddies.length === 0 && (
             <p className="text-xs text-slate-500 text-center py-10">
-              No dive buddies yet -- add some from a diver&apos;s profile.
+              {t.buddiesListModal.noBuddiesYet}
             </p>
           )}
           {status === "ready" &&
@@ -97,7 +99,7 @@ export function BuddiesListModal({ userId, onClose }: { userId: string; onClose:
                   onClick={() => setChatWith(b)}
                   className="shrink-0 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold px-3 py-2 rounded-xl text-[10px] flex items-center gap-1"
                 >
-                  <MessageSquare className="w-3.5 h-3.5" /> Chat
+                  <MessageSquare className="w-3.5 h-3.5" /> {t.buddiesListModal.chat}
                 </button>
               </div>
             ))}

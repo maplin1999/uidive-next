@@ -7,11 +7,13 @@ import { useEscapeClose } from "@/lib/useEscapeClose";
 import { DiveLogFormModal } from "@/components/profile/DiveLogFormModal";
 import { DiveLogDetailModal } from "@/components/profile/DiveLogDetailModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Opened by clicking your own "Dives" stat on the profile header -- the
 // count itself stays public on every profile (see dive_log_stats), but the
 // actual logbook of entries is only ever opened for the signed-in owner.
 export function DiveLogbookModal({ userId, onClose }: { userId: string; onClose: () => void }) {
+  const { t } = useLocale();
   const [logs, setLogs] = useState<DiveLog[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [formOpen, setFormOpen] = useState(false);
@@ -71,13 +73,13 @@ export function DiveLogbookModal({ userId, onClose }: { userId: string; onClose:
           <div className="flex justify-between items-center border-b border-slate-800 pb-3.5 shrink-0">
             <div>
               <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <Anchor className="w-4 h-4 text-cyan-400" /> Dive Log
+                <Anchor className="w-4 h-4 text-cyan-400" /> {t.diveLogbookModal.title}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Your private logbook -- only you can see these entries.</p>
+              <p className="text-xs text-slate-400 mt-0.5">{t.diveLogbookModal.privateNote}</p>
             </div>
             <button
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t.common.close}
               className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
             >
               <X className="w-4 h-4" />
@@ -88,19 +90,19 @@ export function DiveLogbookModal({ userId, onClose }: { userId: string; onClose:
             onClick={() => setFormOpen(true)}
             className="shrink-0 w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
           >
-            <Plus className="w-4 h-4" /> Log a Dive
+            <Plus className="w-4 h-4" /> {t.diveLogbookModal.logADive}
           </button>
 
           <div className="flex-1 overflow-y-auto space-y-2 -mx-1 px-1">
-            {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">Loading your dives…</p>}
+            {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">{t.diveLogbookModal.loading}</p>}
             {status === "error" && (
-              <p className="text-xs text-rose-400 text-center py-6">Could not load your dive log.</p>
+              <p className="text-xs text-rose-400 text-center py-6">{t.diveLogbookModal.loadError}</p>
             )}
             {status === "ready" && logs.length === 0 && (
               <div className="text-center py-10 space-y-1.5">
                 <div className="text-3xl">🤿</div>
-                <p className="text-sm font-bold text-white">No dives logged yet</p>
-                <p className="text-xs text-slate-400">Tap &quot;Log a Dive&quot; to start your logbook.</p>
+                <p className="text-sm font-bold text-white">{t.diveLogbookModal.noDivesYet}</p>
+                <p className="text-xs text-slate-400">{t.diveLogbookModal.tapToStart}</p>
               </div>
             )}
             {status === "ready" &&
@@ -147,9 +149,9 @@ export function DiveLogbookModal({ userId, onClose }: { userId: string; onClose:
 
       {deleting && (
         <ConfirmModal
-          title="Delete this dive?"
-          message={`This permanently removes your ${formatDiveDate(deleting.dive_date)} dive at ${deleting.location} from your log.`}
-          confirmLabel="Delete"
+          title={t.diveLogbookModal.deleteThisDiveTitle}
+          message={`${t.diveLogbookModal.deleteThisDiveMessagePrefix} ${formatDiveDate(deleting.dive_date)} ${t.diveLogbookModal.deleteThisDiveMessageMiddle} ${deleting.location} ${t.diveLogbookModal.deleteThisDiveMessageSuffix}`}
+          confirmLabel={t.diveLogbookModal.delete}
           confirming={deleteBusy}
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleting(null)}

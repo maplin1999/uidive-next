@@ -7,6 +7,8 @@ import { useEscapeClose } from "@/lib/useEscapeClose";
 import { supabase } from "@/lib/supabase";
 import { DEMO_ACCOUNT, CERT_OPTIONS } from "@/lib/auth-types";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import type { Dictionary } from "@/lib/i18n/translations/en";
 
 // Migrated from the old site's #auth-modal: sign in / sign up tabs, demo
 // account autofill, forgot password, and the "check your email" wait state
@@ -14,6 +16,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 // state machine instead of a second separate modal + polling interval,
 // which keeps this a single self-contained component.
 export function AuthModal() {
+  const { t } = useLocale();
   const { isAuthModalOpen, authModalTab, closeAuthModal, openAuthModal, refreshProfile } =
     useAuth();
   const [view, setView] = useState<"form" | "confirm">("form");
@@ -54,7 +57,7 @@ export function AuthModal() {
   async function handleForgotPassword() {
     const email = signinEmail.trim().toLowerCase();
     if (!email) {
-      setSigninError('Enter your email above first, then tap "Forgot password?"');
+      setSigninError(t.authModal.forgotEmailFirst);
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email);
@@ -70,7 +73,7 @@ export function AuthModal() {
     setSigninError("");
     const email = signinEmail.trim().toLowerCase();
     if (!email || !signinPassword) {
-      setSigninError("Please enter both email and password.");
+      setSigninError(t.authModal.pleaseEnterBoth);
       return;
     }
 
@@ -82,7 +85,7 @@ export function AuthModal() {
     setSigninLoading(false);
 
     if (error) {
-      setSigninError("Incorrect email or password.");
+      setSigninError(t.authModal.incorrectCredentials);
       return;
     }
 
@@ -98,19 +101,19 @@ export function AuthModal() {
     const email = signupEmail.trim().toLowerCase();
 
     if (!name || !email || !signupPassword || !signupConfirm) {
-      setSignupError("Please fill in all required fields.");
+      setSignupError(t.authModal.pleaseFillRequired);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setSignupError("Please enter a valid email address.");
+      setSignupError(t.authModal.invalidEmail);
       return;
     }
     if (signupPassword.length < 6) {
-      setSignupError("Password must be at least 6 characters.");
+      setSignupError(t.authModal.passwordTooShort);
       return;
     }
     if (signupPassword !== signupConfirm) {
-      setSignupError("Passwords do not match.");
+      setSignupError(t.authModal.passwordsDontMatch);
       return;
     }
 
@@ -131,7 +134,7 @@ export function AuthModal() {
     if (error) {
       setSignupError(
         error.message.includes("already registered")
-          ? "An account with that email already exists. Try signing in instead."
+          ? t.authModal.alreadyRegistered
           : error.message
       );
       return;
@@ -157,7 +160,7 @@ export function AuthModal() {
     >
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl modal-spring max-h-[90vh] overflow-y-auto">
         {view === "confirm" ? (
-          <ConfirmEmailView email={pendingEmail} onClose={handleClose} />
+          <ConfirmEmailView email={pendingEmail} onClose={handleClose} t={t} />
         ) : (
           <>
             <div className="flex justify-between items-start">
@@ -167,16 +170,16 @@ export function AuthModal() {
                 </div>
                 <div>
                   <h3 className="font-black text-white text-base leading-none">
-                    Welcome to UiDive
+                    {t.authModal.welcomeHeading}
                   </h3>
                   <p className="text-[10px] text-slate-400 mt-1">
-                    Sign in to book, post, and earn Corals
+                    {t.authModal.welcomeSubtitle}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                aria-label="Close"
+                aria-label={t.common.close}
                 className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
               >
                 <X className="w-4 h-4" />
@@ -193,7 +196,7 @@ export function AuthModal() {
                     : "border-transparent text-slate-400 hover:text-slate-200"
                 }`}
               >
-                Sign In
+                {t.authModal.signIn}
               </button>
               <button
                 type="button"
@@ -204,7 +207,7 @@ export function AuthModal() {
                     : "border-transparent text-slate-400 hover:text-slate-200"
                 }`}
               >
-                Sign Up
+                {t.authModal.signUp}
               </button>
             </div>
 
@@ -216,12 +219,12 @@ export function AuthModal() {
                   </p>
                 )}
 
-                <Field label="Email">
+                <Field label={t.authModal.email}>
                   <input
                     type="email"
                     value={signinEmail}
                     onChange={(e) => setSigninEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={t.authModal.emailPlaceholder}
                     className={inputClass}
                   />
                 </Field>
@@ -229,14 +232,14 @@ export function AuthModal() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Password
+                      {t.authModal.password}
                     </label>
                     <button
                       type="button"
                       onClick={handleForgotPassword}
                       className="text-[10px] font-bold text-cyan-400 hover:underline"
                     >
-                      Forgot password?
+                      {t.authModal.forgotPassword}
                     </button>
                   </div>
                   <div className="relative">
@@ -251,7 +254,7 @@ export function AuthModal() {
                       type="button"
                       onClick={() => setSigninShowPassword((v) => !v)}
                       tabIndex={-1}
-                      aria-label={signinShowPassword ? "Hide password" : "Show password"}
+                      aria-label={signinShowPassword ? t.authModal.hidePassword : t.authModal.showPassword}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                     >
                       {signinShowPassword ? (
@@ -268,14 +271,14 @@ export function AuthModal() {
                   disabled={signinLoading}
                   className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
                 >
-                  {signinLoading ? "Signing in…" : "Sign In"}
+                  {signinLoading ? t.authModal.signingIn : t.authModal.signIn}
                 </button>
                 <button
                   type="button"
                   onClick={fillDemoAccount}
                   className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" /> Try Demo Account
+                  <Zap className="w-3.5 h-3.5 text-amber-400" /> {t.authModal.tryDemoAccount}
                 </button>
               </form>
             ) : (
@@ -286,40 +289,40 @@ export function AuthModal() {
                   </p>
                 )}
 
-                <Field label="Full Name">
+                <Field label={t.authModal.fullName}>
                   <input
                     type="text"
                     value={signupName}
                     onChange={(e) => setSignupName(e.target.value)}
-                    placeholder="Alex Rivera"
+                    placeholder={t.authModal.fullNamePlaceholder}
                     className={inputClass}
                   />
                 </Field>
-                <Field label="Email">
+                <Field label={t.authModal.email}>
                   <input
                     type="email"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={t.authModal.emailPlaceholder}
                     className={inputClass}
                   />
                 </Field>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Password">
+                  <Field label={t.authModal.password}>
                     <div className="relative">
                       <input
                         type={signupShowPassword ? "text" : "password"}
                         value={signupPassword}
                         onChange={(e) => setSignupPassword(e.target.value)}
-                        placeholder="At least 6 chars"
+                        placeholder={t.authModal.passwordPlaceholder}
                         className={`${inputClass} pr-11`}
                       />
                       <button
                         type="button"
                         onClick={() => setSignupShowPassword((v) => !v)}
                         tabIndex={-1}
-                        aria-label={signupShowPassword ? "Hide password" : "Show password"}
+                        aria-label={signupShowPassword ? t.authModal.hidePassword : t.authModal.showPassword}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                       >
                         {signupShowPassword ? (
@@ -330,19 +333,19 @@ export function AuthModal() {
                       </button>
                     </div>
                   </Field>
-                  <Field label="Confirm">
+                  <Field label={t.authModal.confirmLabel}>
                     <input
                       type={signupShowPassword ? "text" : "password"}
                       value={signupConfirm}
                       onChange={(e) => setSignupConfirm(e.target.value)}
-                      placeholder="Repeat password"
+                      placeholder={t.authModal.confirmPasswordPlaceholder}
                       className={inputClass}
                     />
                   </Field>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Certification">
+                  <Field label={t.authModal.certification}>
                     <select
                       value={signupCert}
                       onChange={(e) => setSignupCert(e.target.value)}
@@ -353,12 +356,12 @@ export function AuthModal() {
                       ))}
                     </select>
                   </Field>
-                  <Field label="Location">
+                  <Field label={t.authModal.location}>
                     <input
                       type="text"
                       value={signupLocation}
                       onChange={(e) => setSignupLocation(e.target.value)}
-                      placeholder="Sydney, NSW"
+                      placeholder={t.authModal.locationPlaceholder}
                       className={inputClass}
                     />
                   </Field>
@@ -369,28 +372,28 @@ export function AuthModal() {
                   disabled={signupLoading}
                   className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
                 >
-                  {signupLoading ? "Creating account…" : "Create Account"}
+                  {signupLoading ? t.authModal.creatingAccount : t.authModal.createAccount}
                 </button>
                 <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-                  By signing up you&apos;ll get a welcome bonus of{" "}
-                  <span className="text-amber-400 font-bold">100 🪸 Corals</span>, and you agree
-                  to our{" "}
+                  {t.authModal.signupDisclaimerPrefix}{" "}
+                  <span className="text-amber-400 font-bold">{t.authModal.corals}</span>
+                  {t.authModal.signupDisclaimerAnd}{" "}
                   <Link
                     href="/legal?tab=terms"
                     target="_blank"
                     rel="noopener"
                     className="text-cyan-400 hover:underline font-semibold"
                   >
-                    Terms of Service
+                    {t.authModal.termsOfService}
                   </Link>{" "}
-                  and{" "}
+                  {t.authModal.and}{" "}
                   <Link
                     href="/legal?tab=privacy"
                     target="_blank"
                     rel="noopener"
                     className="text-cyan-400 hover:underline font-semibold"
                   >
-                    Privacy Policy
+                    {t.authModal.privacyPolicy}
                   </Link>
                   .
                 </p>
@@ -403,24 +406,32 @@ export function AuthModal() {
   );
 }
 
-function ConfirmEmailView({ email, onClose }: { email: string; onClose: () => void }) {
+function ConfirmEmailView({
+  email,
+  onClose,
+  t,
+}: {
+  email: string;
+  onClose: () => void;
+  t: Dictionary;
+}) {
   return (
     <div className="space-y-4 text-center py-4">
       <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto">
         <Waves className="w-6 h-6 text-cyan-400" />
       </div>
       <div>
-        <h3 className="font-black text-white text-base">Check your email</h3>
+        <h3 className="font-black text-white text-base">{t.authModal.checkYourEmail}</h3>
         <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-          We sent a confirmation link to <span className="text-slate-200 font-semibold">{email}</span>.
-          Click it to activate your account, then come back and sign in.
+          {t.authModal.confirmationSentPrefix} <span className="text-slate-200 font-semibold">{email}</span>.{" "}
+          {t.authModal.confirmationSentSuffix}
         </p>
       </div>
       <button
         onClick={onClose}
         className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
       >
-        Got it
+        {t.authModal.gotIt}
       </button>
     </div>
   );

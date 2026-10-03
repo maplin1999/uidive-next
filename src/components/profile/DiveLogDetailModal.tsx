@@ -4,6 +4,7 @@ import { Anchor, Clock, Gauge, Trash2, Pencil, X, Users, StickyNote } from "luci
 import { DiveLog, formatDiveDate } from "@/lib/dive-log";
 import { EQUIPMENT_ITEMS } from "@/lib/trips";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Single dive's full detail -- opened by tapping an entry in the logbook.
 // Owner-only (same privacy as the logbook itself), with Edit/Delete actions
@@ -19,9 +20,10 @@ export function DiveLogDetailModal({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const { t } = useLocale();
   useEscapeClose(onClose);
   const equipmentLabels = EQUIPMENT_ITEMS.filter((item) => diveLog.equipment.includes(item.id)).map(
-    (item) => item.label
+    (item) => t.equipment.items[item.id as keyof typeof t.equipment.items] ?? item.label
   );
 
   return (
@@ -41,7 +43,7 @@ export function DiveLogDetailModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -53,13 +55,13 @@ export function DiveLogDetailModal({
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <Stat icon={<Gauge className="w-4 h-4 text-cyan-400" />} label="Max Depth" value={diveLog.depth_m != null ? `${diveLog.depth_m}m` : "--"} />
-          <Stat icon={<Clock className="w-4 h-4 text-cyan-400" />} label="Duration" value={diveLog.duration_min != null ? `${diveLog.duration_min} min` : "--"} />
+          <Stat icon={<Gauge className="w-4 h-4 text-cyan-400" />} label={t.diveLogDetailModal.maxDepth} value={diveLog.depth_m != null ? `${diveLog.depth_m}m` : "--"} />
+          <Stat icon={<Clock className="w-4 h-4 text-cyan-400" />} label={t.diveLogDetailModal.duration} value={diveLog.duration_min != null ? `${diveLog.duration_min} min` : "--"} />
         </div>
 
         {diveLog.buddy_name && (
           <p className="text-xs text-slate-400 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-slate-500 shrink-0" /> Dove with{" "}
+            <Users className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t.diveLogDetailModal.doveWith}{" "}
             <span className="text-slate-200 font-semibold">{diveLog.buddy_name}</span>
           </p>
         )}
@@ -88,13 +90,13 @@ export function DiveLogDetailModal({
             onClick={onEdit}
             className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors flex items-center justify-center gap-1.5"
           >
-            <Pencil className="w-3.5 h-3.5" /> Edit
+            <Pencil className="w-3.5 h-3.5" /> {t.diveLogDetailModal.edit}
           </button>
           <button
             onClick={onDelete}
             className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors flex items-center justify-center gap-1.5"
           >
-            <Trash2 className="w-3.5 h-3.5" /> Delete
+            <Trash2 className="w-3.5 h-3.5" /> {t.diveLogDetailModal.delete}
           </button>
         </div>
       </div>

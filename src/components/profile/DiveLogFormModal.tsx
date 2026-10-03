@@ -7,6 +7,7 @@ import { EQUIPMENT_ITEMS, isoDate } from "@/lib/trips";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { useClickOutside } from "@/lib/useClickOutside";
 import { DatePickerCalendar } from "@/components/home/DatePickerCalendar";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Log a Dive -- create or edit a single public.dive_logs row. Follows the
 // same themed-field conventions as TripFormModal (ThemedSelect's native-popup
@@ -32,6 +33,7 @@ export function DiveLogFormModal({
   onClose: () => void;
   onSaved: (log: DiveLog) => void;
 }) {
+  const { t } = useLocale();
   const isEdit = !!diveLog;
   const [diveDate, setDiveDate] = useState<string | null>(diveLog?.dive_date ?? prefill?.dive_date ?? null);
   const [location, setLocation] = useState(diveLog?.location ?? prefill?.location ?? "");
@@ -58,7 +60,7 @@ export function DiveLogFormModal({
       if (!diveDate) bad.add("diveDate");
       if (!location.trim()) bad.add("location");
       setInvalidFields(bad);
-      setError("Date and location are required.");
+      setError(t.diveLogFormModal.dateAndLocationRequired);
       return;
     }
     setError("");
@@ -79,7 +81,7 @@ export function DiveLogFormModal({
       onSaved(saved);
     } catch (err) {
       console.error("Could not save dive log entry:", err);
-      setError("Could not save this dive -- please try again.");
+      setError(t.diveLogFormModal.saveError);
     } finally {
       setSaving(false);
     }
@@ -96,15 +98,15 @@ export function DiveLogFormModal({
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
             <h3 className="font-bold text-white text-base flex items-center gap-2">
-              <Anchor className="w-4 h-4 text-cyan-400" /> {isEdit ? "Edit Dive" : "Log a Dive"}
+              <Anchor className="w-4 h-4 text-cyan-400" /> {isEdit ? t.diveLogFormModal.editDive : t.diveLogFormModal.logADive}
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              {prefill?.booking_id ? "Pre-filled from your booking -- edit anything before saving." : "Only you can see this entry."}
+              {prefill?.booking_id ? t.diveLogFormModal.prefilledNote : t.diveLogFormModal.privateNote}
             </p>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -118,7 +120,7 @@ export function DiveLogFormModal({
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Date">
+          <Field label={t.diveLogFormModal.date}>
             <div className="relative" ref={dateRef}>
               <button
                 type="button"
@@ -132,7 +134,7 @@ export function DiveLogFormModal({
                         day: "numeric",
                         year: "numeric",
                       })
-                    : "Select date"}
+                    : t.diveLogFormModal.selectDate}
                 </span>
                 <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
               </button>
@@ -156,7 +158,7 @@ export function DiveLogFormModal({
               )}
             </div>
           </Field>
-          <Field label="Location">
+          <Field label={t.diveLogFormModal.location}>
             <input
               type="text"
               autoComplete="off"
@@ -171,26 +173,26 @@ export function DiveLogFormModal({
                 });
               }}
               maxLength={80}
-              placeholder="Cebu, PH"
+              placeholder={t.diveLogFormModal.locationPlaceholder}
               className={fieldCls(invalidFields.has("location"))}
             />
           </Field>
         </div>
 
-        <Field label="Dive Site (optional)">
+        <Field label={t.diveLogFormModal.diveSiteOptional}>
           <input
             type="text"
             autoComplete="off"
             value={diveSite}
             onChange={(e) => setDiveSite(e.target.value)}
             maxLength={80}
-            placeholder="e.g. Shark Point"
+            placeholder={t.diveLogFormModal.diveSitePlaceholder}
             className={inputCls}
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Max Depth (m)">
+          <Field label={t.diveLogFormModal.maxDepth}>
             <input
               type="number"
               min={0}
@@ -202,7 +204,7 @@ export function DiveLogFormModal({
               className={`${inputCls} no-spinner`}
             />
           </Field>
-          <Field label="Duration (min)">
+          <Field label={t.diveLogFormModal.duration}>
             <input
               type="number"
               min={0}
@@ -215,32 +217,32 @@ export function DiveLogFormModal({
           </Field>
         </div>
 
-        <Field label="Buddy (optional)">
+        <Field label={t.diveLogFormModal.buddyOptional}>
           <input
             type="text"
             autoComplete="off"
             value={buddyName}
             onChange={(e) => setBuddyName(e.target.value)}
             maxLength={60}
-            placeholder="Who did you dive with?"
+            placeholder={t.diveLogFormModal.buddyPlaceholder}
             className={inputCls}
           />
         </Field>
 
-        <Field label="Notes (optional)">
+        <Field label={t.diveLogFormModal.notesOptional}>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             maxLength={600}
-            placeholder="Marine life spotted, conditions, how it felt..."
+            placeholder={t.diveLogFormModal.notesPlaceholder}
             className={`${inputCls} resize-none`}
           />
         </Field>
 
         <details className="text-xs" open={Object.values(equipment).some(Boolean)}>
           <summary className="cursor-pointer text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-            Equipment Used (optional)
+            {t.diveLogFormModal.equipmentUsedOptional}
           </summary>
           <div className="space-y-2 mt-3">
             {EQUIPMENT_ITEMS.map((item) => (
@@ -248,7 +250,9 @@ export function DiveLogFormModal({
                 key={item.id}
                 className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-cyan-500/40 transition-colors"
               >
-                <span className="text-sm text-slate-200 font-semibold">{item.label}</span>
+                <span className="text-sm text-slate-200 font-semibold">
+                  {t.equipment.items[item.id as keyof typeof t.equipment.items] ?? item.label}
+                </span>
                 <input
                   type="checkbox"
                   checked={!!equipment[item.id]}
@@ -265,7 +269,7 @@ export function DiveLogFormModal({
           disabled={saving}
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
         >
-          {saving ? "Saving…" : isEdit ? "Save Changes" : "Log This Dive"}
+          {saving ? t.diveLogFormModal.saving : isEdit ? t.diveLogFormModal.saveChanges : t.diveLogFormModal.logThisDive}
         </button>
       </div>
     </div>

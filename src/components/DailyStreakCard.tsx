@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { CoralsCelebration } from "@/components/CoralsCelebration";
 import { claimDailyReward, alreadyClaimedDailyToday } from "@/lib/shop";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Daily Corals claim -- moved here from the Explore page so it lives with
 // the rest of a diver's own stats/rewards on their Profile instead of the
@@ -11,6 +12,7 @@ import { claimDailyReward, alreadyClaimedDailyToday } from "@/lib/shop";
 // be dropped into any page with just a toast callback, same pattern as
 // ConservationBanner.
 export function DailyStreakCard({ onToast }: { onToast: (message: string) => void }) {
+  const { t } = useLocale();
   const { user, requireAuth, refreshProfile } = useAuth();
   const [claimingDaily, setClaimingDaily] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
@@ -28,7 +30,7 @@ export function DailyStreakCard({ onToast }: { onToast: (message: string) => voi
       setCelebrating(true);
     } catch (err) {
       console.error("Could not claim daily reward:", err);
-      onToast("❌ Could not claim your daily reward -- please try again.");
+      onToast(t.dailyStreakCard.claimError);
       await refreshProfile(); // in case it actually succeeded server-side already today
     } finally {
       setClaimingDaily(false);
@@ -44,13 +46,13 @@ export function DailyStreakCard({ onToast }: { onToast: (message: string) => voi
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h3 className="text-sm font-bold text-amber-400">Daily Diver Log Streak</h3>
+              <h3 className="text-sm font-bold text-amber-400">{t.dailyStreakCard.heading}</h3>
               <span className="bg-amber-500/20 text-amber-300 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
-                5 Days Active
+                {t.dailyStreakCard.daysActive}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Book or log a dive today to earn +50 🪸 Corals rewards!
+              {t.dailyStreakCard.description}
             </p>
           </div>
         </div>
@@ -61,17 +63,17 @@ export function DailyStreakCard({ onToast }: { onToast: (message: string) => voi
         >
           <span>
             {alreadyClaimedToday
-              ? "Claimed for Today ✓"
+              ? t.dailyStreakCard.claimedForToday
               : claimingDaily
-                ? "Claiming…"
-                : "Claim 50 Corals"}
+                ? t.dailyStreakCard.claiming
+                : t.dailyStreakCard.claim50Corals}
           </span>
           {!alreadyClaimedToday && <span>🪸</span>}
         </button>
       </div>
 
       {celebrating && (
-        <CoralsCelebration amount={50} title="🎉 Daily Streak Claimed!" onDone={() => setCelebrating(false)} />
+        <CoralsCelebration amount={50} title={t.dailyStreakCard.celebrationTitle} onDone={() => setCelebrating(false)} />
       )}
     </>
   );

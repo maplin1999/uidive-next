@@ -38,7 +38,7 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [activity, setActivity] = useState<ActivityFilter>("all");
   const [dateFilter, setDateFilter] = useState<string | null>(null);
-  const [dateLabel, setDateLabel] = useState("Any Date");
+  const [dateLabel, setDateLabel] = useState(t.heroSearch.anyDate);
   const [tripType, setTripType] = useState<TripTypeFilter>("all");
   const [selectedTrip, setSelectedTrip] = useState<DiveTrip | null>(null);
 

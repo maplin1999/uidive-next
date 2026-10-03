@@ -4,6 +4,8 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import type { Dictionary } from "@/lib/i18n/translations/en";
 
 // Migrated from the old site's #tab-legal section (index.html) and its
 // switchLegalTab() helper (app.js). Static content, no Supabase/auth
@@ -24,6 +26,7 @@ export default function LegalPage() {
 // fine print, same as the old site's openLegalPage('terms')) land straight
 // on the Terms tab instead of always defaulting to Privacy.
 function LegalPageInner() {
+  const { t } = useLocale();
   const searchParams = useSearchParams();
   const requestedTab = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<LegalTab>(requestedTab === "terms" ? "terms" : "privacy");
@@ -35,24 +38,24 @@ function LegalPageInner() {
           href="/"
           className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition-colors w-fit"
         >
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-4 h-4" /> {t.legal.back}
         </Link>
 
         <div className="flex items-center gap-2 p-1 bg-slate-900 border border-slate-800 rounded-2xl w-fit">
           <TabButton
-            label="Privacy Policy"
+            label={t.legal.privacyTab}
             active={activeTab === "privacy"}
             onClick={() => setActiveTab("privacy")}
           />
           <TabButton
-            label="Terms of Service"
+            label={t.legal.termsTab}
             active={activeTab === "terms"}
             onClick={() => setActiveTab("terms")}
           />
         </div>
 
         <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
-          {activeTab === "privacy" ? <PrivacyPolicy /> : <TermsOfService />}
+          {activeTab === "privacy" ? <PrivacyPolicy t={t} /> : <TermsOfService t={t} />}
         </div>
       </div>
     </main>
@@ -83,105 +86,80 @@ function TabButton({
   );
 }
 
-function PrivacyPolicy() {
+function PrivacyPolicy({ t }: { t: Dictionary }) {
   return (
     <div className="space-y-5 text-sm text-slate-300 leading-relaxed">
       <div>
-        <h1 className="text-xl font-black text-white">Privacy Policy</h1>
+        <h1 className="text-xl font-black text-white">{t.legal.privacyTitle}</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Effective date: September 29, 2026
+          {t.legal.effectiveDate}
         </p>
       </div>
       <p>
-        This Privacy Policy explains what information UiDive (&quot;we&quot;,
-        &quot;us&quot;) collects when you use the UiDive app and website (the
-        &quot;Service&quot;), how we use it, and the choices you have.
+        {t.legal.privacyIntro}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Information we collect</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.infoWeCollectHeading}</h2>
       <ul className="list-disc pl-5 space-y-1">
         <li>
-          <strong className="text-slate-200">Account information</strong> —
-          name, email address, password, certification level, and location
-          you provide when you sign up.
+          <strong className="text-slate-200">{t.legal.accountInfoLabel}</strong> —{" "}
+          {t.legal.accountInfoBody}
         </li>
         <li>
-          <strong className="text-slate-200">Profile content</strong> — your
-          bio, avatar, dive logs, community posts, comments, and photos you
-          choose to share.
+          <strong className="text-slate-200">{t.legal.profileContentLabel}</strong> —{" "}
+          {t.legal.profileContentBody}
         </li>
         <li>
-          <strong className="text-slate-200">Booking information</strong> —
-          the trips you book, dates, equipment preferences, and payment
-          confirmation details (we do not store your full card number —
-          payments are processed by our payment provider).
+          <strong className="text-slate-200">{t.legal.bookingInfoLabel}</strong> —{" "}
+          {t.legal.bookingInfoBody}
         </li>
         <li>
-          <strong className="text-slate-200">Host information</strong> — if
-          you apply to host trips, the verification documents and trip
-          details you submit.
+          <strong className="text-slate-200">{t.legal.hostInfoLabel}</strong> —{" "}
+          {t.legal.hostInfoBody}
         </li>
         <li>
-          <strong className="text-slate-200">Usage &amp; device data</strong>{" "}
-          — basic technical information like your browser type and general
-          activity on the Service, so we can keep it working reliably.
+          <strong className="text-slate-200">{t.legal.usageDataLabel}</strong>{" "}
+          — {t.legal.usageDataBody}
         </li>
         <li>
-          <strong className="text-slate-200">Cookies</strong> — small pieces
-          of data stored in your browser to keep you signed in and remember
-          your preferences. See &quot;Cookies&quot; below.
+          <strong className="text-slate-200">{t.legal.cookiesLabel}</strong> —{" "}
+          {t.legal.cookiesListBody}
         </li>
       </ul>
 
-      <h2 className="text-sm font-bold text-white">How we use it</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.howWeUseItHeading}</h2>
       <p>
-        We use your information to operate the Service: creating and
-        securing your account, processing bookings, showing you relevant
-        trips, enabling community features (posts, comments, likes,
-        messaging), communicating with you about your bookings, and
-        improving the Service over time. We do not sell your personal
-        information.
+        {t.legal.howWeUseItBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Cookies</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.cookiesHeading}</h2>
       <p>
-        We use cookies and similar local storage to keep you signed in
-        between visits and remember choices like your theme preference. You
-        can decline non-essential cookies from the banner shown on your
-        first visit; declining may limit some conveniences (like staying
-        signed in) but won&apos;t block core browsing.
+        {t.legal.cookiesBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Sharing</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.sharingHeading}</h2>
       <p>
-        We share information only with service providers who help us run the
-        Service (such as our backend hosting and payment processing
-        providers), when required by law, or with your consent — never for
-        their own marketing purposes.
+        {t.legal.sharingBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Your choices</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.yourChoicesHeading}</h2>
       <p>
-        You can review and update your profile information at any time from
-        your Profile tab. You may request deletion of your account and
-        associated data by contacting us at the email below.
+        {t.legal.yourChoicesBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Children&apos;s privacy</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.childrensPrivacyHeading}</h2>
       <p>
-        The Service is not directed at children under 16, and we do not
-        knowingly collect information from them.
+        {t.legal.childrensPrivacyBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Changes to this policy</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.changesToPolicyHeading}</h2>
       <p>
-        We may update this policy from time to time. We&apos;ll update the
-        effective date above when we do.
+        {t.legal.changesToPolicyBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Contact us</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.contactUsHeading}</h2>
       <p>
-        Questions about this policy? Email us at{" "}
+        {t.legal.privacyContactBody}{" "}
         <a
           href="mailto:privacy@uidive.com"
           className="text-cyan-400 hover:underline"
@@ -194,88 +172,66 @@ function PrivacyPolicy() {
   );
 }
 
-function TermsOfService() {
+function TermsOfService({ t }: { t: Dictionary }) {
   return (
     <div className="space-y-5 text-sm text-slate-300 leading-relaxed">
       <div>
-        <h1 className="text-xl font-black text-white">Terms of Service</h1>
+        <h1 className="text-xl font-black text-white">{t.legal.termsTitle}</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Effective date: September 29, 2026
+          {t.legal.effectiveDate}
         </p>
       </div>
       <p>
-        These Terms govern your use of UiDive (the &quot;Service&quot;). By
-        creating an account or using the Service, you agree to these Terms.
+        {t.legal.termsIntro}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Your account</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.yourAccountHeading}</h2>
       <p>
-        You&apos;re responsible for keeping your login credentials secure and
-        for all activity under your account. You must provide accurate
-        information, including a certification level appropriate to the
-        trips you book.
+        {t.legal.yourAccountBody}
       </p>
 
       <h2 className="text-sm font-bold text-white">
-        Bookings &amp; cancellations
+        {t.legal.bookingsCancellationsHeading}
       </h2>
       <p>
-        When you book a trip through UiDive, you&apos;re entering an
-        agreement with the dive operator or host running that trip.
-        Cancellation terms, refund eligibility, and rescheduling are shown at
-        the time of booking. UiDive facilitates the booking and payment but
-        is not the dive operator.
+        {t.legal.bookingsCancellationsBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Hosting trips</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.hostingTripsHeading}</h2>
       <p>
-        If you&apos;re approved to host trips, you&apos;re responsible for
-        the accuracy of your listings, holding any required certifications
-        or licenses to operate dives in your area, and complying with local
-        diving safety regulations.
+        {t.legal.hostingTripsBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Assumption of risk</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.assumptionOfRiskHeading}</h2>
       <p>
-        Scuba diving and free diving carry inherent risks, including serious
-        injury or death. You participate in any dive trip booked through the
-        Service at your own risk, and are responsible for confirming you
-        hold the certification and fitness required for a given trip.
+        {t.legal.assumptionOfRiskBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Community conduct</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.communityConductHeading}</h2>
       <p>
-        Posts, comments, and messages must not be harassing, hateful,
-        fraudulent, or unlawful. We may remove content or suspend accounts
-        that violate these Terms.
+        {t.legal.communityConductBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Corals &amp; vouchers</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.coralsVouchersHeading}</h2>
       <p>
-        Corals are a loyalty point awarded for activity on the Service and
-        have no cash value. Vouchers redeemed with Corals are subject to the
-        terms shown at redemption and may not be resold.
+        {t.legal.coralsVouchersBody}
       </p>
 
       <h2 className="text-sm font-bold text-white">
-        Disclaimer &amp; limitation of liability
+        {t.legal.disclaimerHeading}
       </h2>
       <p>
-        The Service is provided &quot;as is.&quot; To the fullest extent
-        permitted by law, UiDive is not liable for indirect or consequential
-        damages arising from your use of the Service or participation in any
-        trip booked through it.
+        {t.legal.disclaimerBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Changes to these Terms</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.changesToTermsHeading}</h2>
       <p>
-        We may update these Terms from time to time. Continuing to use the
-        Service after a change means you accept the updated Terms.
+        {t.legal.changesToTermsBody}
       </p>
 
-      <h2 className="text-sm font-bold text-white">Contact us</h2>
+      <h2 className="text-sm font-bold text-white">{t.legal.contactUsHeading}</h2>
       <p>
-        Questions about these Terms? Email us at{" "}
+        {t.legal.termsContactBody}{" "}
         <a
           href="mailto:support@uidive.com"
           className="text-cyan-400 hover:underline"

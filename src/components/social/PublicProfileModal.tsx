@@ -41,10 +41,12 @@ import { COSMETIC_CATALOG, resolveAvatarUrl } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { useClickOutside } from "@/lib/useClickOutside";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's #public-profile-modal (viewPublicProfile()),
 // including the equipped calling-card banner / avatar ring cosmetics.
 export function PublicProfileModal() {
+  const { t } = useLocale();
   const { user, requireAuth } = useAuth();
   const { profileUserId, closeProfile, openReport } = useSocial();
   const router = useRouter();
@@ -74,11 +76,11 @@ export function PublicProfileModal() {
     try {
       await navigator.clipboard.writeText(String(id));
       setDiverIdCopied(true);
-      showToast("📋 Diver ID copied to clipboard!");
+      showToast(t.publicProfileModal.diverIdCopiedToast);
       window.setTimeout(() => setDiverIdCopied(false), 1500);
     } catch (err) {
       console.error("Could not copy Diver ID:", err);
-      showToast("❌ Could not copy -- please try again.");
+      showToast(t.publicProfileModal.copyErrorToast);
     }
   }
 
@@ -165,7 +167,7 @@ export function PublicProfileModal() {
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
                   className="p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white"
-                  aria-label="Profile options"
+                  aria-label={t.publicProfileModal.profileOptions}
                 >
                   <MoreVertical className="w-4 h-4" />
                 </button>
@@ -178,13 +180,13 @@ export function PublicProfileModal() {
                       }}
                       className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
-                      <Flag className="w-3.5 h-3.5" /> Report user
+                      <Flag className="w-3.5 h-3.5" /> {t.publicProfileModal.reportUser}
                     </button>
                     <button
                       onClick={handleToggleBlock}
                       className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                     >
-                      <Ban className="w-3.5 h-3.5" /> {blocked ? "Unblock user" : "Block user"}
+                      <Ban className="w-3.5 h-3.5" /> {blocked ? t.publicProfileModal.unblockUser : t.publicProfileModal.blockUser}
                     </button>
                   </div>
                 )}
@@ -193,16 +195,16 @@ export function PublicProfileModal() {
           </div>
           <button
             onClick={closeProfile}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {status === "loading" && <p className="text-xs text-slate-500 text-center py-10">Loading…</p>}
+        {status === "loading" && <p className="text-xs text-slate-500 text-center py-10">{t.publicProfileModal.loading}</p>}
         {status === "error" && (
-          <p className="text-xs text-rose-400 text-center py-10">Could not load that profile.</p>
+          <p className="text-xs text-rose-400 text-center py-10">{t.publicProfileModal.loadError}</p>
         )}
 
         {status === "ready" && profile && (
@@ -264,13 +266,13 @@ export function PublicProfileModal() {
                           type="button"
                           onClick={() => copyDiverId(profile.diver_id)}
                           className="hover:text-cyan-300 transition-colors cursor-pointer"
-                          title={`Click to copy ${profile.name.split(" ")[0]}'s Diver ID`}
+                          title={`${t.publicProfileModal.clickToCopyDiverIdPrefix} ${profile.name.split(" ")[0]}${t.publicProfileModal.clickToCopyDiverIdSuffix}`}
                         >
                           {profile.name}
                         </button>
                       </h2>
                       <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-mono font-bold text-slate-300 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
-                        {diverIdCopied ? "Copied!" : `Diver ID: #${profile.diver_id} • Click to copy`}
+                        {diverIdCopied ? t.publicProfileModal.copied : `${t.publicProfileModal.diverIdPrefix}${profile.diver_id} ${t.publicProfileModal.diverIdSuffix}`}
                       </div>
                     </div>
                     {hostBadge && (
@@ -286,20 +288,20 @@ export function PublicProfileModal() {
                         </div>
                         <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-white opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none z-20 shadow-xl">
                           {hostBadge.host_type === "shop"
-                            ? "Verified Dive Shop"
+                            ? t.profile.verifiedDiveShop
                             : hostBadge.host_type === "both"
-                              ? "Verified Dive Shop & Divemaster"
-                              : "Verified Divemaster"}
+                              ? t.profile.verifiedDiveShopDivemaster
+                              : t.profile.verifiedDivemaster}
                         </div>
                       </div>
                     )}
                   </div>
 
                   <div className="flex items-center justify-center sm:justify-start gap-5 sm:gap-6">
-                    <ProfileStatPill label="Posts" value={posts.length} accent="violet" />
-                    <ProfileStatPill label="Buddies" value={buddiesCount} accent="cyan" />
-                    <ProfileStatPill label="Dives" value={diveCount} />
-                    <ProfileStatPill label="Corals" value={profile.corals} accent="amber" />
+                    <ProfileStatPill label={t.profile.statsPosts} value={posts.length} accent="violet" />
+                    <ProfileStatPill label={t.profile.statsBuddies} value={buddiesCount} accent="cyan" />
+                    <ProfileStatPill label={t.profile.statsDives} value={diveCount} />
+                    <ProfileStatPill label={t.publicProfileModal.corals} value={profile.corals} accent="amber" />
                   </div>
 
                   {/* Depth-gauge accent -- matches the signed-in Profile
@@ -319,21 +321,21 @@ export function PublicProfileModal() {
                   <div className="w-full sm:w-56 pt-1">
                     {!user ? (
                       <p className="text-xs text-slate-500">
-                        Sign in to add {profile.name.split(" ")[0]} as a buddy.
+                        {t.publicProfileModal.signInToAddBuddyPrefix} {profile.name.split(" ")[0]} {t.publicProfileModal.signInToAddBuddySuffix}
                       </p>
                     ) : friendship === "accepted" ? (
                       <button
                         onClick={() => setChatOpen(true)}
                         className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
                       >
-                        <MessageSquare className="w-4 h-4" /> Message
+                        <MessageSquare className="w-4 h-4" /> {t.publicProfileModal.message}
                       </button>
                     ) : friendship === "pending" || requestSent ? (
                       <button
                         disabled
                         className="w-full py-2.5 bg-slate-800 text-slate-400 font-bold rounded-xl text-xs"
                       >
-                        Request Pending
+                        {t.publicProfileModal.requestPending}
                       </button>
                     ) : (
                       <button
@@ -343,7 +345,7 @@ export function PublicProfileModal() {
                         }}
                         className="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2"
                       >
-                        <UserPlus className="w-4 h-4" /> Add Buddy
+                        <UserPlus className="w-4 h-4" /> {t.publicProfileModal.addBuddy}
                       </button>
                     )}
                   </div>
@@ -353,12 +355,12 @@ export function PublicProfileModal() {
 
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Grid className="w-5 h-5 text-cyan-400" /> {profile.name.split(" ")[0]}&apos;s Dive Logs &amp; Photos
+                <Grid className="w-5 h-5 text-cyan-400" /> {profile.name.split(" ")[0]}{t.publicProfileModal.diveLogsAndPhotosSuffix}
               </h3>
               {posts.length === 0 ? (
                 <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
                   <div className="text-3xl">📸</div>
-                  <p className="text-sm font-bold text-slate-300">No dive logs yet</p>
+                  <p className="text-sm font-bold text-slate-300">{t.publicProfileModal.noDiveLogsYet}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -367,7 +369,7 @@ export function PublicProfileModal() {
                       month: "short",
                       day: "numeric",
                     });
-                    const headline = post.caption || post.location_name || "Dive log";
+                    const headline = post.caption || post.location_name || t.publicProfileModal.diveLogFallback;
                     function goToPost() {
                       closeProfile();
                       router.push(`/community?post=${post.id}`);
@@ -398,7 +400,7 @@ export function PublicProfileModal() {
                           <div className="always-dark absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
                             <p className="text-xs font-bold text-white truncate">{headline}</p>
                             <p className="text-[10px] text-slate-300">
-                              Logged {when}
+                              {t.publicProfileModal.loggedPrefix} {when}
                               {post.location_name && post.caption ? ` • ${post.location_name}` : ""}
                             </p>
                           </div>
@@ -419,7 +421,7 @@ export function PublicProfileModal() {
                             </p>
                           )}
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[10px] text-slate-500">Logged {when}</p>
+                            <p className="text-[10px] text-slate-500">{t.publicProfileModal.loggedPrefix} {when}</p>
                             {post.corals_awarded && (
                               <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 shrink-0">
                                 +10 🪸
@@ -449,13 +451,17 @@ export function PublicProfileModal() {
 
       {confirmBlockOpen && profile && (
         <ConfirmModal
-          title={blocked ? `Unblock ${profile.name.split(" ")[0]}?` : `Block ${profile.name.split(" ")[0]}?`}
+          title={
+            blocked
+              ? `${t.publicProfileModal.unblockQuestionPrefix} ${profile.name.split(" ")[0]}${t.publicProfileModal.questionSuffix}`
+              : `${t.publicProfileModal.blockQuestionPrefix} ${profile.name.split(" ")[0]}${t.publicProfileModal.questionSuffix}`
+          }
           message={
             blocked
-              ? "You'll be able to see their posts and comments again, and they'll be able to message you."
-              : "You won't see their posts or comments, and they won't be able to message you. You can unblock them later."
+              ? t.publicProfileModal.unblockMessage
+              : t.publicProfileModal.blockMessage
           }
-          confirmLabel={blocked ? "Unblock" : "Block"}
+          confirmLabel={blocked ? t.publicProfileModal.unblock : t.publicProfileModal.block}
           destructive={!blocked}
           confirming={blockBusy}
           onConfirm={handleConfirmToggleBlock}

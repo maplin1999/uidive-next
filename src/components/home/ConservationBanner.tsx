@@ -11,6 +11,7 @@ import {
   fetchConservationStats,
   pledgeCoralsToConservation,
 } from "@/lib/conservation";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // New (not migrated -- the old site had nothing like this): a standing
 // banner on the Explore page showing a share of UiDive's own booking
@@ -20,6 +21,7 @@ import {
 // split as the Dive Log/leaderboard stats elsewhere. Partner charity is
 // deliberately not named yet -- see add-conservation-pledges.sql.
 export function ConservationBanner({ onToast }: { onToast: (message: string) => void }) {
+  const { t } = useLocale();
   const { user, requireAuth, refreshProfile } = useAuth();
   const [monthTotal, setMonthTotal] = useState(0);
   const [statsLoaded, setStatsLoaded] = useState(false);
@@ -47,7 +49,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
     if (!user) return;
     if (amount <= 0) return;
     if (amount > user.corals) {
-      onToast(`❌ Not enough 🪸 Corals! You have ${user.corals}.`);
+      onToast(`${t.conservationBanner.notEnoughCoralsPrefix} ${user.corals}.`);
       return;
     }
 
@@ -58,10 +60,10 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
       loadStats();
       setPledgeOpen(false);
       setCustomAmount("");
-      onToast(`🌊 Pledged ${amount} Corals toward this month's ocean conservation goal!`);
+      onToast(`${t.conservationBanner.pledgedTogglePrefix} ${amount} ${t.conservationBanner.pledgedToggleSuffix}`);
     } catch (err) {
       console.error("Could not pledge Corals:", err);
-      onToast("❌ Could not pledge those Corals -- please try again.");
+      onToast(t.conservationBanner.pledgeError);
     } finally {
       setPledging(false);
     }
@@ -74,11 +76,9 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
           <Waves className="w-5 h-5 text-cyan-400" />
         </div>
         <div className="space-y-1 min-w-0">
-          <h3 className="text-sm font-bold text-white">Supporting Ocean Conservation</h3>
+          <h3 className="text-sm font-bold text-white">{t.conservationBanner.heading}</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            A share of every booking funds real reef &amp; ocean conservation work -- we&apos;ll
-            announce our partner charity soon. Pledge your 🪸 Corals to help us hit this
-            month&apos;s goal.
+            {t.conservationBanner.description}
           </p>
         </div>
       </div>
@@ -88,7 +88,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
         <div className="flex items-center justify-between text-[11px] font-bold">
           <span className="text-cyan-300">
             {statsLoaded ? monthTotal.toLocaleString() : "…"} / {CONSERVATION_MONTHLY_GOAL_CORALS.toLocaleString()}{" "}
-            Corals pledged this month
+            {t.conservationBanner.coralsPledgedSuffix}
           </span>
           <span className="text-slate-500">{Math.round(progressPct)}%</span>
         </div>
@@ -115,7 +115,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
           onClick={() => (requireAuth() ? setPledgeOpen(true) : undefined)}
           className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors shadow-lg flex items-center justify-center gap-1.5"
         >
-          <span>🪸</span> <span>Pledge Corals</span>
+          <span>🪸</span> <span>{t.conservationBanner.pledgeCorals}</span>
         </button>
       ) : (
         <div className="p-3 sm:p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
@@ -135,7 +135,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
               <input
                 type="number"
                 min={1}
-                placeholder="Custom"
+                placeholder={t.conservationBanner.customPlaceholder}
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
                 className="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/50"
@@ -146,13 +146,13 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
                 disabled={pledging || !customAmount || Number(customAmount) <= 0}
                 className="px-3 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 transition-colors"
               >
-                {pledging ? "…" : "Pledge"}
+                {pledging ? "…" : t.conservationBanner.pledge}
               </button>
             </div>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-[11px] text-slate-500">
-              Your balance: <span className="text-amber-400 font-bold">{user ? user.corals : 0}</span> 🪸
+              {t.conservationBanner.yourBalance} <span className="text-amber-400 font-bold">{user ? user.corals : 0}</span> 🪸
             </p>
             <button
               type="button"
@@ -162,7 +162,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
               }}
               className="text-[11px] font-bold text-slate-500 hover:text-slate-300 transition-colors"
             >
-              Cancel
+              {t.conservationBanner.cancel}
             </button>
           </div>
         </div>

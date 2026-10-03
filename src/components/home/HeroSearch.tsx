@@ -4,14 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Layers, Waves, Wind } from "lucide-react";
 import { DiveTrip, isoDate, upcomingSaturday } from "@/lib/trips";
 import { DatePickerCalendar } from "@/components/home/DatePickerCalendar";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 export type ActivityFilter = "all" | "scuba" | "freediving";
-
-const ACTIVITY_LABELS: Record<ActivityFilter, string> = {
-  all: "All Activities",
-  scuba: "Scuba",
-  freediving: "Free Diving",
-};
 
 const ACTIVITY_ICONS: Record<ActivityFilter, React.ComponentType<{ className?: string }>> = {
   all: Layers,
@@ -45,6 +40,12 @@ export function HeroSearch({
   onDateChange: (date: string | null, label: string) => void;
   onSearch: () => void;
 }) {
+  const { t } = useLocale();
+  const ACTIVITY_LABELS: Record<ActivityFilter, string> = {
+    all: t.heroSearch.allActivities,
+    scuba: t.heroSearch.scuba,
+    freediving: t.heroSearch.freeDiving,
+  };
   const [whereOpen, setWhereOpen] = useState(false);
   const [whenOpen, setWhenOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -100,7 +101,7 @@ export function HeroSearch({
               }}
             >
               <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block pointer-events-none">
-                Where
+                {t.heroSearch.where}
               </label>
               <input
                 type="text"
@@ -113,7 +114,7 @@ export function HeroSearch({
                   setActivityOpen(false);
                 }}
                 onClick={(e) => e.stopPropagation()}
-                placeholder="Search Destinations"
+                placeholder={t.heroSearch.searchDestinationsPlaceholder}
                 className="bg-transparent text-sm w-full focus:outline-none placeholder-slate-200 text-slate-200 truncate"
               />
 
@@ -129,11 +130,11 @@ export function HeroSearch({
                   className="absolute z-30 top-full mt-2 left-0 w-72 max-w-[85vw] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto"
                 >
                   <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-2">
-                    Popular Destinations
+                    {t.heroSearch.popularDestinations}
                   </div>
                   <div className="space-y-0.5">
                     {suggestions.length === 0 && (
-                      <p className="text-xs text-slate-500 px-2 py-1.5">No matching destinations yet.</p>
+                      <p className="text-xs text-slate-500 px-2 py-1.5">{t.heroSearch.noMatchingDestinations}</p>
                     )}
                     {suggestions.map((d) => (
                       <button
@@ -164,7 +165,7 @@ export function HeroSearch({
               }}
               className="relative hover:z-10 flex-1 sm:min-w-[130px] flex flex-col justify-center text-left px-5 py-3 sm:py-2.5 hover:bg-slate-800/50 hero-segment-shadow transition-colors"
             >
-              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">When</div>
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t.heroSearch.when}</div>
               <span className="text-sm text-slate-200 whitespace-nowrap block truncate">{dateLabel}</span>
             </button>
 
@@ -182,7 +183,7 @@ export function HeroSearch({
                 }}
                 className="flex-1 flex flex-col justify-center text-left px-5 py-3 sm:py-2.5"
               >
-                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Activity</div>
+                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t.heroSearch.activity}</div>
                 <span className="text-sm text-slate-200 whitespace-nowrap block truncate">
                   {ACTIVITY_LABELS[activity]}
                 </span>
@@ -190,7 +191,7 @@ export function HeroSearch({
               <button
                 type="button"
                 onClick={onSearch}
-                aria-label="Search dive trips"
+                aria-label={t.heroSearch.searchDiveTrips}
                 className="hidden sm:flex shrink-0 mr-1.5 w-11 h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 items-center justify-center transition-colors"
               >
                 <Search className="w-4 h-4" />
@@ -202,11 +203,11 @@ export function HeroSearch({
             <button
               type="button"
               onClick={onSearch}
-              aria-label="Search dive trips"
+              aria-label={t.heroSearch.searchDiveTrips}
               className="w-full h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center gap-2 transition-colors"
             >
               <Search className="w-4 h-4" />
-              <span className="text-sm font-bold">Search</span>
+              <span className="text-sm font-bold">{t.heroSearch.search}</span>
             </button>
           </div>
         </div>
@@ -220,28 +221,28 @@ export function HeroSearch({
             <div className="flex items-center gap-1.5 px-1">
               <button
                 type="button"
-                onClick={() => pickDatePreset("Any Date", null)}
+                onClick={() => pickDatePreset(t.heroSearch.anyDate, null)}
                 className={`flex-1 text-center px-2 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${
                   dateFilter === null
                     ? "bg-cyan-500/10 border border-cyan-500/40 text-cyan-300"
                     : "border border-transparent text-slate-300 hover:bg-slate-800"
                 }`}
               >
-                Any Date
+                {t.heroSearch.anyDate}
               </button>
               <button
                 type="button"
-                onClick={() => pickDatePreset("This Weekend", upcomingSaturday(0))}
+                onClick={() => pickDatePreset(t.heroSearch.thisWeekend, upcomingSaturday(0))}
                 className="flex-1 text-center px-2 py-1.5 rounded-xl text-[11px] font-bold border border-transparent text-slate-300 hover:bg-slate-800 transition-colors"
               >
-                This Weekend
+                {t.heroSearch.thisWeekend}
               </button>
               <button
                 type="button"
-                onClick={() => pickDatePreset("Next Weekend", upcomingSaturday(1))}
+                onClick={() => pickDatePreset(t.heroSearch.nextWeekend, upcomingSaturday(1))}
                 className="flex-1 text-center px-2 py-1.5 rounded-xl text-[11px] font-bold border border-transparent text-slate-300 hover:bg-slate-800 transition-colors"
               >
-                Next Weekend
+                {t.heroSearch.nextWeekend}
               </button>
             </div>
             <div className="border-t border-slate-800 pt-2">
