@@ -48,6 +48,8 @@ export function Footer() {
           <FooterColumn title="Legal">
             <FooterLink href="/terms-of-service">Terms of Service</FooterLink>
             <FooterLink href="/privacy-polcy">Privacy Policy</FooterLink>
+            <FooterLink>&nbsp;</FooterLink>
+            <FooterLink href="/sitemaps">Sitemaps</FooterLink>
           </FooterColumn>
         </div>
 
