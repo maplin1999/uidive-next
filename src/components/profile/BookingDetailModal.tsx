@@ -22,6 +22,7 @@ import { DiveLog, fetchDiveLogByBooking } from "@/lib/dive-log";
 import { DiveLogFormModal } from "@/components/profile/DiveLogFormModal";
 import { DiveLogDetailModal } from "@/components/profile/DiveLogDetailModal";
 import { useCurrency } from "@/components/currency/CurrencyContext";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -38,6 +39,7 @@ export function BookingDetailModal({
 }) {
   const { user, requireAuth } = useAuth();
   const { formatPrice } = useCurrency();
+  const { t } = useLocale();
   const { openProfile } = useSocial();
   const trip = booking.dive_trips;
   const isConfirmed = booking.status === "confirmed";
@@ -104,24 +106,24 @@ export function BookingDetailModal({
         year: "numeric",
       })
     : "";
-  const whenStr = [dateStr, trip?.scheduled_time].filter(Boolean).join(" • ") || "Date TBC";
+  const whenStr = [dateStr, trip?.scheduled_time].filter(Boolean).join(" • ") || t.bookingDetail.dateTbc;
 
   const statusBadge =
     booking.status === "refunded" ? (
       <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full">
-        Refunded
+        {t.profile.statusRefunded}
       </span>
     ) : booking.status === "cancelled" ? (
       <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/30 px-2 py-0.5 rounded-full">
-        Cancelled
+        {t.profile.statusCancelled}
       </span>
     ) : isConfirmed && hasPassed ? (
       <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded-full">
-        Completed
+        {t.profile.statusCompleted}
       </span>
     ) : (
       <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-        Confirmed
+        {t.profile.statusConfirmed}
       </span>
     );
 
@@ -142,7 +144,7 @@ export function BookingDetailModal({
 
   async function handleSubmitReview() {
     if (!rating) {
-      setReviewError("Tap a star to choose a rating first.");
+      setReviewError(t.bookingDetail.ratingRequired);
       return;
     }
     setReviewError("");
@@ -154,7 +156,7 @@ export function BookingDetailModal({
     } catch (err) {
       console.error("Could not save review:", err);
       setReviewError(
-        err instanceof Error ? err.message : "Could not save your review -- please try again."
+        err instanceof Error ? err.message : t.bookingDetail.reviewSaveError
       );
     } finally {
       setSubmittingReview(false);
@@ -172,7 +174,7 @@ export function BookingDetailModal({
         <div className="flex justify-between items-start">
           <div className="min-w-0">
             <div className="mb-1">{statusBadge}</div>
-            <h2 className="text-2xl font-black text-white truncate">{trip?.title || "Dive trip"}</h2>
+            <h2 className="text-2xl font-black text-white truncate">{trip?.title || t.profile.fallbackTripTitle}</h2>
             <p className="text-xs text-slate-400">{trip?.location}</p>
             {trip?.host_id && trip.profiles && (
               <button
@@ -180,7 +182,7 @@ export function BookingDetailModal({
                 className="mt-1 text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
               >
                 <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
-                Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
+                {t.diveDetail.hostedBy} <span className="font-bold text-slate-200">{trip.profiles.name}</span>
                 {hostStats && hostStats.review_count > 0 && (
                   <>
                     <span className="text-amber-400">★ {Number(hostStats.avg_rating).toFixed(1)}</span>
@@ -193,7 +195,7 @@ export function BookingDetailModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.diveDetail.close}
             className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
           >
             <X className="w-5 h-5" />
@@ -204,52 +206,52 @@ export function BookingDetailModal({
           <>
             <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
               <div>
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Visibility</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.tripCard.visibility}</p>
                 <p className="text-base font-extrabold text-cyan-400 mt-0.5">{trip.visibility || "—"}</p>
               </div>
               <div className="border-x border-slate-800">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Water Temp</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.waterTemp}</p>
                 <p className="text-base font-extrabold text-emerald-400 mt-0.5">{trip.water_temp || "—"}</p>
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Swell</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.swell}</p>
                 <p className="text-base font-extrabold truncate text-indigo-400 mt-0.5">{trip.swell || "—"}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
               <div>
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Wind</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.wind}</p>
                 <p className="text-base font-extrabold truncate text-sky-400 mt-0.5">{trip.wind || "—"}</p>
               </div>
               <div className="border-x border-slate-800">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Tide</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.tide}</p>
                 <p className="text-base font-extrabold truncate text-teal-400 mt-0.5">{trip.tide || "—"}</p>
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 uppercase font-bold">Current</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.current}</p>
                 <p className="text-base font-extrabold truncate text-orange-400 mt-0.5">{trip.current || "—"}</p>
               </div>
             </div>
             {trip.conditions_updated_at && (
               <p className="text-[9px] text-slate-500 -mt-2 flex items-center gap-1">
-                <Radio className="w-2.5 h-2.5 text-emerald-400" /> Wind, Swell &amp; Current update live ·
-                updated {formatRelativeTime(trip.conditions_updated_at)}
+                <Radio className="w-2.5 h-2.5 text-emerald-400" /> {t.diveDetail.conditionsLive} ·{" "}
+                {t.diveDetail.updated} {formatRelativeTime(trip.conditions_updated_at)}
               </p>
             )}
           </>
         )}
 
         <div className="flex items-center justify-between bg-slate-950 p-4 rounded-2xl border border-slate-800">
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amount Paid</p>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t.bookingDetail.amountPaid}</p>
           <span className="text-lg font-black text-white">{formatPrice(booking.price_paid)}</span>
         </div>
 
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <Backpack className="w-3.5 h-3.5" /> Bringing Your Own
+            <Backpack className="w-3.5 h-3.5" /> {t.bookingDetail.bringingYourOwn}
           </h3>
           {ownedEquipment.length === 0 ? (
-            <p className="text-xs text-slate-500">No equipment noted for this booking.</p>
+            <p className="text-xs text-slate-500">{t.bookingDetail.noEquipmentNoted}</p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {ownedEquipment.map((item) => (
@@ -257,7 +259,7 @@ export function BookingDetailModal({
                   key={item.id}
                   className="text-[10px] font-bold text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 px-2.5 py-1 rounded-full"
                 >
-                  {item.label}
+                  {t.equipment.items[item.id as keyof typeof t.equipment.items] ?? item.label}
                 </span>
               ))}
             </div>
@@ -266,14 +268,14 @@ export function BookingDetailModal({
 
         <div>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5" /> Fellow Divers
+            <Users className="w-3.5 h-3.5" /> {t.bookingDetail.fellowDivers}
           </h3>
-          {rosterStatus === "loading" && <p className="text-xs text-slate-500">Loading fellow divers…</p>}
+          {rosterStatus === "loading" && <p className="text-xs text-slate-500">{t.bookingDetail.loadingFellowDivers}</p>}
           {rosterStatus === "error" && (
-            <p className="text-xs text-slate-500">Fellow divers aren&apos;t available right now.</p>
+            <p className="text-xs text-slate-500">{t.bookingDetail.fellowDiversUnavailable}</p>
           )}
           {rosterStatus === "ready" && roster.length === 0 && (
-            <p className="text-xs text-slate-500">No fellow divers booked yet.</p>
+            <p className="text-xs text-slate-500">{t.bookingDetail.noFellowDiversYet}</p>
           )}
           {rosterStatus === "ready" && roster.length > 0 && (
             <div className="space-y-1.5">
@@ -290,8 +292,8 @@ export function BookingDetailModal({
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-white truncate">
-                      {d.diver_name || "Diver"}
-                      {d.is_you && <span className="text-slate-500 font-semibold"> (You)</span>}
+                      {d.diver_name || t.bookingDetail.diverFallbackName}
+                      {d.is_you && <span className="text-slate-500 font-semibold"> {t.bookingDetail.youSuffix}</span>}
                     </p>
                     <p className="text-[10px] text-slate-400 truncate">{d.diver_cert || ""}</p>
                   </div>
@@ -304,7 +306,7 @@ export function BookingDetailModal({
         {isConfirmed && hasPassed && (
           <div>
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Star className="w-3.5 h-3.5" /> {existingReview && !editingReview ? "Your Review" : "Rate This Dive"}
+              <Star className="w-3.5 h-3.5" /> {existingReview && !editingReview ? t.bookingDetail.yourReview : t.bookingDetail.rateThisDive}
             </h3>
             {existingReview && !editingReview ? (
               <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
@@ -325,7 +327,7 @@ export function BookingDetailModal({
                   onClick={() => setEditingReview(true)}
                   className="inline-flex items-center gap-1.5 text-[10px] font-bold text-cyan-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2.5 py-1 rounded-full transition-colors"
                 >
-                  <Pencil className="w-3 h-3" /> Edit Review
+                  <Pencil className="w-3 h-3" /> {t.bookingDetail.editReview}
                 </button>
               </div>
             ) : (
@@ -351,7 +353,7 @@ export function BookingDetailModal({
                   onChange={(e) => setComment(e.target.value)}
                   rows={2}
                   maxLength={300}
-                  placeholder="How was the dive? (optional)"
+                  placeholder={t.bookingDetail.commentPlaceholder}
                   className="bg-slate-900 w-full px-3 py-2 rounded-xl border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 resize-none"
                 />
                 <button
@@ -359,7 +361,7 @@ export function BookingDetailModal({
                   disabled={submittingReview}
                   className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                 >
-                  {submittingReview ? "Saving…" : existingReview ? "Save Review" : "Submit Review"}
+                  {submittingReview ? t.bookingDetail.saving : existingReview ? t.bookingDetail.saveReview : t.bookingDetail.submitReview}
                 </button>
               </div>
             )}
@@ -376,7 +378,7 @@ export function BookingDetailModal({
               className="mt-3 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
             >
               <Anchor className="w-3.5 h-3.5 text-cyan-400" />
-              {bookingDiveLog ? "View in Dive Log" : "Add to Dive Log"}
+              {bookingDiveLog ? t.bookingDetail.viewInDiveLog : t.bookingDetail.addToDiveLog}
             </button>
           </div>
         )}
@@ -391,7 +393,7 @@ export function BookingDetailModal({
               className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>Open Group Chat</span>
+              <span>{t.bookingDetail.openGroupChat}</span>
             </button>
             <button
               onClick={() => setConfirmCancelOpen(true)}
@@ -399,7 +401,7 @@ export function BookingDetailModal({
               className="w-full py-3 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               <XCircle className="w-4 h-4" />
-              <span>{cancelling ? "Cancelling…" : "Cancel Booking"}</span>
+              <span>{cancelling ? t.bookingDetail.cancelling : t.bookingDetail.cancelBooking}</span>
             </button>
           </div>
         )}
@@ -410,10 +412,10 @@ export function BookingDetailModal({
       )}
       {confirmCancelOpen && (
         <ConfirmModal
-          title="Cancel this booking?"
-          message="Your spot will be released back to other divers. This can't be undone."
-          confirmLabel="Cancel Booking"
-          cancelLabel="Keep Booking"
+          title={t.bookingDetail.cancelBookingTitle}
+          message={t.bookingDetail.cancelBookingMessage}
+          confirmLabel={t.bookingDetail.cancelBooking}
+          cancelLabel={t.bookingDetail.keepBooking}
           confirming={cancelling}
           onConfirm={handleCancel}
           onCancel={() => setConfirmCancelOpen(false)}
