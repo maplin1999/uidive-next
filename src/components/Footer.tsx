@@ -50,7 +50,7 @@ export function Footer() {
           {/* LEGAL */}
           <FooterColumn title={t.footer.legal}>
             <FooterLink href="/terms-of-service">{t.footer.termsOfService}</FooterLink>
-            <FooterLink href="/privacy-polcy">{t.footer.privacyPolicy}</FooterLink>
+            <FooterLink href="/privacy-policy">{t.footer.privacyPolicy}</FooterLink>
             <FooterLink href="/dive-safe">{t.footer.diveSafe}</FooterLink>
           </FooterColumn>
         </div>

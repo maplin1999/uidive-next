@@ -379,7 +379,7 @@ export function AuthModal() {
                   <span className="text-amber-400 font-bold">{t.authModal.corals}</span>
                   {t.authModal.signupDisclaimerAnd}{" "}
                   <Link
-                    href="/legal?tab=terms"
+                    href="/terms-of-service"
                     target="_blank"
                     rel="noopener"
                     className="text-cyan-400 hover:underline font-semibold"
@@ -388,7 +388,7 @@ export function AuthModal() {
                   </Link>{" "}
                   {t.authModal.and}{" "}
                   <Link
-                    href="/legal?tab=privacy"
+                    href="/privacy-policy"
                     target="_blank"
                     rel="noopener"
                     className="text-cyan-400 hover:underline font-semibold"

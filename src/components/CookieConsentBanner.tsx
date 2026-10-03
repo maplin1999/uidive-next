@@ -45,7 +45,7 @@ export function CookieConsentBanner() {
         <div className="flex-1 min-w-0">
           <p className="text-xs text-slate-300 leading-relaxed">
             {t.cookieConsentBanner.body}{" "}
-            <Link href="/legal" className="text-cyan-400 hover:underline font-semibold">
+            <Link href="/privacy-policy" className="text-cyan-400 hover:underline font-semibold">
               {t.cookieConsentBanner.learnMore}
             </Link>
           </p>
