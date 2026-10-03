@@ -20,7 +20,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "UiDive",
   url: "https://www.uidive.com",
-  logo: "https://www.uidive.com/logo.png",
+  logo: "https://www.uidive.com/assets/images/uidive-logo.svg",
   description:
     "UiDive is a platform helping divers find dives, connect with dive buddies, discover diving experiences and explore the underwater world together.",
   sameAs: ["https://www.instagram.com/uidive", "https://www.facebook.com/uidive"],

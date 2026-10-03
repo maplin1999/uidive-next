@@ -17,19 +17,23 @@ export default function ContactUsPage() {
 
   return (
     <main className="bg-slate-950 text-white">
+
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-slate-950 to-slate-950" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
-              {t.contactUsPage.eyebrow}
-            </p>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{t.contactUsPage.heading}</h1>
-            <p className="mt-6 text-base leading-7 text-slate-300 sm:text-lg">{t.contactUsPage.intro}</p>
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-slate-950 to-slate-950" />
+          <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
+            <div className="max-w-3xl">
+              <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
+                {t.aboutUs.eyebrow}
+              </p>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+                {t.contactUsPage.heading}
+              </h1>
+              <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
+                {t.contactUsPage.intro}
+              </p>
+            </div>
           </div>
-        </div>
       </section>
 
       {/* Ways to reach us */}
