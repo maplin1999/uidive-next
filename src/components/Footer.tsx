@@ -38,16 +38,9 @@ export function Footer() {
 
           {/* COMPANY */}
           <FooterColumn title="Company">
-            <FooterLink href="/about">About Us</FooterLink>
-            <FooterLink href="/faq">FAQ</FooterLink>
-            <li>
-              <a
-                href="mailto:support@uidive.com"
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
-              >
-                <Mail className="w-3 h-3 shrink-0" /> Contact Us
-              </a>
-            </li>
+            <FooterLink href="/about-us">About Us</FooterLink>
+            <FooterLink href="/faqs">FAQ's</FooterLink>
+            <FooterLink href="/contact-us">Contact Us</FooterLink>
           </FooterColumn>
 
           {/* LEGAL */}
