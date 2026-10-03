@@ -22,13 +22,14 @@ import { SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "UiDive", template: "%s | UiDive" },
-  description: "Scuba dive trip booking and community",
+  description: "Scuba dive and freediving trip booking and community",
   openGraph: {
     title: "UiDive",
-    description: "Find and book scuba dive trips, then share them with a community of divers.",
+    description: "Find and book scuba dive and freediving trips, then share them with a community of divers.",
     images: [
       {
         url: "/images/og/card-rare-wingspan.jpg",
+        type: "image/jpeg",
         width: 1200,
         height: 630,
         alt: "UiDive",
@@ -37,15 +38,23 @@ export const metadata: Metadata = {
     url: "/about",
     type: "website",
     siteName: "UiDive",
-    locale: "en_UK",
+    locale: "en_GB",
+    alternateLocale: [
+      "en_US",
+      "en_AU",
+      "en_NZ",
+      "en_ES",
+      "en_FR",
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "UiDive",
-    description: "Find and book scuba dive trips, then share them with a community of divers.",
+    description: "Find and book scuba dive and freediving trips, then share them with a community of divers.",
     images: [
       {
         url: "/images/og/card-rare-wingspan.jpg",
+        type: "image/jpeg",
         width: 1200,
         height: 630,
         alt: "UiDive",
