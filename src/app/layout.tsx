@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+//import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Header } from "@/components/Header";
