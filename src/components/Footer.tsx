@@ -41,6 +41,7 @@ export function Footer() {
             <FooterLink href="/about-us">About Us</FooterLink>
             <FooterLink href="/faqs">FAQ's</FooterLink>
             <FooterLink href="/contact-us">Contact Us</FooterLink>
+            <FooterLink href="/dive-safe">Dive Safe</FooterLink>
           </FooterColumn>
 
           {/* LEGAL */}
