@@ -24,24 +24,20 @@ export default function PrivacyPolicyPage() {
     <main className="bg-slate-950 text-white">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-slate-950 to-slate-950" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8">
-          <Link
-            href="/"
-            className="mb-6 flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition-colors w-fit"
-          >
-            <ArrowLeft className="w-4 h-4" /> {t.legal.back}
-          </Link>
-
-          <div className="max-w-2xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
-              {t.legal.privacyEyebrow}
-            </p>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{t.legal.privacyTitle}</h1>
-            <p className="mt-4 text-xs text-slate-500">{t.legal.effectiveDate}</p>
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-slate-950 to-slate-950" />
+          <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
+            <div className="max-w-3xl">
+              <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
+                {t.legal.privacyEyebrow}
+              </p>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+                {t.legal.privacyTitle}
+              </h1>
+              <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
+               {t.legal.effectiveDate}
+              </p>
+            </div>
           </div>
-        </div>
       </section>
 
       {/* Key points */}
