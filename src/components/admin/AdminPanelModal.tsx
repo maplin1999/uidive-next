@@ -17,15 +17,20 @@ import {
 import { useToast, Toast } from "@/components/Toast";
 import { useEscapeClose } from "@/lib/useEscapeClose";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 type AdminTab = "hosts" | "reports";
-
-const TARGET_LABELS: Record<string, string> = { post: "Post", comment: "Comment", user: "User" };
 
 // Migrated from the old site's #admin-host-review-modal (openAdminHostReviewModal()):
 // host-application verification and reported-content moderation, in one
 // tabbed panel reachable from the admin badge next to the admin's name.
 export function AdminPanelModal({ onClose }: { onClose: () => void }) {
+  const { t } = useLocale();
+  const TARGET_LABELS: Record<string, string> = {
+    post: t.adminPanel.targetPost,
+    comment: t.adminPanel.targetComment,
+    user: t.adminPanel.targetUser,
+  };
   const [tab, setTab] = useState<AdminTab>("hosts");
   const [applications, setApplications] = useState<PendingHostApplication[]>([]);
   const [reports, setReports] = useState<PendingReport[]>([]);
@@ -82,11 +87,11 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     setBusyId(hostUserId);
     try {
       await approveHostApplication(hostUserId);
-      showToast("✅ Host approved.");
+      showToast(t.adminPanel.hostApprovedToast);
       load();
     } catch (err) {
       console.error("Could not approve this application:", err);
-      showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not approve this application.");
+      showToast(err instanceof Error ? `❌ ${err.message}` : t.adminPanel.couldNotApprove);
     } finally {
       setBusyId(null);
     }
@@ -94,16 +99,16 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
 
   async function handleReject(hostUserId: string) {
     if (busyId) return;
-    const reason = window.prompt("Reason for rejection (shown to the applicant):", "");
+    const reason = window.prompt(t.adminPanel.rejectReasonPrompt, "");
     if (reason === null) return;
     setBusyId(hostUserId);
     try {
       await rejectHostApplication(hostUserId, reason);
-      showToast("Application rejected.");
+      showToast(t.adminPanel.applicationRejectedToast);
       load();
     } catch (err) {
       console.error("Could not reject this application:", err);
-      showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not reject this application.");
+      showToast(err instanceof Error ? `❌ ${err.message}` : t.adminPanel.couldNotReject);
     } finally {
       setBusyId(null);
     }
@@ -118,11 +123,11 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     setBusyId(reportId);
     try {
       await reviewReport(reportId, action);
-      showToast("Report dismissed.");
+      showToast(t.adminPanel.reportDismissedToast);
       load();
     } catch (err) {
       console.error("Could not review this report:", err);
-      showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not review this report.");
+      showToast(err instanceof Error ? `❌ ${err.message}` : t.adminPanel.couldNotReviewReport);
     } finally {
       setBusyId(null);
     }
@@ -134,12 +139,12 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
     setBusyId(reportId);
     try {
       await reviewReport(reportId, "remove");
-      showToast("🗑️ Content removed.");
+      showToast(t.adminPanel.contentRemovedToast);
       setConfirmRemove(null);
       load();
     } catch (err) {
       console.error("Could not review this report:", err);
-      showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not review this report.");
+      showToast(err instanceof Error ? `❌ ${err.message}` : t.adminPanel.couldNotReviewReport);
     } finally {
       setBusyId(null);
     }
@@ -156,13 +161,13 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
             <h3 className="font-bold text-white text-base flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-violet-400" /> Admin Panel
+              <ShieldCheck className="w-4 h-4 text-violet-400" /> {t.adminPanel.title}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">Host verifications &amp; reported content</p>
+            <p className="text-xs text-slate-400 mt-0.5">{t.adminPanel.subtitle}</p>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.adminPanel.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -177,7 +182,7 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
               tab === "hosts" ? "bg-cyan-500 text-slate-950" : "text-slate-400"
             }`}
           >
-            Host Applications
+            {t.adminPanel.tabHostApplications}
           </button>
           <button
             type="button"
@@ -186,7 +191,7 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
               tab === "reports" ? "bg-cyan-500 text-slate-950" : "text-slate-400"
             }`}
           >
-            Reports
+            {t.adminPanel.tabReports}
             {reports.length > 0 && (
               <span className="text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5 py-0.5 min-w-[1.1rem] text-center leading-none">
                 {reports.length}
@@ -195,18 +200,18 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">Loading…</p>}
+        {status === "loading" && <p className="text-xs text-slate-500 text-center py-6">{t.profile.loading}</p>}
         {status === "error" && (
-          <p className="text-xs text-rose-400 text-center py-6">Could not load the admin panel.</p>
+          <p className="text-xs text-rose-400 text-center py-6">{t.adminPanel.loadError}</p>
         )}
 
         {status === "ready" && tab === "hosts" && (
           <div className="space-y-3">
             {applications.length === 0 && (
-              <p className="text-xs text-slate-500 text-center py-6">No pending applications right now.</p>
+              <p className="text-xs text-slate-500 text-center py-6">{t.adminPanel.noApplications}</p>
             )}
             {applications.map((app) => {
-              const applicant = app.profiles || { name: "Unknown diver", avatar_url: "" };
+              const applicant = app.profiles || { name: t.adminPanel.unknownDiver, avatar_url: "" };
               const applicantDocs = docs[app.user_id];
               return (
                 <div key={app.user_id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
@@ -219,30 +224,30 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-white truncate">
-                        {applicant.name || "Unknown diver"}
+                        {applicant.name || t.adminPanel.unknownDiver}
                         {app.business_name ? ` -- ${app.business_name}` : ""}
                       </p>
                       <p className="text-[10px] text-slate-500 uppercase font-bold">
-                        {app.host_type} • {app.location || "No location given"}
+                        {app.host_type} • {app.location || t.adminPanel.noLocationGiven}
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400">{app.display_bio || "No bio given."}</p>
+                  <p className="text-xs text-slate-400">{app.display_bio || t.adminPanel.noBioGiven}</p>
                   <p className="text-[10px] text-slate-500">
-                    {app.cert_agency || "No agency given"} #{app.cert_number || "—"} •{" "}
-                    {app.years_experience || 0} yrs experience
+                    {app.cert_agency || t.adminPanel.noAgencyGiven} #{app.cert_number || "—"} •{" "}
+                    {app.years_experience || 0} {t.adminPanel.yrsExperienceSuffix}
                   </p>
                   <button
                     onClick={() => handleViewDocs(app.user_id)}
                     className="text-[10px] font-bold text-cyan-400 hover:text-cyan-300"
                   >
-                    View Documents
+                    {t.adminPanel.viewDocuments}
                   </button>
                   {openDocsFor === app.user_id && (
                     <div className="space-y-1 pl-2 border-l-2 border-slate-800">
-                      {!applicantDocs && <p className="text-[10px] text-slate-500">Loading…</p>}
+                      {!applicantDocs && <p className="text-[10px] text-slate-500">{t.profile.loading}</p>}
                       {applicantDocs?.length === 0 && (
-                        <p className="text-[10px] text-slate-500">No documents uploaded.</p>
+                        <p className="text-[10px] text-slate-500">{t.adminPanel.noDocumentsUploaded}</p>
                       )}
                       {applicantDocs?.map((d) => (
                         <p key={d.doc_type} className="text-[10px]">
@@ -254,10 +259,10 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                               rel="noopener"
                               className="text-cyan-400 hover:underline"
                             >
-                              {d.file_name || "view file"}
+                              {d.file_name || t.adminPanel.viewFile}
                             </a>
                           ) : (
-                            <span className="text-slate-600">link unavailable</span>
+                            <span className="text-slate-600">{t.adminPanel.linkUnavailable}</span>
                           )}
                         </p>
                       ))}
@@ -269,14 +274,14 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                       disabled={busyId === app.user_id}
                       className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                     >
-                      {busyId === app.user_id ? "Approving…" : "Approve"}
+                      {busyId === app.user_id ? t.adminPanel.approving : t.adminPanel.approve}
                     </button>
                     <button
                       onClick={() => handleReject(app.user_id)}
                       disabled={busyId === app.user_id}
                       className="flex-1 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 disabled:opacity-60 border border-rose-500/40 text-rose-300 font-bold rounded-xl text-xs transition-colors"
                     >
-                      {busyId === app.user_id ? "Rejecting…" : "Reject"}
+                      {busyId === app.user_id ? t.adminPanel.rejecting : t.adminPanel.reject}
                     </button>
                   </div>
                 </div>
@@ -288,10 +293,10 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
         {status === "ready" && tab === "reports" && (
           <div className="space-y-3">
             {reports.length === 0 && (
-              <p className="text-xs text-slate-500 text-center py-6">No pending reports right now.</p>
+              <p className="text-xs text-slate-500 text-center py-6">{t.adminPanel.noReports}</p>
             )}
             {reports.map((r) => {
-              const reporter = r.profiles?.name || "A diver";
+              const reporter = r.profiles?.name || t.adminPanel.fallbackDiver;
               const when = new Date(r.created_at).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -300,19 +305,19 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
               return (
                 <div key={r.id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-white">{targetLabel} reported</p>
+                    <p className="text-sm font-bold text-white">{targetLabel} {t.adminPanel.reportedSuffix}</p>
                     <span className="text-[10px] text-slate-500">{when}</span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    <strong className="text-slate-200">Reason:</strong> {r.reason}
+                    <strong className="text-slate-200">{t.adminPanel.reasonLabel}</strong> {r.reason}
                   </p>
                   {r.details && (
                     <p className="text-xs text-slate-400">
-                      <strong className="text-slate-200">Details:</strong> {r.details}
+                      <strong className="text-slate-200">{t.adminPanel.detailsLabel}</strong> {r.details}
                     </p>
                   )}
                   <p className="text-[10px] text-slate-500">
-                    Reported by {reporter} • target id {r.target_id}
+                    {t.adminPanel.reportedByPrefix} {reporter} • {t.adminPanel.targetIdPrefix} {r.target_id}
                   </p>
                   <div className="flex gap-2 pt-1">
                     <button
@@ -320,7 +325,7 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                       disabled={busyId === r.id}
                       className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-slate-200 font-bold rounded-xl text-xs transition-colors"
                     >
-                      {busyId === r.id ? "Dismissing…" : "Dismiss"}
+                      {busyId === r.id ? t.adminPanel.dismissing : t.adminPanel.dismiss}
                     </button>
                     {r.target_type !== "user" && (
                       <button
@@ -328,7 +333,7 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
                         disabled={busyId === r.id}
                         className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs transition-colors"
                       >
-                        {busyId === r.id ? "Removing…" : `Remove ${targetLabel}`}
+                        {busyId === r.id ? t.adminPanel.removing : `${t.adminPanel.removePrefix} ${targetLabel}`}
                       </button>
                     )}
                   </div>
@@ -342,9 +347,9 @@ export function AdminPanelModal({ onClose }: { onClose: () => void }) {
 
       {confirmRemove && (
         <ConfirmModal
-          title={`Permanently delete this ${confirmRemove.targetType === "user" ? "user's report" : confirmRemove.targetType}?`}
-          message="This can't be undone."
-          confirmLabel="Delete"
+          title={`${t.adminPanel.deleteReportTitlePrefix} ${confirmRemove.targetType === "user" ? t.adminPanel.deleteUserReportNoun : confirmRemove.targetType}?`}
+          message={t.adminPanel.cannotBeUndone}
+          confirmLabel={t.adminPanel.delete}
           confirming={busyId === confirmRemove.reportId}
           onConfirm={handleConfirmRemove}
           onCancel={() => setConfirmRemove(null)}
