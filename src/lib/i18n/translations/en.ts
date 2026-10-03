@@ -141,7 +141,12 @@ const en = {
     spotNotHeld: "Your spot wasn't held -- feel free to try booking again.",
     backToExplore: "Back to Explore",
   },
-} as const;
+};
 
 export default en;
+// Deliberately not `as const` -- that would give every leaf a literal
+// string type (e.g. "Explore" rather than `string`), and es.ts/fr.ts's
+// `satisfies Dictionary` would then reject their own, differently-worded
+// translations as a type mismatch. Omitting it still gets everything we
+// actually want: identical key *shape* enforced at the type level.
 export type Dictionary = typeof en;

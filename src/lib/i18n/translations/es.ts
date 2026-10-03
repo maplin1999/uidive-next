@@ -1,8 +1,8 @@
 import type { Dictionary } from "./en";
 
-// `satisfies Dictionary` (not `: Dictionary`) so TypeScript still checks
-// every key against English's shape but keeps each value's literal string
-// type -- same trick en.ts's own `as const` relies on.
+// `satisfies Dictionary` (not `: Dictionary`) so TypeScript checks every
+// key against English's shape (same keys, string values) while still
+// inferring this object's own type from its own literals.
 const es = {
   nav: {
     explore: "Explorar",
