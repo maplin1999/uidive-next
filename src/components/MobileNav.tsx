@@ -36,13 +36,13 @@ export function MobileNav() {
       <MobileNavLink
         href="/community"
         icon={<Camera className="w-5 h-5" />}
-        label="Feed"
+        label="Community"
         active={pathname?.startsWith("/community")}
       />
       <MobileNavLink
         href="/diveshop"
         icon={<ShoppingBag className="w-5 h-5" />}
-        label="Shop"
+        label="Dive Shop"
         active={pathname?.startsWith("/diveshop")}
       />
       {isVerifiedHost && (
@@ -94,7 +94,7 @@ function MobileNavLink({
       }`}
     >
       {icon}
-      <span className="text-[10px] font-bold">{label}</span>
+      <span className="text-[10px] font-bold whitespace-nowrap">{label}</span>
       {!!badge && badge > 0 && (
         <span className="absolute top-0 right-2 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
           {badge > 9 ? "9+" : badge}

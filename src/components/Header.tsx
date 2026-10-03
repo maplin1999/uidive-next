@@ -25,6 +25,8 @@ import { useToast, Toast } from "@/components/Toast";
 import { useInboxBadge } from "@/lib/useInboxBadge";
 import { useVerifiedHost } from "@/lib/useVerifiedHost";
 import { AdminPanelModal } from "@/components/admin/AdminPanelModal";
+import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
+import { BagIcon } from "@/components/icons/BagIcon";
 import { Theme, applyTheme, readCurrentTheme, storeTheme } from "@/lib/theme";
 import { DiverAvatar } from "@/components/DiverAvatar";
 
@@ -48,6 +50,7 @@ export function Header() {
   const isVerifiedHost = useVerifiedHost();
   const pathname = usePathname();
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  const [lockerOpen, setLockerOpen] = useState(false);
   // Mirrors the old site's toggleTheme(): read whatever the anti-FOUC
   // script in layout.tsx already applied, rather than assuming light, so
   // the icon shown here doesn't flash/mismatch on first paint.
@@ -217,6 +220,19 @@ export function Header() {
                     >
                       <CalendarCheck className="w-3.5 h-3.5" /> My Bookings
                     </Link>
+                    {/* Treasure Chest cosmetics locker -- moved here from the
+                        profile header's own "Locker" button so it's reachable
+                        from any page, not just /profile. Renamed "My Dive Bag"
+                        to read better as a dropdown item. */}
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        setLockerOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
+                    >
+                      <BagIcon className="w-3.5 h-3.5" /> My Dive Bag
+                    </button>
                     {!isVerifiedHost && (
                       <Link
                         href="/host-dashboard"
@@ -256,6 +272,7 @@ export function Header() {
       </header>
       <Toast message={message} />
       {adminPanelOpen && <AdminPanelModal onClose={() => setAdminPanelOpen(false)} />}
+      {lockerOpen && <CosmeticsLockerModal onClose={() => setLockerOpen(false)} />}
     </>
   );
 }
