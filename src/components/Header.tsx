@@ -93,13 +93,6 @@ export function Header() {
               </span>
             </div>
           </Link>
-          <Image
-            src="/images/uidive-logo.svg"
-            alt="UiDive"
-            width={48}
-            height={48}
-            priority
-          />
 
           <nav className="hidden md:flex items-center space-x-1">
             <NavLink href="/" icon={<Compass className="w-4 h-4" />} label={t.nav.explore} active={pathname === "/"} />
