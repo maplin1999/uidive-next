@@ -13,7 +13,7 @@ import { useVerifiedHost } from "@/lib/useVerifiedHost";
 // header nav. Only shown once there's actually somewhere for every item to
 // go; Inbox/Host are auth-gated the same way the header's desktop links are.
 export function MobileNav() {
-  const { user, requireAuth } = useAuth();
+  const { user } = useAuth();
   const inboxBadge = useInboxBadge();
   const isVerifiedHost = useVerifiedHost();
   const pathname = usePathname();
@@ -53,21 +53,13 @@ export function MobileNav() {
           active={pathname?.startsWith("/host-dashboard")}
         />
       )}
-      {user ? (
+      {user && (
         <MobileNavLink
           href="/profile"
           icon={<User className="w-5 h-5" />}
           label="Profile"
           active={pathname?.startsWith("/profile")}
         />
-      ) : (
-        <button
-          onClick={() => requireAuth()}
-          className="mobile-nav-btn flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-slate-400 transition-colors"
-        >
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-bold">Profile</span>
-        </button>
       )}
     </nav>
   );
