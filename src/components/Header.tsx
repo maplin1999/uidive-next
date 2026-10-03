@@ -89,7 +89,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-3 group text-left min-w-0" aria-label="uiDive home">
             <Image
               src="/images/uidive-logo.svg"
-              alt="DiveBuddy"
+              alt="UiDive"
               width={48}
               height={48}
               priority
