@@ -86,8 +86,14 @@ export function Header() {
     <>
       <header className="chrome-header-strong sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center space-x-3 group text-left min-w-0">
-            
+          <Link href="/" className="flex items-center space-x-3 group text-left min-w-0" aria-label="uiDive home">
+            <Image
+              src="/images/uidive-logo.svg"
+              alt="DiveBuddy"
+              width={48}
+              height={48}
+              priority
+            />
             <div className="flex flex-col justify-center min-w-0">
               <span className="font-black text-xl sm:text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent block pb-1 truncate">
                 UiDive
