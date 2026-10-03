@@ -7,6 +7,7 @@ import { DiverSearchResult, searchDivers, sendBuddyRequest } from "@/lib/inbox";
 import { useToast, Toast } from "@/components/Toast";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 type SendState = "idle" | "sending" | "sent" | "already";
 
@@ -16,6 +17,7 @@ type SendState = "idle" | "sending" | "sent" | "already";
 export function AddBuddyModal({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
   const { message, showToast } = useToast();
+  const { t } = useLocale();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
   const [results, setResults] = useState<DiverSearchResult[]>([]);
@@ -29,23 +31,24 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
   async function handleSearch() {
     const q = query.trim();
     if (!q) {
-      setStatus("Enter a Diver ID or name first.");
+      setStatus(t.addBuddyModal.enterIdFirst);
       return;
     }
     setSearching(true);
-    setStatus("Searching…");
+    setStatus(t.addBuddyModal.searching);
     setResults([]);
     try {
       const data = await searchDivers(q);
       if (data.length === 0) {
-        setStatus("No divers found with that ID or name.");
+        setStatus(t.addBuddyModal.noneFound);
       } else {
-        setStatus(`${data.length} diver${data.length === 1 ? "" : "s"} found:`);
+        const noun = data.length === 1 ? t.addBuddyModal.diverSingular : t.addBuddyModal.diverPlural;
+        setStatus(`${data.length} ${noun} ${t.addBuddyModal.foundSuffix}`);
         setResults(data);
       }
     } catch (err) {
       console.error("Buddy search failed:", err);
-      setStatus("Search failed -- please try again.");
+      setStatus(t.addBuddyModal.searchFailed);
     } finally {
       setSearching(false);
     }
@@ -56,7 +59,7 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
     try {
       await sendBuddyRequest(user!.id, addresseeId);
       setSendStates((prev) => ({ ...prev, [addresseeId]: "sent" }));
-      showToast("🤿 Buddy request sent!");
+      showToast(t.addBuddyModal.buddyRequestSentToast);
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       if (code === "23505") {
@@ -64,7 +67,7 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
       } else {
         console.error("Could not send buddy request:", err);
         setSendStates((prev) => ({ ...prev, [addresseeId]: "idle" }));
-        showToast(err instanceof Error ? `❌ ${err.message}` : "❌ Could not send buddy request.");
+        showToast(err instanceof Error ? `❌ ${err.message}` : t.addBuddyModal.couldNotSendBuddyRequest);
       }
     }
   }
@@ -79,11 +82,11 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <h3 className="font-bold text-white text-base flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-cyan-400" /> Add Dive Buddy
+            <UserPlus className="w-4 h-4 text-cyan-400" /> {t.addBuddyModal.title}
           </h3>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.addBuddyModal.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -91,7 +94,7 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="space-y-3 text-xs">
-          <label className="text-slate-400 block font-semibold">Enter Diver ID or Name</label>
+          <label className="text-slate-400 block font-semibold">{t.addBuddyModal.enterIdOrName}</label>
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -103,13 +106,13 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
                   handleSearch();
                 }
               }}
-              placeholder="e.g. DIV-4F9A2B or Elena"
+              placeholder={t.addBuddyModal.placeholder}
               className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 text-slate-200 focus:outline-none focus:border-cyan-500"
             />
             <button
               onClick={handleSearch}
               disabled={searching}
-              aria-label="Search for a dive buddy"
+              aria-label={t.addBuddyModal.searchAria}
               className="shrink-0 bg-slate-800 hover:bg-slate-700 disabled:opacity-60 border border-slate-700 text-cyan-400 font-bold px-4 py-3 rounded-xl transition-colors"
             >
               <Search className="w-4 h-4" />
@@ -145,12 +148,12 @@ export function AddBuddyModal({ onClose }: { onClose: () => void }) {
                     className="shrink-0 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold px-3 py-2 rounded-lg text-[11px] transition-colors"
                   >
                     {sendState === "sending"
-                      ? "Sending…"
+                      ? t.addBuddyModal.sending
                       : sendState === "sent"
-                        ? "Request sent ✓"
+                        ? t.addBuddyModal.requestSent
                         : sendState === "already"
-                          ? "Already sent"
-                          : "Send Request"}
+                          ? t.addBuddyModal.alreadySent
+                          : t.addBuddyModal.sendRequest}
                   </button>
                 </div>
               );

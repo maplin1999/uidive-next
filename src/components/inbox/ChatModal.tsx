@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { DEFAULT_AVATAR } from "@/lib/auth-types";
 import { DirectMessage, fetchMessages, sendMessage, markMessagesRead } from "@/lib/inbox";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's #chat-modal (openChatModal() for a real buddy
 // conversation). Simple 3s polling rather than a realtime subscription --
@@ -24,6 +25,7 @@ export function ChatModal({
   onMessagesChanged?: () => void;
 }) {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -85,7 +87,7 @@ export function ChatModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.chatModal.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
           >
             <X className="w-4 h-4" />
@@ -94,7 +96,9 @@ export function ChatModal({
 
         <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 text-xs pt-3">
           {messages.length === 0 && (
-            <p className="text-xs text-slate-500 text-center py-4">Say hi to {partnerName} 👋</p>
+            <p className="text-xs text-slate-500 text-center py-4">
+              {t.chatModal.sayHiPrefix} {partnerName} {t.chatModal.sayHiSuffix}
+            </p>
           )}
           {messages.map((m, i) => {
             const isYou = m.sender_id === user.id;
@@ -138,7 +142,7 @@ export function ChatModal({
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
-            placeholder="Type message... (Press Enter)"
+            placeholder={t.chatModal.messagePlaceholder}
             className="bg-slate-950 text-xs px-4 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500 text-slate-200"
           />
           <button
@@ -146,7 +150,7 @@ export function ChatModal({
             disabled={sending || !input.trim()}
             className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1 transition-colors shrink-0"
           >
-            <span>Send</span>
+            <span>{t.chatModal.send}</span>
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>

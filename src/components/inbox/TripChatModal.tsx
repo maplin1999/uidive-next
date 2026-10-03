@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { TripChatMessage, fetchTripChatMessages, sendTripChatMessage } from "@/lib/inbox";
 import { resolveAvatarUrl } from "@/lib/cosmetics";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's #trip-chat-modal -- a shared group chat among
 // co-divers on a trip (no separate host-led channel; everyone with a
@@ -21,6 +22,7 @@ export function TripChatModal({
   onClose: () => void;
 }) {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [messages, setMessages] = useState<TripChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -79,7 +81,7 @@ export function TripChatModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.tripChatModal.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
           >
             <X className="w-4 h-4" />
@@ -88,11 +90,11 @@ export function TripChatModal({
 
         <div ref={boxRef} className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 text-xs pt-3">
           {messages.length === 0 && (
-            <p className="text-xs text-slate-500 text-center py-4">Say hi to your fellow divers 👋</p>
+            <p className="text-xs text-slate-500 text-center py-4">{t.tripChatModal.sayHiToFellowDivers}</p>
           )}
           {messages.map((m, i) => {
             const isYou = m.user_id === user.id;
-            const senderName = isYou ? "You" : m.profiles?.name || "Diver";
+            const senderName = isYou ? t.tripChatModal.you : m.profiles?.name || t.tripChatModal.fallbackDiver;
             const avatarUrl = isYou
               ? resolveAvatarUrl(user.avatar, user.equipped_avatar_id)
               : resolveAvatarUrl(m.profiles?.avatar_url, m.profiles?.equipped_avatar_id);
@@ -125,7 +127,7 @@ export function TripChatModal({
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
-            placeholder="Message everyone on this trip…"
+            placeholder={t.tripChatModal.messagePlaceholder}
             className="bg-slate-950 text-xs px-4 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500 text-slate-200"
           />
           <button
@@ -133,7 +135,7 @@ export function TripChatModal({
             disabled={sending || !input.trim()}
             className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1 transition-colors shrink-0"
           >
-            <span>Send</span>
+            <span>{t.tripChatModal.send}</span>
             <Send className="w-3.5 h-3.5" />
           </button>
         </div>

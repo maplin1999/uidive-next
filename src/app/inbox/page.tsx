@@ -20,6 +20,7 @@ import { ChatModal } from "@/components/inbox/ChatModal";
 import { TripChatModal } from "@/components/inbox/TripChatModal";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { resolveAvatarUrl } from "@/lib/cosmetics";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 type InboxTab = "requests" | "messages" | "groups";
 
@@ -39,6 +40,7 @@ type InboxTab = "requests" | "messages" | "groups";
 export default function InboxPage() {
   const { user, requireAuth } = useAuth();
   const { openProfile } = useSocial();
+  const { t } = useLocale();
 
   const [requests, setRequests] = useState<BuddyRequest[]>([]);
   const [buddies, setBuddies] = useState<Buddy[]>([]);
@@ -83,15 +85,13 @@ export default function InboxPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-4">
           <div className="text-3xl">📬</div>
-          <h1 className="text-lg font-bold text-white">Sign in to view your Inbox</h1>
-          <p className="text-xs text-slate-400">
-            Buddy requests, messages, and trip group chats all live here.
-          </p>
+          <h1 className="text-lg font-bold text-white">{t.inbox.signInTitle}</h1>
+          <p className="text-xs text-slate-400">{t.inbox.signInBody}</p>
           <button
             onClick={() => requireAuth()}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
           >
-            Sign In
+            {t.profile.signIn}
           </button>
         </div>
       </main>
@@ -116,42 +116,40 @@ export default function InboxPage() {
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-black text-white">Inbox</h1>
-            <p className="text-xs text-slate-400">Buddy requests and messages, all in one place</p>
+            <h1 className="text-2xl font-black text-white">{t.inbox.title}</h1>
+            <p className="text-xs text-slate-400">{t.inbox.subtitle}</p>
           </div>
           <button
             onClick={() => setAddBuddyOpen(true)}
             className="inline-flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-500/20 transition-all"
           >
-            <UserPlus className="w-4 h-4" /> Add Buddy
+            <UserPlus className="w-4 h-4" /> {t.inbox.addBuddy}
           </button>
         </div>
 
-        {status === "loading" && <p className="text-xs text-slate-500 text-center py-10">Loading…</p>}
+        {status === "loading" && <p className="text-xs text-slate-500 text-center py-10">{t.profile.loading}</p>}
         {status === "error" && (
-          <p className="text-xs text-rose-400 text-center py-10">
-            Could not load your Inbox -- please refresh.
-          </p>
+          <p className="text-xs text-rose-400 text-center py-10">{t.inbox.loadError}</p>
         )}
 
         {status === "ready" && (
           <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl w-fit max-w-full overflow-x-auto">
             <InboxTabButton
-              label="Requests"
+              label={t.inbox.tabRequests}
               icon={UserPlus}
               count={requests.length}
               active={activeTab === "requests"}
               onClick={() => setActiveTab("requests")}
             />
             <InboxTabButton
-              label="Messages"
+              label={t.inbox.tabMessages}
               icon={MessageSquare}
               count={conversations.filter((c) => c.unread).length}
               active={activeTab === "messages"}
               onClick={() => setActiveTab("messages")}
             />
             <InboxTabButton
-              label="Group Chats"
+              label={t.inbox.tabGroups}
               icon={Users}
               count={0}
               active={activeTab === "groups"}
@@ -164,11 +162,11 @@ export default function InboxPage() {
         {status === "ready" && activeTab === "requests" && (
           <div className="space-y-3">
             {requests.length === 0 && (
-              <EmptyState emoji="📭" text="No pending buddy requests right now." />
+              <EmptyState emoji="📭" text={t.inbox.noRequests} />
             )}
             {requests.map((req) => {
               const person = req.profiles || {
-                name: "A diver",
+                name: t.inbox.fallbackDiverName,
                 avatar_url: "",
                 cert: "",
                 diver_id: "",
@@ -191,7 +189,7 @@ export default function InboxPage() {
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-white truncate hover:underline">{person.name}</p>
-                      <p className="text-[11px] text-slate-500">wants to be your dive buddy</p>
+                      <p className="text-[11px] text-slate-500">{t.inbox.wantsBuddy}</p>
                     </div>
                   </button>
                   <div className="flex items-center gap-2 shrink-0">
@@ -200,14 +198,14 @@ export default function InboxPage() {
                       disabled={respondingId === req.id}
                       className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
-                      {respondingId === req.id ? "…" : "Accept"}
+                      {respondingId === req.id ? "…" : t.inbox.accept}
                     </button>
                     <button
                       onClick={() => handleRespond(req.id, false)}
                       disabled={respondingId === req.id}
                       className="bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-slate-300 font-bold px-3 py-2 rounded-xl text-[10px] transition-colors"
                     >
-                      {respondingId === req.id ? "…" : "Decline"}
+                      {respondingId === req.id ? "…" : t.inbox.decline}
                     </button>
                   </div>
                 </div>
@@ -220,10 +218,7 @@ export default function InboxPage() {
         {status === "ready" && activeTab === "messages" && (
           <div className="space-y-3">
             {conversations.length === 0 && (
-              <EmptyState
-                emoji="💬"
-                text="No conversations yet — start one from your Dive Buddies list."
-              />
+              <EmptyState emoji="💬" text={t.inbox.noConversations} />
             )}
             {conversations.map((c) => (
               <div
@@ -254,7 +249,7 @@ export default function InboxPage() {
                   <div className="truncate">
                     <h4 className="text-xs font-bold text-white truncate">{c.partner.name}</h4>
                     <p className="text-[11px] text-slate-400 truncate">
-                      {c.lastMessage.sender_id === user.id ? `You: ${c.lastMessage.content}` : c.lastMessage.content}
+                      {c.lastMessage.sender_id === user.id ? `${t.inbox.youPrefix} ${c.lastMessage.content}` : c.lastMessage.content}
                     </p>
                   </div>
                   {c.unread && <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 ml-2" />}
@@ -268,7 +263,7 @@ export default function InboxPage() {
         {status === "ready" && activeTab === "groups" && (
           <div className="space-y-3">
             {groupChats.length === 0 && (
-              <EmptyState emoji="🤿" text="Book a trip to join its group chat with fellow divers." />
+              <EmptyState emoji="🤿" text={t.inbox.noGroupChats} />
             )}
             {groupChats.map((trip) => {
               const dateStr = trip.scheduled_date
@@ -290,7 +285,7 @@ export default function InboxPage() {
                     </div>
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold text-white truncate">{trip.title}</h4>
-                      <p className="text-[11px] text-slate-400 truncate">{subtitle || "Group chat"}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{subtitle || t.inbox.groupChatFallback}</p>
                     </div>
                   </div>
                 </button>
