@@ -9,13 +9,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:py-12">
       <div className="max-w-3xl mx-auto space-y-6">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition-colors w-fit"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </Link>
-
+        
         <div className="p-6 sm:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-8">
           <div className="space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
