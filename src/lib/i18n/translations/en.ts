@@ -644,6 +644,7 @@ const en = {
   },
   faq: {
     back: "Back",
+    eyebrow: "Support",
     heading: "Frequently Asked Questions",
     cantFindPrefix: "Can't find what you're looking for?",
     contactUs: "Contact us",
@@ -670,6 +671,8 @@ const en = {
     termsTab: "Terms of Service",
     viewTermsLink: "View our Terms of Service",
     viewPrivacyLink: "View our Privacy Policy",
+    termsEyebrow: "Legal",
+    privacyEyebrow: "Legal",
     privacyTitle: "Privacy Policy",
     effectiveDate: "Effective date: September 29, 2026",
     privacyIntro: "This Privacy Policy explains what information UiDive (\"we\", \"us\") collects when you use the UiDive app and website (the \"Service\"), how we use it, and the choices you have.",
@@ -722,6 +725,7 @@ const en = {
   },
   contactUsPage: {
     back: "Back",
+    eyebrow: "Get In Touch",
     heading: "Contact Us",
     intro: "Have a question, a bit of feedback, or something isn't working the way it should? We'd love to hear from you.",
     emailHeading: "Email us",
@@ -732,6 +736,7 @@ const en = {
   },
   sitemapsPage: {
     back: "Back",
+    eyebrow: "Navigate",
     heading: "Site Map",
     intro: "Every page on UiDive, grouped the same way as the footer.",
     exploreHeading: "Explore",
@@ -740,6 +745,7 @@ const en = {
   },
   diveSafePage: {
     back: "Back",
+    eyebrow: "Dive Responsibly",
     heading: "Dive Safety",
     intro: "Diving is an incredible way to explore the underwater world, and it's safest when a few simple habits become second nature. UiDive is a platform for finding dives and dive buddies -- it doesn't replace certified training, local regulations, or your own judgment on the day.",
     certificationHeading: "Dive within your certification",

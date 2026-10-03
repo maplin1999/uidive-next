@@ -645,6 +645,7 @@ const es = {
   },
   faq: {
     back: "Atrás",
+    eyebrow: "Ayuda",
     heading: "Preguntas frecuentes",
     cantFindPrefix: "¿No encuentras lo que buscas?",
     contactUs: "Contáctanos",
@@ -671,6 +672,8 @@ const es = {
     termsTab: "Términos de Servicio",
     viewTermsLink: "Ver nuestros Términos de Servicio",
     viewPrivacyLink: "Ver nuestra Política de Privacidad",
+    termsEyebrow: "Legal",
+    privacyEyebrow: "Legal",
     privacyTitle: "Política de Privacidad",
     effectiveDate: "Fecha de entrada en vigor: 29 de septiembre de 2026",
     privacyIntro: "Esta Política de Privacidad explica qué información recopila UiDive (\"nosotros\") cuando usas la app y el sitio web de UiDive (el \"Servicio\"), cómo la usamos, y las opciones que tienes.",
@@ -723,6 +726,7 @@ const es = {
   },
   contactUsPage: {
     back: "Atrás",
+    eyebrow: "Hablemos",
     heading: "Contáctanos",
     intro: "¿Tienes una pregunta, algún comentario, o algo no funciona como debería? Nos encantaría saber de ti.",
     emailHeading: "Escríbenos",
@@ -733,6 +737,7 @@ const es = {
   },
   sitemapsPage: {
     back: "Atrás",
+    eyebrow: "Navegar",
     heading: "Mapa del Sitio",
     intro: "Todas las páginas de UiDive, agrupadas igual que en el pie de página.",
     exploreHeading: "Explorar",
@@ -741,6 +746,7 @@ const es = {
   },
   diveSafePage: {
     back: "Atrás",
+    eyebrow: "Bucea con Responsabilidad",
     heading: "Seguridad en el Buceo",
     intro: "El buceo es una forma increíble de explorar el mundo submarino, y es más seguro cuando algunos hábitos simples se vuelven naturales. UiDive es una plataforma para encontrar inmersiones y compañeros de buceo -- no sustituye la formación certificada, la normativa local ni tu propio criterio el día de la inmersión.",
     certificationHeading: "Bucea dentro de tu certificación",

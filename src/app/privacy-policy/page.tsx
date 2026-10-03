@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Split out of the old combined /legal page -- see terms-of-service/page.tsx
@@ -20,13 +20,19 @@ export default function PrivacyPolicyPage() {
           <ArrowLeft className="w-4 h-4" /> {t.legal.back}
         </Link>
 
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">{t.legal.privacyEyebrow}</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{t.legal.privacyTitle}</h1>
+            <p className="text-xs text-slate-500">{t.legal.effectiveDate}</p>
+          </div>
+        </div>
+
         <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
           <div className="space-y-5 text-sm text-slate-300 leading-relaxed">
-            <div>
-              <h1 className="text-xl font-black text-white">{t.legal.privacyTitle}</h1>
-              <p className="text-xs text-slate-500 mt-1">{t.legal.effectiveDate}</p>
-            </div>
-
             <p>{t.legal.privacyIntro}</p>
 
             <h2 className="text-sm font-bold text-white">{t.legal.infoWeCollectHeading}</h2>

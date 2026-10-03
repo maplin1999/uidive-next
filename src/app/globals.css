@@ -294,6 +294,12 @@ html[data-theme="light"] .bg-slate-900 {
 html[data-theme="light"] .bg-slate-900\/60 {
   background-color: var(--l-surface-muted) !important;
 }
+/* Section-rhythm bands on content pages (About Us Mission/Values, used the
+   same way elsewhere these pages might grow) -- same muted-surface treatment
+   as the /60 variant above, just a lighter opacity in dark mode. */
+html[data-theme="light"] .bg-slate-900\/40 {
+  background-color: var(--l-surface-muted) !important;
+}
 /* My Dive Bag modal's header bar (CosmeticsLockerModal.tsx) -- the only
    bg-slate-900/95 usage in the app, so it's safe to flip it light here
    rather than needing a dedicated hook class. Without this it stayed a
@@ -319,6 +325,9 @@ html[data-theme="light"] .hover\:bg-slate-800\/60:hover {
 html[data-theme="light"] .hover\:bg-slate-800\/50:hover {
   background-color: var(--l-surface-hover) !important;
 }
+html[data-theme="light"] .hover\:bg-slate-800\/40:hover {
+  background-color: var(--l-surface-hover) !important;
+}
 html[data-theme="light"] .hover\:bg-slate-800:hover {
   background-color: var(--l-surface-muted) !important;
 }
@@ -338,6 +347,9 @@ html[data-theme="light"] .border-slate-800 {
 }
 html[data-theme="light"] .border-slate-800\/80 {
   border-color: var(--l-border-soft) !important;
+}
+html[data-theme="light"] .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--l-border) !important;
 }
 html[data-theme="light"] .border-slate-700 {
   border-color: var(--l-border-strong) !important;
@@ -448,6 +460,23 @@ html[data-theme="light"] .border-violet-400 {
 html[data-theme="light"] .border-amber-400 {
   border-color: #a15c07 !important;
 }
+/* Emerald/violet icon-badge accents (About Us "Discover"/"Explore" cards,
+   Contact Us social-links badge) -- same soft-background + thin-border
+   recipe as the cyan badges above (bg-cyan-500/10 + border-cyan-500/30),
+   just keyed to the same darker emerald/violet shades used for
+   border-emerald-400/border-violet-400 right above. */
+html[data-theme="light"] .bg-emerald-500\/10 {
+  background-color: rgba(4, 120, 87, 0.08) !important;
+}
+html[data-theme="light"] .border-emerald-500\/30 {
+  border-color: rgba(4, 120, 87, 0.3) !important;
+}
+html[data-theme="light"] .bg-violet-500\/10 {
+  background-color: rgba(109, 40, 217, 0.08) !important;
+}
+html[data-theme="light"] .border-violet-500\/30 {
+  border-color: rgba(109, 40, 217, 0.3) !important;
+}
 /* Diver certification / verified-host avatar rings are deliberately NOT
    re-themed for light mode (unlike the cosmetic-tier accents above) -- the
    whole point of a cert ring is that it's the same recognizable color for
@@ -463,6 +492,9 @@ html[data-theme="light"] .focus\:border-cyan-500\/50:focus {
 }
 html[data-theme="light"] .hover\:text-cyan-400:hover {
   color: var(--l-accent) !important;
+}
+html[data-theme="light"] .hover\:text-cyan-300:hover {
+  color: var(--l-accent-hover) !important;
 }
 html[data-theme="light"] .shadow-cyan-500\/20 {
   --tw-shadow-color: var(--l-accent-soft-20) !important;
@@ -569,6 +601,11 @@ html[data-theme="light"] .from-slate-900.via-purple-950\/20.to-slate-900 {
    cards above, cyan-to-emerald to match the banner's own accent colors. */
 html[data-theme="light"] .from-cyan-950\/50.via-slate-900.to-emerald-950\/40 {
   background-image: linear-gradient(to right, rgba(14, 143, 166, 0.12), #ffffff, rgba(4, 120, 87, 0.1)) !important;
+}
+/* About Us hero -- same "light gradient with a themed tint" treatment,
+   diagonal instead of left-right to match the hero's bg-gradient-to-br. */
+html[data-theme="light"] .from-cyan-950.via-slate-950.to-slate-950 {
+  background-image: linear-gradient(to bottom right, rgba(14, 143, 166, 0.1), #ffffff, #ffffff) !important;
 }
 
 /* "Always dark" elements: photo badges, the photo caption bar, profile-grid

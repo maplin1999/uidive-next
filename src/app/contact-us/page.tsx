@@ -21,9 +21,15 @@ export default function ContactUsPage() {
           <ArrowLeft className="w-4 h-4" /> {t.contactUsPage.back}
         </Link>
 
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-black text-white">{t.contactUsPage.heading}</h1>
-          <p className="text-sm text-slate-400 leading-relaxed">{t.contactUsPage.intro}</p>
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+            <Mail className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">{t.contactUsPage.eyebrow}</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{t.contactUsPage.heading}</h1>
+            <p className="text-sm text-slate-400 leading-relaxed">{t.contactUsPage.intro}</p>
+          </div>
         </div>
 
         <div className="rounded-3xl bg-slate-900 border border-slate-800 shadow-xl p-6 sm:p-8 space-y-6">

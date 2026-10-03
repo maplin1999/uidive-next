@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, HelpCircle } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
 import type { Dictionary } from "@/lib/i18n/translations/en";
 
@@ -37,15 +37,21 @@ export default function FaqPage() {
           <ArrowLeft className="w-4 h-4" /> {t.faq.back}
         </Link>
 
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-black text-white">{t.faq.heading}</h1>
-          <p className="text-sm text-slate-400">
-            {t.faq.cantFindPrefix}{" "}
-            <a href="mailto:support@uidive.com" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-              {t.faq.contactUs}
-            </a>
-            .
-          </p>
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+            <HelpCircle className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">{t.faq.eyebrow}</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{t.faq.heading}</h1>
+            <p className="text-sm text-slate-400">
+              {t.faq.cantFindPrefix}{" "}
+              <a href="mailto:support@uidive.com" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                {t.faq.contactUs}
+              </a>
+              .
+            </p>
+          </div>
         </div>
 
         <div className="rounded-3xl bg-slate-900 border border-slate-800 shadow-xl divide-y divide-slate-800 overflow-hidden">

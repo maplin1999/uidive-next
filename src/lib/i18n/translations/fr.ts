@@ -642,6 +642,7 @@ const fr = {
   },
   faq: {
     back: "Retour",
+    eyebrow: "Aide",
     heading: "Questions fréquentes",
     cantFindPrefix: "Vous ne trouvez pas ce que vous cherchez ?",
     contactUs: "Contactez-nous",
@@ -668,6 +669,8 @@ const fr = {
     termsTab: "Conditions d'Utilisation",
     viewTermsLink: "Voir nos Conditions d'Utilisation",
     viewPrivacyLink: "Voir notre Politique de Confidentialité",
+    termsEyebrow: "Légal",
+    privacyEyebrow: "Légal",
     privacyTitle: "Politique de Confidentialité",
     effectiveDate: "Date d'entrée en vigueur : 29 septembre 2026",
     privacyIntro: "Cette Politique de Confidentialité explique quelles informations UiDive (\"nous\") collecte lorsque vous utilisez l'application et le site web UiDive (le \"Service\"), comment nous les utilisons, et les choix dont vous disposez.",
@@ -720,6 +723,7 @@ const fr = {
   },
   contactUsPage: {
     back: "Retour",
+    eyebrow: "Nous Joindre",
     heading: "Contactez-nous",
     intro: "Une question, un commentaire, ou quelque chose qui ne fonctionne pas comme prévu ? Nous serions ravis de vous entendre.",
     emailHeading: "Écrivez-nous",
@@ -730,6 +734,7 @@ const fr = {
   },
   sitemapsPage: {
     back: "Retour",
+    eyebrow: "Naviguer",
     heading: "Plan du Site",
     intro: "Toutes les pages d'UiDive, regroupées de la même façon que dans le pied de page.",
     exploreHeading: "Explorer",
@@ -738,6 +743,7 @@ const fr = {
   },
   diveSafePage: {
     back: "Retour",
+    eyebrow: "Plongez en Toute Responsabilité",
     heading: "Sécurité en Plongée",
     intro: "La plongée est une façon incroyable d'explorer le monde sous-marin, et elle est plus sûre lorsque quelques habitudes simples deviennent naturelles. UiDive est une plateforme pour trouver des plongées et des partenaires de plongée -- elle ne remplace pas une formation certifiée, la réglementation locale, ni votre propre jugement le jour J.",
     certificationHeading: "Plongez selon votre certification",

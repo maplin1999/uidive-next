@@ -261,16 +261,18 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-emerald-500" />
-          <div className="relative mx-auto max-w-7xl px-6 py-20 text-center lg:px-8">
+        {/* CTA -- same muted cyan/emerald recipe as the Ocean Conservation
+            banner (low-opacity gradient stops over a dark card, thin
+            accent border) instead of a full bright gradient fill, which
+            read as too bright against the rest of the page. */}
+        <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="rounded-3xl bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl px-6 py-16 text-center sm:px-12">
 
-            <h2 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {t.aboutUs.ctaTitle}
             </h2>
 
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-950/80">
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-300">
               {t.aboutUs.ctaBody}
             </p>
 
@@ -278,7 +280,7 @@ export default function AboutPage() {
               {user ? (
                 <Link
                   href="/"
-                  className="inline-flex items-center rounded-full bg-slate-950 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  className="inline-flex items-center rounded-full bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
                 >
                   {t.aboutUs.ctaButtonExplore}
                 </Link>
@@ -286,7 +288,7 @@ export default function AboutPage() {
                 <button
                   type="button"
                   onClick={() => openAuthModal("signup")}
-                  className="inline-flex items-center rounded-full bg-slate-950 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  className="inline-flex items-center rounded-full bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
                 >
                   {t.aboutUs.ctaButton}
                 </button>
