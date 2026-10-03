@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us | UiDive",
+  title: "About Us",
   description:
     "Discover UiDive, a platform built to help divers find dives, buddies, discover experiences, and connect with the diving community.",
   keywords: [
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "diving platform",
   ],
   openGraph: {
-    title: "About Us | UiDive",
+    title: "About Us",
     description:
       "A better way for divers to connect, discover and dive together.",
     type: "website",
@@ -24,8 +24,8 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "UiDive",
-  url: "https://www.divebuddy.com",
-  logo: "https://www.divebuddy.com/logo.png",
+  url: "https://www.uidive.com",
+  logo: "https://www.uidive.com/logo.png",
   description:
     "UiDive is a platform helping divers find dives, connect with dive buddies, discover diving experiences and explore the underwater world together.",
   sameAs: [
