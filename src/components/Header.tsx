@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Waves,
@@ -86,15 +87,19 @@ export function Header() {
       <header className="chrome-header-strong sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <Link href="/" className="flex items-center space-x-3 group text-left min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors shrink-0">
-              <Waves className="w-5 h-5 text-cyan-400" />
-            </div>
             <div className="flex flex-col justify-center min-w-0">
               <span className="font-black text-xl sm:text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent block pb-1 truncate">
                 UiDive
               </span>
             </div>
           </Link>
+          <Image
+            src="/images/uidive-logo.svg"
+            alt="UiDive"
+            width={48}
+            height={48}
+            priority
+          />
 
           <nav className="hidden md:flex items-center space-x-1">
             <NavLink href="/" icon={<Compass className="w-4 h-4" />} label={t.nav.explore} active={pathname === "/"} />
