@@ -8,11 +8,11 @@ import { useLocale } from "@/components/i18n/LocaleContext";
 // Complements (rather than duplicates) the Terms of Service's Assumption
 // of Risk section: this is practical guidance, that's the legal language.
 //
-// Structure matches about-us/page.tsx -- a full-width gradient Hero, then
-// the six guidance cards in the same icon-badge grid style as the About Us
-// What We Do section, closing with a muted-gradient card (same recipe as
-// the About Us CTA) pointing to the Terms of Service instead of a plain
-// text link.
+// Structure matches about-us/page.tsx's own section rhythm: Hero, a banded
+// section with a centered intro + icon-badge card grid (Mission's shape,
+// sized up to all six guidelines rather than a highlighted three), and a
+// closing muted-gradient card (the CTA's shape) pointing to the Terms of
+// Service instead of a plain text link.
 export default function DiveSafePage() {
   const { t } = useLocale();
 
@@ -50,36 +50,48 @@ export default function DiveSafePage() {
       </section>
 
       {/* Guidance */}
-      <section className="mx-auto max-w-7xl px-6 pb-16 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <article
-                key={section.title}
-                className="rounded-2xl bg-slate-900 border border-slate-800 p-6 hover:border-cyan-500/40 transition-colors"
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30">
-                  <Icon className="w-5 h-5 text-cyan-400" />
-                </div>
-                <h2 className="mt-4 text-lg font-bold text-white">{section.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{section.body}</p>
-              </article>
-            );
-          })}
+      <section className="bg-slate-900/40 border-y border-slate-800">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">
+              {t.diveSafePage.contentEyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{t.diveSafePage.contentTitle}</h2>
+            <p className="mt-6 text-lg leading-8 text-slate-400">{t.diveSafePage.contentBody}</p>
+          </div>
+
+          <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <article
+                  key={section.title}
+                  className="rounded-2xl bg-slate-900 border border-slate-800 p-6 hover:border-cyan-500/40 transition-colors"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+                    <Icon className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-bold text-white">{section.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">{section.body}</p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* Further reading */}
-      <section className="mx-auto max-w-3xl px-6 pb-20 lg:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl px-6 py-8 text-center sm:px-10">
-          <p className="text-sm text-slate-300">{t.diveSafePage.furtherReadingNote}</p>
-          <Link
-            href="/terms-of-service"
-            className="mt-4 inline-flex items-center rounded-full bg-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
-          >
-            {t.diveSafePage.furtherReadingLink}
-          </Link>
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl px-6 py-16 text-center sm:px-12">
+          <p className="text-sm text-slate-300 max-w-2xl mx-auto">{t.diveSafePage.furtherReadingNote}</p>
+          <div className="mt-8">
+            <Link
+              href="/terms-of-service"
+              className="inline-flex items-center rounded-full bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+            >
+              {t.diveSafePage.furtherReadingLink}
+            </Link>
+          </div>
         </div>
       </section>
     </main>

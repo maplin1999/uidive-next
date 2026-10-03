@@ -9,9 +9,9 @@ import { useLocale } from "@/components/i18n/LocaleContext";
 // social links already present in about-us/page.tsx's organizationSchema
 // (kept here as plain links rather than duplicating structured data).
 //
-// Structure matches about-us/page.tsx -- a full-width gradient Hero, then
-// a two-card grid in the same icon-badge style as the About Us Mission
-// section, instead of one stacked card.
+// Structure matches about-us/page.tsx's own section rhythm: Hero, a banded
+// section with a centered intro + icon-badge card grid (Mission's shape),
+// and a closing muted-gradient CTA card cross-linking to the FAQ.
 export default function ContactUsPage() {
   const { t } = useLocale();
 
@@ -40,50 +40,76 @@ export default function ContactUsPage() {
       </section>
 
       {/* Ways to reach us */}
-      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-2">
-          <article className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30">
-              <Mail className="w-5 h-5 text-cyan-400" />
-            </div>
-            <h2 className="mt-6 text-xl font-bold text-white">{t.contactUsPage.emailHeading}</h2>
-            <p className="mt-3 leading-7 text-slate-400">{t.contactUsPage.emailBody}</p>
-            <a
-              href="mailto:support@uidive.com"
-              className="mt-4 inline-block text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              support@uidive.com
-            </a>
-          </article>
+      <section className="bg-slate-900/40 border-y border-slate-800">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">
+              {t.contactUsPage.contentEyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{t.contactUsPage.contentTitle}</h2>
+            <p className="mt-6 text-lg leading-8 text-slate-400">{t.contactUsPage.contentBody}</p>
+          </div>
 
-          <article className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-              <Instagram className="w-5 h-5 text-emerald-400" />
-            </div>
-            <h2 className="mt-6 text-xl font-bold text-white">{t.contactUsPage.socialHeading}</h2>
-            <p className="mt-3 leading-7 text-slate-400">{t.contactUsPage.socialBody}</p>
-            <div className="mt-4 flex items-center gap-4">
+          <div className="mt-16 grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+                <Mail className="w-5 h-5 text-cyan-400" />
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-white">{t.contactUsPage.emailHeading}</h3>
+              <p className="mt-3 leading-7 text-slate-400">{t.contactUsPage.emailBody}</p>
               <a
-                href="https://www.instagram.com/uidive"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition-colors"
+                href="mailto:support@uidive.com"
+                className="mt-4 inline-block text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
               >
-                <Instagram className="w-4 h-4" /> Instagram
+                support@uidive.com
               </a>
-              <a
-                href="https://www.facebook.com/uidive"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition-colors"
-              >
-                <Facebook className="w-4 h-4" /> Facebook
-              </a>
-            </div>
-          </article>
+            </article>
+
+            <article className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                <Instagram className="w-5 h-5 text-emerald-400" />
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-white">{t.contactUsPage.socialHeading}</h3>
+              <p className="mt-3 leading-7 text-slate-400">{t.contactUsPage.socialBody}</p>
+              <div className="mt-4 flex items-center gap-4">
+                <a
+                  href="https://www.instagram.com/uidive"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition-colors"
+                >
+                  <Instagram className="w-4 h-4" /> Instagram
+                </a>
+                <a
+                  href="https://www.facebook.com/uidive"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition-colors"
+                >
+                  <Facebook className="w-4 h-4" /> Facebook
+                </a>
+              </div>
+            </article>
+          </div>
+
+          <p className="mt-6 text-xs text-slate-500">{t.contactUsPage.responseTimeNote}</p>
         </div>
+      </section>
 
-        <p className="mt-6 text-xs text-slate-500">{t.contactUsPage.responseTimeNote}</p>
+      {/* CTA */}
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl px-6 py-16 text-center sm:px-12">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{t.contactUsPage.ctaTitle}</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-300">{t.contactUsPage.ctaBody}</p>
+          <div className="mt-8">
+            <Link
+              href="/faqs"
+              className="inline-flex items-center rounded-full bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+            >
+              {t.contactUsPage.ctaButton}
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );

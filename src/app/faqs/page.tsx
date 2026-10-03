@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, CreditCard, Award, Anchor } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
 import type { Dictionary } from "@/lib/i18n/translations/en";
 
@@ -11,11 +11,10 @@ import type { Dictionary } from "@/lib/i18n/translations/en";
 // logs, Corals, hosting) rather than generic boilerplate, so this stays
 // accurate as those features change rather than becoming stale copy.
 //
-// Structure matches about-us/page.tsx -- a full-width gradient Hero
-// (eyebrow/title/intro) followed by content sections, rather than the
-// compact back-link-and-card layout this page (and the other footer
-// pages) started with, so the whole footer section reads as one
-// consistent visual language.
+// Structure matches about-us/page.tsx's own section rhythm: Hero, a banded
+// section with a centered intro + icon-badge card grid (Mission's shape),
+// an unbanded section with a left-aligned intro + the actual content
+// (What We Do's shape), and a closing muted-gradient CTA card.
 type FaqKeyPair = { qKey: keyof Dictionary["faq"]; aKey: keyof Dictionary["faq"] };
 
 const FAQ_KEYS: FaqKeyPair[] = [
@@ -32,6 +31,12 @@ const FAQ_KEYS: FaqKeyPair[] = [
 export default function FaqPage() {
   const { t } = useLocale();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const topics = [
+    { icon: CreditCard, title: t.faq.topic1Title, body: t.faq.topic1Body },
+    { icon: Award, title: t.faq.topic2Title, body: t.faq.topic2Body },
+    { icon: Anchor, title: t.faq.topic3Title, body: t.faq.topic3Body },
+  ];
 
   return (
     <main className="bg-slate-950 text-white">
@@ -63,9 +68,44 @@ export default function FaqPage() {
         </div>
       </section>
 
-      {/* Questions */}
-      <section className="mx-auto max-w-3xl px-6 pb-20 lg:px-8">
-        <div className="rounded-3xl bg-slate-900 border border-slate-800 shadow-xl divide-y divide-slate-800 overflow-hidden">
+      {/* Topics */}
+      <section className="bg-slate-900/40 border-y border-slate-800">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">
+              {t.faq.contentEyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{t.faq.contentTitle}</h2>
+            <p className="mt-6 text-lg leading-8 text-slate-400">{t.faq.contentBody}</p>
+          </div>
+
+          <div className="mt-16 grid gap-6 md:grid-cols-3">
+            {topics.map((topic) => {
+              const Icon = topic.icon;
+              return (
+                <article key={topic.title} className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+                    <Icon className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <h3 className="mt-6 text-xl font-bold text-white">{topic.title}</h3>
+                  <p className="mt-3 leading-7 text-slate-400">{topic.body}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* All questions */}
+      <section className="mx-auto max-w-3xl px-6 py-20 lg:px-8">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">
+            {t.faq.allQuestionsEyebrow}
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{t.faq.allQuestionsTitle}</h2>
+        </div>
+
+        <div className="mt-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl divide-y divide-slate-800 overflow-hidden">
           {FAQ_KEYS.map((item, i) => {
             const open = openIndex === i;
             return (
@@ -89,6 +129,22 @@ export default function FaqPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl px-6 py-16 text-center sm:px-12">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{t.faq.ctaTitle}</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-300">{t.faq.ctaBody}</p>
+          <div className="mt-8">
+            <a
+              href="mailto:support@uidive.com"
+              className="inline-flex items-center rounded-full bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+            >
+              {t.faq.ctaButton}
+            </a>
+          </div>
         </div>
       </section>
     </main>
