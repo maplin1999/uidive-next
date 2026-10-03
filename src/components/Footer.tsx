@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Waves } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
@@ -21,9 +22,13 @@ export function Footer() {
           {/* BRAND */}
           <div className="col-span-2 sm:col-span-1 space-y-3">
             <Link href="/" className="flex items-center space-x-2.5 group w-fit">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors shrink-0">
-                <Waves className="w-4 h-4 text-cyan-400" />
-              </div>
+              <Image
+                            src="/assets/images/uidive-logo.svg"
+                            alt="UiDive"
+                            width={48}
+                            height={48}
+                            priority
+                          />
               <span className="font-black text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
                 UiDive
               </span>
