@@ -123,10 +123,21 @@ export default function HomePage() {
                 setDateLabel(label);
               }}
               onSearch={() => {
-                document.getElementById("trips-section")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
+                // Plain scrollIntoView({ block: "start" }) puts the
+                // section's top flush with the viewport's top -- but the
+                // sticky header (Header.tsx, ~68px tall) then sits on top
+                // of that and hides the "Find & Book Dive Trips" heading
+                // underneath it, so the page reads as having scrolled too
+                // far (the first thing actually visible is the filter
+                // buttons, below the hidden heading). Offset by the
+                // header's real rendered height instead of a hardcoded
+                // guess, plus a little breathing room, so the heading
+                // itself lands just below the header.
+                const section = document.getElementById("trips-section");
+                if (!section) return;
+                const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+                const top = section.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
+                window.scrollTo({ top, behavior: "smooth" });
               }}
             />
 
