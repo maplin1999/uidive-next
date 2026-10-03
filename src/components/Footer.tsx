@@ -83,8 +83,8 @@ export function Footer() {
           {/* COMPANY */}
           <FooterColumn title={t.footer.company}>
             <FooterLink href="/about-us">{t.footer.aboutUs}</FooterLink>
-            <FooterLink href="/faqs">{t.footer.faqs}</FooterLink>
             <FooterLink href="/contact-us">{t.footer.contactUs}</FooterLink>
+            <FooterLink href="/faqs">{t.footer.faqs}</FooterLink>
             <FooterLink href="/sitemaps">{t.footer.sitemaps}</FooterLink>
           </FooterColumn>
 
