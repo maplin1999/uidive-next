@@ -623,7 +623,8 @@ const en = {
     simplicityBody: "Finding a dive, meeting a buddy and planning an adventure should be simple.",
     ctaTitle: "Ready to find your next dive?",
     ctaBody: "Join a growing community of people who want to spend more time exploring beneath the surface.",
-    ctaButton: "Join DiveBuddy",
+    ctaButton: "Join UiDive",
+    ctaButtonExplore: "Explore Dives",
   },
   cookieConsentBanner: {
     body: "We use cookies to keep you signed in, remember your preferences, and understand how UiDive is used.",

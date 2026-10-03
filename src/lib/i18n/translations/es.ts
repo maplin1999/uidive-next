@@ -624,7 +624,8 @@ const es = {
     simplicityBody: "Encontrar una inmersión, conocer a un compañero y planear una aventura debería ser simple.",
     ctaTitle: "¿Listo para encontrar tu próxima inmersión?",
     ctaBody: "Únete a una comunidad creciente de personas que quieren pasar más tiempo explorando bajo la superficie.",
-    ctaButton: "Únete a DiveBuddy",
+    ctaButton: "Únete a UiDive",
+    ctaButtonExplore: "Explorar Inmersiones",
   },
   cookieConsentBanner: {
     body: "Usamos cookies para mantenerte conectado, recordar tus preferencias y entender cómo se usa UiDive.",

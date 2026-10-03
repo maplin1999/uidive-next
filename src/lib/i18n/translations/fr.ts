@@ -621,7 +621,8 @@ const fr = {
     simplicityBody: "Trouver une plongée, rencontrer un partenaire et planifier une aventure devrait être simple.",
     ctaTitle: "Prêt à trouver votre prochaine plongée ?",
     ctaBody: "Rejoignez une communauté grandissante de personnes qui veulent passer plus de temps à explorer sous la surface.",
-    ctaButton: "Rejoindre DiveBuddy",
+    ctaButton: "Rejoindre UiDive",
+    ctaButtonExplore: "Explorer les Plongées",
   },
   cookieConsentBanner: {
     body: "Nous utilisons des cookies pour vous maintenir connecté, mémoriser vos préférences et comprendre comment UiDive est utilisé.",
