@@ -26,6 +26,8 @@ import { HostApplicationForm } from "@/components/host/HostApplicationForm";
 import { TripFormModal } from "@/components/host/TripFormModal";
 import { TripRosterModal } from "@/components/host/TripRosterModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import { useCurrency } from "@/components/currency/CurrencyContext";
 
 // The Host Dashboard tab (#tab-host-dashboard in the old site). Four states,
 // same as renderHostStatusCard() drove there: no application yet, pending
@@ -33,6 +35,8 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 export default function HostDashboardPage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
+  const { t } = useLocale();
+  const { formatPrice } = useCurrency();
 
   const [hostStatus, setHostStatus] = useState<HostStatus | null | undefined>(undefined);
   const [statusError, setStatusError] = useState(false);
@@ -82,12 +86,12 @@ export default function HostDashboardPage() {
     setCancellingBusy(true);
     try {
       await cancelTrip(cancellingTrip.id);
-      showToast("Trip cancelled.");
+      showToast(t.hostDashboard.tripCancelledToast);
       setCancellingTrip(null);
       loadDashboard();
     } catch (err) {
       console.error("Could not cancel trip:", err);
-      showToast("Could not cancel this trip -- please try again.");
+      showToast(t.hostDashboard.couldNotCancelTrip);
     } finally {
       setCancellingBusy(false);
     }
@@ -108,15 +112,13 @@ export default function HostDashboardPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-4">
           <div className="text-3xl">⚓</div>
-          <h1 className="text-lg font-bold text-white">Sign in to access the Host Dashboard</h1>
-          <p className="text-xs text-slate-400">
-            Hosts manage their dive trips and bookings from here once signed in.
-          </p>
+          <h1 className="text-lg font-bold text-white">{t.hostDashboard.signInTitle}</h1>
+          <p className="text-xs text-slate-400">{t.hostDashboard.signInBody}</p>
           <button
             onClick={() => requireAuth()}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
           >
-            Sign In
+            {t.profile.signIn}
           </button>
         </div>
       </main>
@@ -126,9 +128,7 @@ export default function HostDashboardPage() {
   if (statusError) {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-12">
-        <p className="text-xs text-rose-400 text-center py-12">
-          Could not load your host status -- please refresh.
-        </p>
+        <p className="text-xs text-rose-400 text-center py-12">{t.hostDashboard.statusLoadError}</p>
       </main>
     );
   }
@@ -137,7 +137,7 @@ export default function HostDashboardPage() {
   if (hostStatus === undefined) {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-12">
-        <p className="text-xs text-slate-500 text-center py-12">Loading…</p>
+        <p className="text-xs text-slate-500 text-center py-12">{t.profile.loading}</p>
       </main>
     );
   }
@@ -148,15 +148,13 @@ export default function HostDashboardPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-4">
           <div className="text-3xl">🤿</div>
-          <h1 className="text-lg font-bold text-white">Become a UiDive Host</h1>
-          <p className="text-xs text-slate-400">
-            Run dive trips, manage bookings, and get discovered by divers near you.
-          </p>
+          <h1 className="text-lg font-bold text-white">{t.hostDashboard.becomeHostTitle}</h1>
+          <p className="text-xs text-slate-400">{t.hostDashboard.becomeHostBody}</p>
           <button
             onClick={() => setApplicationOpen(true)}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
           >
-            Apply to Become a Host
+            {t.hostDashboard.applyToBecomeHost}
           </button>
         </div>
         {applicationOpen && (
@@ -164,7 +162,7 @@ export default function HostDashboardPage() {
             onClose={() => setApplicationOpen(false)}
             onSubmitted={() => {
               setApplicationOpen(false);
-              showToast("Application submitted! We'll review it shortly.");
+              showToast(t.hostDashboard.applicationSubmittedToast);
               loadStatus();
             }}
           />
@@ -180,10 +178,9 @@ export default function HostDashboardPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-amber-500/30 text-center space-y-3">
           <div className="text-3xl">⏳</div>
-          <h1 className="text-lg font-bold text-white">Application Under Review</h1>
+          <h1 className="text-lg font-bold text-white">{t.hostDashboard.pendingTitle}</h1>
           <p className="text-xs text-slate-400">
-            Thanks for applying, {hostStatus.business_name}! Our team is reviewing your host
-            application. We&apos;ll let you know as soon as it&apos;s approved.
+            {t.hostDashboard.pendingBodyPrefix} {hostStatus.business_name}{t.hostDashboard.pendingBodySuffix}
           </p>
         </div>
       </main>
@@ -196,15 +193,13 @@ export default function HostDashboardPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-rose-500/30 text-center space-y-3">
           <div className="text-3xl">✕</div>
-          <h1 className="text-lg font-bold text-white">Application Not Approved</h1>
+          <h1 className="text-lg font-bold text-white">{t.hostDashboard.rejectedTitle}</h1>
           {hostStatus.rejection_reason && (
             <p className="text-xs text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-xl p-3">
               {hostStatus.rejection_reason}
             </p>
           )}
-          <p className="text-xs text-slate-400">
-            You can reach out to support if you think this was a mistake.
-          </p>
+          <p className="text-xs text-slate-400">{t.hostDashboard.rejectedBody}</p>
         </div>
       </main>
     );
@@ -216,10 +211,8 @@ export default function HostDashboardPage() {
       <main className="min-h-screen bg-slate-950 px-4 py-12">
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-slate-900 border border-rose-500/30 text-center space-y-3">
           <div className="text-3xl">🚫</div>
-          <h1 className="text-lg font-bold text-white">Host Account Suspended</h1>
-          <p className="text-xs text-slate-400">
-            Contact support if you believe this is a mistake.
-          </p>
+          <h1 className="text-lg font-bold text-white">{t.hostDashboard.suspendedTitle}</h1>
+          <p className="text-xs text-slate-400">{t.hostDashboard.suspendedBody}</p>
         </div>
       </main>
     );
@@ -243,9 +236,9 @@ export default function HostDashboardPage() {
         <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="text-center sm:text-left">
             <h1 className="text-2xl font-black text-white flex items-center gap-2 justify-center sm:justify-start">
-              <Anchor className="w-6 h-6 text-cyan-400" /> Host Dashboard
+              <Anchor className="w-6 h-6 text-cyan-400" /> {t.hostDashboard.title}
             </h1>
-            <p className="text-xs text-slate-400 mt-1">Create and manage your own dive trips</p>
+            <p className="text-xs text-slate-400 mt-1">{t.hostDashboard.subtitle}</p>
           </div>
           <button
             onClick={() => {
@@ -254,38 +247,36 @@ export default function HostDashboardPage() {
             }}
             className="shrink-0 flex items-center gap-2 text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-4 py-2.5 rounded-xl transition-colors"
           >
-            <Plus className="w-4 h-4" /> Create Trip
+            <Plus className="w-4 h-4" /> {t.hostDashboard.createTrip}
           </button>
         </div>
 
         {/* ANALYTICS GRID */}
         {dashStatus === "loading" && (
-          <p className="text-xs text-slate-500 text-center py-6">Loading…</p>
+          <p className="text-xs text-slate-500 text-center py-6">{t.profile.loading}</p>
         )}
         {dashStatus === "error" && (
-          <p className="text-xs text-rose-400 text-center py-6">
-            Could not load your dashboard -- please refresh.
-          </p>
+          <p className="text-xs text-rose-400 text-center py-6">{t.hostDashboard.dashboardLoadError}</p>
         )}
         {dashStatus === "ready" && (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-              <Stat icon={<Anchor className="w-4 h-4" />} label="Active Trips" value={activeTrips.length} />
+              <Stat icon={<Anchor className="w-4 h-4" />} label={t.hostDashboard.statActiveTrips} value={activeTrips.length} />
               <Stat
                 icon={<CalendarDays className="w-4 h-4" />}
-                label="Upcoming"
+                label={t.hostDashboard.statUpcoming}
                 value={upcomingTrips.length}
               />
-              <Stat icon={<Users className="w-4 h-4" />} label="Total Bookings" value={confirmedBookings.length} />
+              <Stat icon={<Users className="w-4 h-4" />} label={t.hostDashboard.statTotalBookings} value={confirmedBookings.length} />
               <Stat
                 icon={<DollarSign className="w-4 h-4" />}
-                label="Revenue"
-                value={`£${totalRevenue.toFixed(2)}`}
+                label={t.hostDashboard.statRevenue}
+                value={formatPrice(totalRevenue)}
               />
-              <Stat icon={<Gauge className="w-4 h-4" />} label="Fill Rate" value={`${fillRate}%`} />
+              <Stat icon={<Gauge className="w-4 h-4" />} label={t.hostDashboard.statFillRate} value={`${fillRate}%`} />
               <Stat
                 icon={<Star className="w-4 h-4" />}
-                label={reviewStats && reviewStats.review_count > 0 ? `Avg Rating (${reviewStats.review_count})` : "Avg Rating"}
+                label={reviewStats && reviewStats.review_count > 0 ? `${t.hostDashboard.statAvgRating} (${reviewStats.review_count})` : t.hostDashboard.statAvgRating}
                 value={reviewStats && reviewStats.review_count > 0 ? `★ ${reviewStats.avg_rating.toFixed(1)}` : "—"}
               />
             </div>
@@ -293,14 +284,14 @@ export default function HostDashboardPage() {
             {/* TRIPS LIST */}
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <List className="w-5 h-5 text-emerald-400" /> My Trips
+                <List className="w-5 h-5 text-emerald-400" /> {t.hostDashboard.myTrips}
               </h2>
 
               {trips.length === 0 && (
                 <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
                   <div className="text-3xl">🗓️</div>
-                  <p className="text-sm font-bold text-slate-300">No trips yet</p>
-                  <p className="text-xs text-slate-500">Create your first trip and it&apos;ll show up here.</p>
+                  <p className="text-sm font-bold text-slate-300">{t.hostDashboard.noTripsTitle}</p>
+                  <p className="text-xs text-slate-500">{t.hostDashboard.noTripsBody}</p>
                 </div>
               )}
 
@@ -332,12 +323,12 @@ export default function HostDashboardPage() {
                             <p className="text-sm font-bold text-white truncate">{trip.title}</p>
                             {isCancelled && (
                               <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full">
-                                Cancelled
+                                {t.hostDashboard.cancelled}
                               </span>
                             )}
                             {!isCancelled && spotsLeft <= 0 && (
                               <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                                Full
+                                {t.hostDashboard.full}
                               </span>
                             )}
                           </div>
@@ -345,8 +336,8 @@ export default function HostDashboardPage() {
                             {trip.location} • {dateStr}
                           </p>
                           <p className="text-[10px] text-slate-500">
-                            {trip.spots_booked || 0}/{trip.capacity || 0} booked • £
-                            {Number(trip.price || 0).toFixed(2)}/diver
+                            {trip.spots_booked || 0}/{trip.capacity || 0} {t.hostDashboard.bookedSuffix} •{" "}
+                            {formatPrice(trip.price || 0)}/{t.hostDashboard.perDiverSuffix}
                           </p>
                         </div>
 
@@ -355,7 +346,7 @@ export default function HostDashboardPage() {
                             onClick={() => setRosterTrip(trip)}
                             className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20 px-3 py-2 rounded-xl transition-colors"
                           >
-                            Divers
+                            {t.hostDashboard.diversButton}
                           </button>
                           {!isCancelled && (
                             <button
@@ -365,7 +356,7 @@ export default function HostDashboardPage() {
                               }}
                               className="text-[10px] font-bold text-slate-300 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors"
                             >
-                              Edit
+                              {t.hostDashboard.edit}
                             </button>
                           )}
                           {!isCancelled && (
@@ -373,7 +364,7 @@ export default function HostDashboardPage() {
                               onClick={() => setCancellingTrip(trip)}
                               className="text-[10px] font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 px-3 py-2 rounded-xl transition-colors"
                             >
-                              Cancel
+                              {t.hostDashboard.cancel}
                             </button>
                           )}
                         </div>
@@ -393,7 +384,7 @@ export default function HostDashboardPage() {
           onClose={() => setTripFormOpen(false)}
           onSaved={() => {
             setTripFormOpen(false);
-            showToast(editingTrip ? "Trip updated." : "Trip created.");
+            showToast(editingTrip ? t.hostDashboard.tripUpdatedToast : t.hostDashboard.tripCreatedToast);
             loadDashboard();
           }}
         />
@@ -401,10 +392,10 @@ export default function HostDashboardPage() {
       {rosterTrip && <TripRosterModal trip={rosterTrip} onClose={() => setRosterTrip(null)} />}
       {cancellingTrip && (
         <ConfirmModal
-          title={`Cancel "${cancellingTrip.title}"?`}
-          message="This can't be undone."
-          confirmLabel="Cancel Trip"
-          cancelLabel="Keep Trip"
+          title={`${t.hostDashboard.cancelTripPrefix} "${cancellingTrip.title}"?`}
+          message={t.profile.cannotBeUndone}
+          confirmLabel={t.hostDashboard.cancelTripConfirm}
+          cancelLabel={t.hostDashboard.keepTrip}
           confirming={cancellingBusy}
           onConfirm={handleConfirmCancelTrip}
           onCancel={() => setCancellingTrip(null)}

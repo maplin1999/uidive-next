@@ -8,19 +8,24 @@ import { useClickOutside } from "@/lib/useClickOutside";
 import { ThemedSelect } from "@/components/ui/ThemedSelect";
 import { ThemedTimeSelect } from "@/components/ui/ThemedTimeSelect";
 import { DatePickerCalendar } from "@/components/home/DatePickerCalendar";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import type { Dictionary } from "@/lib/i18n/translations/en";
 
-const TRIP_TYPE_OPTIONS = [
-  { value: "boat", label: "Boat" },
-  { value: "shore", label: "Shore" },
+// Values (not just labels) are real stored enums/strings in dive_trips, so
+// only the label side is looked up from the dictionary at render time --
+// these arrays stay module-level and can't call useLocale() themselves.
+const TRIP_TYPE_OPTIONS: { value: string; labelKey: keyof Dictionary["tripFormModal"] }[] = [
+  { value: "boat", labelKey: "tripTypeBoat" },
+  { value: "shore", labelKey: "tripTypeShore" },
 ];
-const ACTIVITY_TYPE_OPTIONS = [
-  { value: "scuba", label: "Scuba" },
-  { value: "freediving", label: "Free Diving" },
+const ACTIVITY_TYPE_OPTIONS: { value: string; labelKey: keyof Dictionary["tripCard"] }[] = [
+  { value: "scuba", labelKey: "scuba" },
+  { value: "freediving", labelKey: "freeDiving" },
 ];
-const DIFFICULTY_OPTIONS = [
-  { value: "Easy", label: "Easy" },
-  { value: "Moderate", label: "Moderate" },
-  { value: "Advanced", label: "Advanced" },
+const DIFFICULTY_OPTIONS: { value: string; labelKey: keyof Dictionary["tripFormModal"] }[] = [
+  { value: "Easy", labelKey: "difficultyEasy" },
+  { value: "Moderate", labelKey: "difficultyModerate" },
+  { value: "Advanced", labelKey: "difficultyAdvanced" },
 ];
 
 function tripToFields(trip?: HostTrip | null): TripFormFields {
@@ -92,6 +97,10 @@ export function TripFormModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useLocale();
+  const tripTypeOptions = TRIP_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t.tripFormModal[o.labelKey] }));
+  const activityTypeOptions = ACTIVITY_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t.tripCard[o.labelKey] }));
+  const difficultyOptions = DIFFICULTY_OPTIONS.map((o) => ({ value: o.value, label: t.tripFormModal[o.labelKey] }));
   const [fields, setFields] = useState<TripFormFields>(tripToFields(trip));
   const [error, setError] = useState("");
   // Ported from the old site's field-invalid class / validateRequiredFields():
@@ -122,7 +131,7 @@ export function TripFormModal({
       if (!fields.title.trim()) bad.add("title");
       if (!fields.location.trim()) bad.add("location");
       setInvalidFields(bad);
-      setError("Title and location are required.");
+      setError(t.tripFormModal.titleLocationRequired);
       return;
     }
     setError("");
@@ -136,7 +145,7 @@ export function TripFormModal({
       onSaved();
     } catch (err) {
       console.error("Could not save trip:", err);
-      setError("Could not save this trip -- please try again.");
+      setError(t.tripFormModal.saveError);
     } finally {
       setSaving(false);
     }
@@ -153,15 +162,13 @@ export function TripFormModal({
         <div className="flex justify-between items-center border-b border-slate-800 pb-3.5">
           <div>
             <h3 className="font-bold text-white text-base flex items-center gap-2">
-              <Anchor className="w-4 h-4 text-cyan-400" /> {isEdit ? "Edit Trip" : "Create Trip"}
+              <Anchor className="w-4 h-4 text-cyan-400" /> {isEdit ? t.tripFormModal.editTrip : t.tripFormModal.createTrip}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Divers will see this on the Explore page once saved
-            </p>
+            <p className="text-xs text-slate-400 mt-0.5">{t.tripFormModal.subtitle}</p>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.tripFormModal.close}
             className="p-2.5 rounded-full bg-slate-800 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
@@ -174,80 +181,80 @@ export function TripFormModal({
           </p>
         )}
 
-        <Field label="Trip Title">
+        <Field label={t.tripFormModal.tripTitleLabel}>
           <input
             type="text"
             autoComplete="off"
             value={fields.title}
             onChange={(e) => update("title", e.target.value)}
             maxLength={80}
-            placeholder="e.g. Sunrise Reef Charter"
+            placeholder={t.tripFormModal.tripTitlePlaceholder}
             className={fieldCls(invalidFields.has("title"))}
           />
         </Field>
 
-        <Field label="Description">
+        <Field label={t.tripFormModal.descriptionLabel}>
           <textarea
             value={fields.description}
             onChange={(e) => update("description", e.target.value)}
             rows={3}
             maxLength={600}
-            placeholder="What divers can expect on this trip -- marine life, route, what's included..."
+            placeholder={t.tripFormModal.descriptionPlaceholder}
             className={`${inputCls} resize-none`}
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Location">
+          <Field label={t.tripFormModal.locationLabel}>
             <input
               type="text"
               autoComplete="off"
               value={fields.location}
               onChange={(e) => update("location", e.target.value)}
               maxLength={80}
-              placeholder="Cebu, PH"
+              placeholder={t.tripFormModal.locationPlaceholder}
               className={fieldCls(invalidFields.has("location"))}
             />
           </Field>
-          <Field label="Trip Type">
+          <Field label={t.tripFormModal.tripTypeLabel}>
             <ThemedSelect
               value={fields.tripType}
-              options={TRIP_TYPE_OPTIONS}
+              options={tripTypeOptions}
               onChange={(v) => update("tripType", v)}
             />
           </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Activity">
+          <Field label={t.tripFormModal.activityLabel}>
             <ThemedSelect
               value={fields.activityType}
-              options={ACTIVITY_TYPE_OPTIONS}
+              options={activityTypeOptions}
               onChange={(v) => update("activityType", v)}
             />
           </Field>
-          <Field label="Difficulty">
+          <Field label={t.tripFormModal.difficultyLabel}>
             <ThemedSelect
               value={fields.difficulty}
-              options={DIFFICULTY_OPTIONS}
+              options={difficultyOptions}
               onChange={(v) => update("difficulty", v)}
             />
           </Field>
         </div>
 
-        <Field label="Max Depth">
+        <Field label={t.tripFormModal.maxDepthLabel}>
           <input
             type="text"
             autoComplete="off"
             value={fields.maxDepth}
             onChange={(e) => update("maxDepth", e.target.value)}
-            placeholder="18m"
+            placeholder={t.tripFormModal.maxDepthPlaceholder}
             className={inputCls}
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Date">
+          <Field label={t.tripFormModal.dateLabel}>
             <div className="relative" ref={dateRef}>
               <button
                 type="button"
@@ -261,7 +268,7 @@ export function TripFormModal({
                         day: "numeric",
                         year: "numeric",
                       })
-                    : "Select date"}
+                    : t.tripFormModal.selectDate}
                 </span>
                 <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
               </button>
@@ -278,13 +285,13 @@ export function TripFormModal({
               )}
             </div>
           </Field>
-          <Field label="Time">
+          <Field label={t.tripFormModal.timeLabel}>
             <ThemedTimeSelect value={fields.scheduledTime} onChange={(v) => update("scheduledTime", v)} />
           </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Price (per diver)">
+          <Field label={t.tripFormModal.priceLabel}>
             <input
               type="number"
               min={0}
@@ -294,7 +301,7 @@ export function TripFormModal({
               className={`${inputCls} no-spinner`}
             />
           </Field>
-          <Field label="Capacity">
+          <Field label={t.tripFormModal.capacityLabel}>
             <input
               type="number"
               min={1}
@@ -308,7 +315,7 @@ export function TripFormModal({
 
         <details className="text-xs">
           <summary className="cursor-pointer text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-            Dive Conditions (optional)
+            {t.tripFormModal.diveConditionsSummary}
           </summary>
           <div className="grid grid-cols-2 gap-3 mt-3">
             <input
@@ -317,8 +324,8 @@ export function TripFormModal({
               value={fields.visibility}
               onChange={(e) => update("visibility", e.target.value)}
               maxLength={20}
-              placeholder="Visibility (e.g. 15m)"
-              aria-label="Visibility"
+              placeholder={t.tripFormModal.visibilityPlaceholder}
+              aria-label={t.tripCard.visibility}
               className={inputCls}
             />
             <input
@@ -327,8 +334,8 @@ export function TripFormModal({
               value={fields.waterTemp}
               onChange={(e) => update("waterTemp", e.target.value)}
               maxLength={20}
-              placeholder="Water Temp (e.g. 27°C)"
-              aria-label="Water Temp"
+              placeholder={t.tripFormModal.waterTempPlaceholder}
+              aria-label={t.diveDetail.waterTemp}
               className={inputCls}
             />
             <input
@@ -337,8 +344,8 @@ export function TripFormModal({
               value={fields.swell}
               onChange={(e) => update("swell", e.target.value)}
               maxLength={20}
-              placeholder="Swell (e.g. 0.5m)"
-              aria-label="Swell"
+              placeholder={t.tripFormModal.swellPlaceholder}
+              aria-label={t.diveDetail.swell}
               className={inputCls}
             />
             <input
@@ -347,8 +354,8 @@ export function TripFormModal({
               value={fields.wind}
               onChange={(e) => update("wind", e.target.value)}
               maxLength={20}
-              placeholder="Wind (e.g. 10kt SE)"
-              aria-label="Wind"
+              placeholder={t.tripFormModal.windPlaceholder}
+              aria-label={t.diveDetail.wind}
               className={inputCls}
             />
             <input
@@ -357,8 +364,8 @@ export function TripFormModal({
               value={fields.tide}
               onChange={(e) => update("tide", e.target.value)}
               maxLength={20}
-              placeholder="Tide (e.g. Low, 8:45am)"
-              aria-label="Tide"
+              placeholder={t.tripFormModal.tidePlaceholder}
+              aria-label={t.diveDetail.tide}
               className={inputCls}
             />
             <input
@@ -367,8 +374,8 @@ export function TripFormModal({
               value={fields.current}
               onChange={(e) => update("current", e.target.value)}
               maxLength={20}
-              placeholder="Current (e.g. Mild)"
-              aria-label="Current"
+              placeholder={t.tripFormModal.currentPlaceholder}
+              aria-label={t.diveDetail.current}
               className={inputCls}
             />
             <input
@@ -377,8 +384,8 @@ export function TripFormModal({
               value={fields.conditionsLabel}
               onChange={(e) => update("conditionsLabel", e.target.value)}
               maxLength={60}
-              placeholder="Conditions summary (e.g. Good Conditions)"
-              aria-label="Conditions summary"
+              placeholder={t.tripFormModal.conditionsSummaryPlaceholder}
+              aria-label={t.tripFormModal.conditionsSummaryAria}
               className={`${inputCls} col-span-2`}
             />
           </div>
@@ -386,7 +393,7 @@ export function TripFormModal({
 
         <details className="text-xs">
           <summary className="cursor-pointer text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-            Media &amp; Highlight (optional)
+            {t.tripFormModal.mediaHighlightSummary}
           </summary>
           <div className="space-y-2 mt-3">
             <input
@@ -394,8 +401,8 @@ export function TripFormModal({
               autoComplete="off"
               value={fields.imageUrl}
               onChange={(e) => update("imageUrl", e.target.value)}
-              placeholder="Image URL"
-              aria-label="Image URL"
+              placeholder={t.tripFormModal.imageUrlPlaceholder}
+              aria-label={t.tripFormModal.imageUrlPlaceholder}
               className={inputCls}
             />
             <input
@@ -403,8 +410,8 @@ export function TripFormModal({
               autoComplete="off"
               value={fields.highlight}
               onChange={(e) => update("highlight", e.target.value)}
-              placeholder="Highlight tag (e.g. Giant Cuttlefish)"
-              aria-label="Highlight tag"
+              placeholder={t.tripFormModal.highlightPlaceholder}
+              aria-label={t.tripFormModal.highlightAria}
               className={inputCls}
             />
           </div>
@@ -415,7 +422,7 @@ export function TripFormModal({
           disabled={saving}
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all"
         >
-          {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Trip"}
+          {saving ? t.tripFormModal.saving : isEdit ? t.postForm.saveChanges : t.tripFormModal.createTrip}
         </button>
       </div>
     </div>
