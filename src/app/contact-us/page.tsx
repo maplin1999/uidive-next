@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Mail, Instagram, Facebook } from "lucide-react";
+import { Mail, Instagram } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
 
 // New page -- the footer's "Contact Us" link had nowhere to go before this.
