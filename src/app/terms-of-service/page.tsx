@@ -39,7 +39,7 @@ export default function TermsOfServicePage() {
               <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
                 {t.legal.termsTitle}
               </h1>
-              <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
+              <p className="mt-4 text-xs text-slate-500">
                {t.legal.effectiveDate}
               </p>
             </div>
