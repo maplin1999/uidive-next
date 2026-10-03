@@ -21,6 +21,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { DiveLog, fetchDiveLogByBooking } from "@/lib/dive-log";
 import { DiveLogFormModal } from "@/components/profile/DiveLogFormModal";
 import { DiveLogDetailModal } from "@/components/profile/DiveLogDetailModal";
+import { useCurrency } from "@/components/currency/CurrencyContext";
 
 // Migrated from the old site's #booking-detail-modal: full trip conditions,
 // equipment noted at booking time, fellow-diver roster, the trip's group
@@ -36,6 +37,7 @@ export function BookingDetailModal({
   onChanged: () => void;
 }) {
   const { user, requireAuth } = useAuth();
+  const { formatPrice } = useCurrency();
   const { openProfile } = useSocial();
   const trip = booking.dive_trips;
   const isConfirmed = booking.status === "confirmed";
@@ -239,7 +241,7 @@ export function BookingDetailModal({
 
         <div className="flex items-center justify-between bg-slate-950 p-4 rounded-2xl border border-slate-800">
           <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amount Paid</p>
-          <span className="text-lg font-black text-white">£{Number(booking.price_paid)}</span>
+          <span className="text-lg font-black text-white">{formatPrice(booking.price_paid)}</span>
         </div>
 
         <div>

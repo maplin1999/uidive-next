@@ -14,6 +14,8 @@ import {
 import { startCheckout } from "@/lib/checkout";
 import { EquipmentChecklistModal } from "@/components/home/EquipmentChecklistModal";
 import { useEscapeClose } from "@/lib/useEscapeClose";
+import { useCurrency } from "@/components/currency/CurrencyContext";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
@@ -37,6 +39,8 @@ export function DiveDetailModal({
   onClose: () => void;
 }) {
   const { user, requireAuth } = useAuth();
+  const { currency, formatPrice } = useCurrency();
+  const { t } = useLocale();
   const { openProfile } = useSocial();
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [booking, setBooking] = useState(false);
@@ -68,7 +72,7 @@ export function DiveDetailModal({
       window.location.href = checkoutUrl;
     } catch (err) {
       console.error("Could not start checkout:", err);
-      setError(err instanceof Error ? err.message : "Could not start checkout -- please try again.");
+      setError(err instanceof Error ? err.message : t.diveDetail.checkoutError);
       setBooking(false);
     }
   }
@@ -112,7 +116,7 @@ export function DiveDetailModal({
                   className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
                 >
                   <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
-                  Hosted by <span className="font-bold text-slate-200">{trip.profiles.name}</span>
+                  {t.diveDetail.hostedBy} <span className="font-bold text-slate-200">{trip.profiles.name}</span>
                   {hostStats && hostStats.review_count > 0 && (
                     <>
                       <span className="text-amber-400">★ {Number(hostStats.avg_rating).toFixed(1)}</span>
@@ -124,7 +128,7 @@ export function DiveDetailModal({
             </div>
             <button
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t.diveDetail.close}
               className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white shrink-0"
             >
               <X className="w-5 h-5" />
@@ -137,29 +141,29 @@ export function DiveDetailModal({
 
           <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Visibility</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.tripCard.visibility}</p>
               <p className="text-base font-extrabold text-cyan-400 mt-0.5">{trip.visibility}</p>
             </div>
             <div className="border-x border-slate-800">
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Water Temp</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.waterTemp}</p>
               <p className="text-base font-extrabold text-emerald-400 mt-0.5">{trip.water_temp}</p>
             </div>
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Swell</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.swell}</p>
               <p className="text-base font-extrabold truncate text-indigo-400 mt-0.5">{trip.swell}</p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Wind</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.wind}</p>
               <p className="text-base font-extrabold truncate text-sky-400 mt-0.5">{trip.wind || "—"}</p>
             </div>
             <div className="border-x border-slate-800">
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Tide</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.tide}</p>
               <p className="text-base font-extrabold truncate text-teal-400 mt-0.5">{trip.tide || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-bold">Current</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">{t.diveDetail.current}</p>
               <p className="text-base font-extrabold truncate text-orange-400 mt-0.5">
                 {trip.current || "—"}
               </p>
@@ -168,15 +172,15 @@ export function DiveDetailModal({
 
           {trip.conditions_updated_at && (
             <p className="text-[9px] text-slate-500 -mt-2 flex items-center gap-1">
-              <Radio className="w-2.5 h-2.5 text-emerald-400" /> Wind, Swell &amp; Current update live ·
-              updated {formatRelativeTime(trip.conditions_updated_at)}
+              <Radio className="w-2.5 h-2.5 text-emerald-400" /> {t.diveDetail.conditionsLive} ·{" "}
+              {t.diveDetail.updated} {formatRelativeTime(trip.conditions_updated_at)}
             </p>
           )}
 
           {rating.count > 0 && (
             <p className="text-xs text-amber-400 font-bold">
               ★ {rating.avg.toFixed(1)}{" "}
-              <span className="text-slate-500 font-semibold">({rating.count} reviews)</span>
+              <span className="text-slate-500 font-semibold">({rating.count} {t.diveDetail.reviews})</span>
             </p>
           )}
 
@@ -195,16 +199,19 @@ export function DiveDetailModal({
               <span className="text-2xl">🪸</span>
               <div>
                 <p className="text-sm font-bold text-amber-400">
-                  {isFull ? "Trip full -- no rewards available" : "Earn +50 Corals"}
+                  {isFull ? t.diveDetail.tripFullNoRewards : t.diveDetail.earnCorals}
                 </p>
                 <p className="text-xs text-slate-400">
-                  {isFull ? "Fully booked -- no spots left on this trip." : "Added automatically upon dive log completion"}
+                  {isFull ? t.diveDetail.fullyBookedNoSpots : t.diveDetail.addedAutomatically}
                 </p>
               </div>
             </div>
-            <span className="text-lg font-black text-white shrink-0">
-              £{Number(trip.price).toLocaleString()} GBP
-            </span>
+            <div className="text-right shrink-0">
+              <span className="text-lg font-black text-white block">{formatPrice(trip.price)}</span>
+              {currency !== "GBP" && (
+                <span className="text-[9px] text-slate-500">{t.diveDetail.chargedInGbp}</span>
+              )}
+            </div>
           </div>
 
           <button
@@ -212,12 +219,12 @@ export function DiveDetailModal({
             disabled={isFull || booking}
             className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center space-x-2"
           >
-            <span>{isFull ? "Fully Booked" : booking ? "Taking you to checkout…" : "Confirm & Pay"}</span>
+            <span>{isFull ? t.tripCard.fullyBooked : booking ? t.diveDetail.takingToCheckout : t.diveDetail.confirmAndPay}</span>
             {!isFull && <CheckCircle className="w-4 h-4" />}
           </button>
           <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3 h-3 shrink-0" />
-            Secure payment via Revolut -- your spot is held while you pay.
+            {t.diveDetail.securePayment}
           </p>
         </div>
       </div>

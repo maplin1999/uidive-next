@@ -29,6 +29,8 @@ import { CosmeticsLockerModal } from "@/components/shop/CosmeticsLockerModal";
 import { BagIcon } from "@/components/icons/BagIcon";
 import { Theme, applyTheme, readCurrentTheme, storeTheme } from "@/lib/theme";
 import { DiverAvatar } from "@/components/DiverAvatar";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import { LocalePrefsMenu } from "@/components/i18n/LocalePrefsMenu";
 
 // The site-wide header (migrated from index.html's <header>), now shared
 // across every page via layout.tsx instead of being one more tab-switched
@@ -43,6 +45,7 @@ import { DiverAvatar } from "@/components/DiverAvatar";
 // it, matching the old site's own index.html default.
 export function Header() {
   const { user, loading, openAuthModal, signOut } = useAuth();
+  const { t } = useLocale();
   const { message, showToast } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -94,24 +97,24 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            <NavLink href="/" icon={<Compass className="w-4 h-4" />} label="Explore" active={pathname === "/"} />
+            <NavLink href="/" icon={<Compass className="w-4 h-4" />} label={t.nav.explore} active={pathname === "/"} />
             <NavLink
               href="/community"
               icon={<Camera className="w-4 h-4" />}
-              label="Community"
+              label={t.nav.community}
               active={pathname?.startsWith("/community")}
             />
             <NavLink
               href="/diveshop"
               icon={<ShoppingBag className="w-4 h-4" />}
-              label="Dive Shop"
+              label={t.nav.diveShop}
               active={pathname?.startsWith("/diveshop")}
             />
             {user && (
               <NavLink
                 href="/inbox"
                 icon={<InboxIcon className="w-4 h-4" />}
-                label="Inbox"
+                label={t.nav.inbox}
                 badge={inboxBadge}
                 active={pathname?.startsWith("/inbox")}
               />
@@ -120,17 +123,18 @@ export function Header() {
               <NavLink
                 href="/host-dashboard"
                 icon={<Anchor className="w-4 h-4" />}
-                label="Host Dashboard"
+                label={t.nav.hostDashboard}
                 active={pathname?.startsWith("/host-dashboard")}
               />
             )}
           </nav>
 
           <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+            <LocalePrefsMenu />
             <button
               onClick={handleToggleTheme}
-              title="Switch theme"
-              aria-label="Switch theme"
+              title={t.header.switchTheme}
+              aria-label={t.header.switchTheme}
               className="theme-toggle-btn shrink-0 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors"
             >
               {theme === "dark" ? (
@@ -147,7 +151,7 @@ export function Header() {
               >
                 <span className="text-base">🪸</span>
                 <span className="text-sm font-bold text-amber-400">{Number(user.corals).toLocaleString()}</span>
-                <span className="hidden sm:inline text-xs font-bold text-amber-400">Corals</span>
+                <span className="hidden sm:inline text-xs font-bold text-amber-400">{t.header.corals}</span>
               </Link>
             )}
 
@@ -164,7 +168,7 @@ export function Header() {
                 className="shrink-0 whitespace-nowrap flex items-center space-x-1.5 sm:space-x-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 sm:px-4 py-2.5 rounded-xl text-xs transition-colors shadow-md shadow-cyan-500/20 min-h-[44px]"
               >
                 <LogIn className="w-3.5 h-3.5 shrink-0" />
-                <span>Log in</span>
+                <span>{t.header.logIn}</span>
               </button>
             )}
 
@@ -195,12 +199,12 @@ export function Header() {
                   <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50">
                     <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-800">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        Account
+                        {t.header.account}
                       </span>
                       <Link
                         href="/profile"
                         onClick={() => setDropdownOpen(false)}
-                        aria-label="Edit profile"
+                        aria-label={t.header.editProfile}
                         className="p-1.5 -mr-1.5 rounded-full text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -211,14 +215,14 @@ export function Header() {
                       onClick={() => setDropdownOpen(false)}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
-                      <User className="w-3.5 h-3.5" /> Profile
+                      <User className="w-3.5 h-3.5" /> {t.nav.profile}
                     </Link>
                     <Link
                       href="/profile"
                       onClick={() => setDropdownOpen(false)}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
-                      <CalendarCheck className="w-3.5 h-3.5" /> My Bookings
+                      <CalendarCheck className="w-3.5 h-3.5" /> {t.header.myBookings}
                     </Link>
                     {/* Treasure Chest cosmetics locker -- moved here from the
                         profile header's own "Locker" button so it's reachable
@@ -231,7 +235,7 @@ export function Header() {
                       }}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                     >
-                      <BagIcon className="w-3.5 h-3.5" /> My Dive Bag
+                      <BagIcon className="w-3.5 h-3.5" /> {t.header.myDiveBag}
                     </button>
                     {!isVerifiedHost && (
                       <Link
@@ -239,7 +243,7 @@ export function Header() {
                         onClick={() => setDropdownOpen(false)}
                         className="w-full text-left px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                       >
-                        <Anchor className="w-3.5 h-3.5" /> Become a Host
+                        <Anchor className="w-3.5 h-3.5" /> {t.header.becomeHost}
                       </Link>
                     )}
                     {user.is_admin && (
@@ -250,7 +254,7 @@ export function Header() {
                         }}
                         className="w-full text-left px-4 py-3 text-xs font-bold text-violet-300 hover:bg-slate-800 transition-colors flex items-center gap-2"
                       >
-                        <ShieldCheck className="w-3.5 h-3.5" /> Admin Panel
+                        <ShieldCheck className="w-3.5 h-3.5" /> {t.header.adminPanel}
                       </button>
                     )}
                     <div className="border-t border-slate-800" />
@@ -261,7 +265,7 @@ export function Header() {
                       }}
                       className="w-full text-left px-4 py-3 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                     >
-                      <LogOut className="w-3.5 h-3.5" /> Log Out
+                      <LogOut className="w-3.5 h-3.5" /> {t.header.logOut}
                     </button>
                   </div>
                 )}

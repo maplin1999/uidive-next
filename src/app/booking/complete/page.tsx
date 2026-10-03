@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle, XCircle, Loader2, Clock } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { fetchLatestPaymentHold, PaymentHold } from "@/lib/checkout";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLLS = 10; // ~20s -- Revolut's webhook almost always lands well under this
@@ -20,6 +21,7 @@ const MAX_POLLS = 10; // ~20s -- Revolut's webhook almost always lands well unde
 // back -- it never flips a booking to confirmed itself.
 export default function BookingCompletePage() {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [hold, setHold] = useState<PaymentHold | null>(null);
   const [pollCount, setPollCount] = useState(0);
   const [error, setError] = useState(false);
@@ -55,7 +57,7 @@ export default function BookingCompletePage() {
   if (!user) {
     return (
       <Centered>
-        <p className="text-sm text-slate-400">Sign in to see your booking status.</p>
+        <p className="text-sm text-slate-400">{t.bookingComplete.signInToSee}</p>
       </Centered>
     );
   }
@@ -64,13 +66,13 @@ export default function BookingCompletePage() {
     return (
       <Centered>
         <XCircle className="w-10 h-10 text-rose-400" />
-        <p className="text-base font-bold text-white mt-3">Could not check your payment status</p>
+        <p className="text-base font-bold text-white mt-3">{t.bookingComplete.checkErrorTitle}</p>
         <p className="text-sm text-slate-400 mt-1">
-          Your booking may still have gone through -- check{" "}
+          {t.bookingComplete.checkErrorBody}{" "}
           <Link href="/profile" className="text-cyan-400 hover:underline">
-            My Bookings
+            {t.bookingComplete.myBookings}
           </Link>{" "}
-          in a moment.
+          {t.bookingComplete.inAMoment}
         </p>
       </Centered>
     );
@@ -80,13 +82,13 @@ export default function BookingCompletePage() {
     return (
       <Centered>
         <Clock className="w-10 h-10 text-amber-400" />
-        <p className="text-base font-bold text-white mt-3">Still confirming your payment</p>
+        <p className="text-base font-bold text-white mt-3">{t.bookingComplete.stillConfirmingTitle}</p>
         <p className="text-sm text-slate-400 mt-1 max-w-xs">
-          This is taking longer than usual. Your spot is held -- check{" "}
+          {t.bookingComplete.stillConfirmingBody}{" "}
           <Link href="/profile" className="text-cyan-400 hover:underline">
-            My Bookings
+            {t.bookingComplete.myBookings}
           </Link>{" "}
-          in a minute, or refresh this page.
+          {t.bookingComplete.inAMinuteOrRefresh}
         </p>
       </Centered>
     );
@@ -96,8 +98,8 @@ export default function BookingCompletePage() {
     return (
       <Centered>
         <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
-        <p className="text-base font-bold text-white mt-3">Confirming your payment…</p>
-        <p className="text-sm text-slate-400 mt-1">Just a moment.</p>
+        <p className="text-base font-bold text-white mt-3">{t.bookingComplete.confirmingTitle}</p>
+        <p className="text-sm text-slate-400 mt-1">{t.bookingComplete.justAMoment}</p>
       </Centered>
     );
   }
@@ -106,7 +108,7 @@ export default function BookingCompletePage() {
     return (
       <Centered>
         <CheckCircle className="w-12 h-12 text-emerald-400" />
-        <p className="text-lg font-black text-white mt-3">Booking confirmed!</p>
+        <p className="text-lg font-black text-white mt-3">{t.bookingComplete.confirmedTitle}</p>
         {hold.dive_trips && (
           <p className="text-sm text-slate-400 mt-1">
             {hold.dive_trips.title} · {hold.dive_trips.location}
@@ -116,7 +118,7 @@ export default function BookingCompletePage() {
           href="/profile"
           className="mt-5 inline-block px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm transition-colors"
         >
-          View My Bookings
+          {t.bookingComplete.viewMyBookings}
         </Link>
       </Centered>
     );
@@ -126,16 +128,16 @@ export default function BookingCompletePage() {
   return (
     <Centered>
       <XCircle className="w-10 h-10 text-rose-400" />
-      <p className="text-base font-bold text-white mt-3">Payment didn&apos;t go through</p>
+      <p className="text-base font-bold text-white mt-3">{t.bookingComplete.paymentFailedTitle}</p>
       <p className="text-sm text-slate-400 mt-1">
-        {hold.status === "expired" ? "That checkout session expired." : "The payment was declined or cancelled."}{" "}
-        Your spot wasn&apos;t held -- feel free to try booking again.
+        {hold.status === "expired" ? t.bookingComplete.expiredReason : t.bookingComplete.declinedReason}{" "}
+        {t.bookingComplete.spotNotHeld}
       </p>
       <Link
         href="/"
         className="mt-5 inline-block px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition-colors"
       >
-        Back to Explore
+        {t.bookingComplete.backToExplore}
       </Link>
     </Centered>
   );

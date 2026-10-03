@@ -47,6 +47,7 @@ import { DiverAvatar } from "@/components/DiverAvatar";
 import { ProfileStatPill } from "@/components/ProfileStatPill";
 import { PostFormModal } from "@/components/community/PostFormModal";
 import { COSMETIC_CATALOG } from "@/lib/cosmetics";
+import { useCurrency } from "@/components/currency/CurrencyContext";
 
 // The Profile tab (#tab-profile in the old site), including Treasure Chest
 // cosmetics (the equipped calling-card banner behind the header and the
@@ -58,6 +59,7 @@ import { COSMETIC_CATALOG } from "@/lib/cosmetics";
 export default function ProfilePage() {
   const { user, requireAuth } = useAuth();
   const { message, showToast } = useToast();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
@@ -499,7 +501,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm font-black text-cyan-400">
-                        £{Number(b.price_paid)}
+                        {formatPrice(b.price_paid)}
                       </span>
                       <ChevronRight className="w-4 h-4 text-slate-600" />
                     </div>
