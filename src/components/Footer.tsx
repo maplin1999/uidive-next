@@ -1,11 +1,17 @@
+"use client";
+
 import Link from "next/link";
-import { Waves, Mail } from "lucide-react";
+import { Waves } from "lucide-react";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Site-wide footer, shared across every page via layout.tsx the same way
 // Header is -- the old vanilla site never had a real footer (just the tab
-// bar), so this is new rather than migrated. Kept as a plain server
-// component (no state, no "use client") since it's static on every page.
+// bar), so this is new rather than migrated. Needs "use client" (unlike
+// its original server-component form) now that it reads translated text
+// via useLocale, which depends on localStorage/navigator and so can only
+// resolve client-side.
 export function Footer() {
+  const { t } = useLocale();
   const year = new Date().getFullYear();
 
   return (
@@ -22,46 +28,38 @@ export function Footer() {
                 UiDive
               </span>
             </Link>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-              Find dive trips near you, book your spot, and connect with divers who&apos;ve been
-              there.
-            </p>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-xs">{t.footer.tagline}</p>
           </div>
 
           {/* EXPLORE */}
-          <FooterColumn title="Explore">
-            <FooterLink href="/">Find Dive Trips</FooterLink>
-            <FooterLink href="/community">Community</FooterLink>
-            <FooterLink href="/diveshop">Dive Shop</FooterLink>
-            <FooterLink href="/host-dashboard">Become a Host</FooterLink>
+          <FooterColumn title={t.footer.explore}>
+            <FooterLink href="/">{t.footer.findDiveTrips}</FooterLink>
+            <FooterLink href="/community">{t.footer.community}</FooterLink>
+            <FooterLink href="/diveshop">{t.footer.diveShop}</FooterLink>
+            <FooterLink href="/host-dashboard">{t.footer.becomeHost}</FooterLink>
           </FooterColumn>
 
           {/* COMPANY */}
-          <FooterColumn title="Company">
-            <FooterLink href="/about">About Us</FooterLink>
-            <FooterLink href="/faq">FAQ</FooterLink>
-            <li>
-              <a
-                href="mailto:support@uidive.com"
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
-              >
-                <Mail className="w-3 h-3 shrink-0" /> Contact Us
-              </a>
-            </li>
+          <FooterColumn title={t.footer.company}>
+            <FooterLink href="/about-us">{t.footer.aboutUs}</FooterLink>
+            <FooterLink href="/faqs">{t.footer.faqs}</FooterLink>
+            <FooterLink href="/contact-us">{t.footer.contactUs}</FooterLink>
+            <FooterLink href="/sitemaps">{t.footer.sitemaps}</FooterLink>
           </FooterColumn>
 
           {/* LEGAL */}
-          <FooterColumn title="Legal">
-            <FooterLink href="/legal?tab=privacy">Privacy Policy</FooterLink>
-            <FooterLink href="/legal?tab=terms">Terms of Service</FooterLink>
+          <FooterColumn title={t.footer.legal}>
+            <FooterLink href="/terms-of-service">{t.footer.termsOfService}</FooterLink>
+            <FooterLink href="/privacy-polcy">{t.footer.privacyPolicy}</FooterLink>
+            <FooterLink href="/dive-safe">{t.footer.diveSafe}</FooterLink>
           </FooterColumn>
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[11px] text-slate-500">
-            © {year} UiDive. All rights reserved.
+            © {year} UiDive. {t.footer.rights}
           </p>
-          <p className="text-[11px] text-slate-500">Made for divers, by divers. 🪸</p>
+          <p className="text-[11px] text-slate-500">{t.footer.madeForDivers}</p>
         </div>
       </div>
     </footer>

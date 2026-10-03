@@ -20,6 +20,7 @@ import { ImageLightbox } from "@/components/ImageLightbox";
 import { DiverAvatar } from "@/components/DiverAvatar";
 import { useClickOutside } from "@/lib/useClickOutside";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from renderRealPosts()'s per-post template string in app.js.
 // Liking and commenting are now real (toggle_post_like RPC, post_comments
@@ -58,7 +59,8 @@ export function PostCard({
   const menuRef = useRef<HTMLDivElement>(null);
   useClickOutside(menuRef, () => setMenuOpen(false));
   const { openProfile, openReport } = useSocial();
-  const author = post.profiles || { name: "A diver", avatar_url: "", cert: "", equipped_avatar_id: null };
+  const { t } = useLocale();
+  const author = post.profiles || { name: t.postCard.anonymousAuthor, avatar_url: "", cert: "", equipped_avatar_id: null };
   const when = new Date(post.created_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -72,7 +74,7 @@ export function PostCard({
       }}
       className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1 shadow-md shrink-0"
     >
-      <span>Book Site</span>
+      <span>{t.postCard.bookSite}</span>
       <ChevronRight className="w-4 h-4" />
     </button>
   ) : null;
@@ -125,7 +127,7 @@ export function PostCard({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">Posted {when}</p>
+            <p className="text-xs text-slate-400">{t.postCard.postedPrefix} {when}</p>
           </div>
         </button>
 
@@ -133,7 +135,7 @@ export function PostCard({
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="w-7 h-7 rounded-full text-slate-500 hover:text-slate-300 hover:bg-slate-800 flex items-center justify-center transition-colors"
-            aria-label="Post options"
+            aria-label={t.postCard.postOptions}
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -148,7 +150,7 @@ export function PostCard({
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                   >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
+                    <Pencil className="w-3.5 h-3.5" /> {t.postCard.edit}
                   </button>
                   <button
                     onClick={() => {
@@ -157,7 +159,7 @@ export function PostCard({
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                   >
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                    <Trash2 className="w-3.5 h-3.5" /> {t.postCard.delete}
                   </button>
                 </>
               ) : (
@@ -166,11 +168,11 @@ export function PostCard({
                     onClick={() => {
                       setMenuOpen(false);
                       if (!onRequireAuth()) return;
-                      openReport("post", post.id, "Post");
+                      openReport("post", post.id, t.postCard.reportLabelPost);
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 transition-colors flex items-center gap-2"
                   >
-                    <Flag className="w-3.5 h-3.5" /> Report post
+                    <Flag className="w-3.5 h-3.5" /> {t.postCard.reportPost}
                   </button>
                   <button
                     onClick={() => {
@@ -180,7 +182,7 @@ export function PostCard({
                     }}
                     className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2"
                   >
-                    <Ban className="w-3.5 h-3.5" /> Block user
+                    <Ban className="w-3.5 h-3.5" /> {t.postCard.blockUser}
                   </button>
                 </>
               )}
@@ -204,7 +206,7 @@ export function PostCard({
           <div className="absolute top-3 right-3 z-10">
             <button
               onClick={() => setLightboxOpen(true)}
-              aria-label="View full-size photo"
+              aria-label={t.postCard.viewFullSizePhoto}
               className="w-8 h-8 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center transition-colors"
             >
               <Maximize2 className="w-4 h-4" />
@@ -249,7 +251,7 @@ export function PostCard({
         </div>
         {post.corals_awarded && (
           <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 shrink-0">
-            +10 🪸 Corals Earned
+            {t.postCard.coralsEarnedBadge}
           </span>
         )}
       </div>
@@ -266,16 +268,16 @@ export function PostCard({
               <div key={c.id} className="flex items-start justify-between gap-2">
                 <p className="text-slate-400">
                   <strong className="font-bold text-slate-200">
-                    {c.profiles?.name || "A diver"}:
+                    {c.profiles?.name || t.postCard.anonymousAuthor}:
                   </strong>{" "}
                   {c.content}
                 </p>
                 <button
                   onClick={() => {
                     if (!onRequireAuth()) return;
-                    openReport("comment", c.id, "comment");
+                    openReport("comment", c.id, t.postCard.reportLabelComment);
                   }}
-                  aria-label="Report comment"
+                  aria-label={t.postCard.reportComment}
                   className="text-slate-600 hover:text-rose-400 transition-colors shrink-0 mt-0.5"
                 >
                   <Flag className="w-3 h-3" />
@@ -292,14 +294,14 @@ export function PostCard({
             onKeyDown={(e) => {
               if (e.key === "Enter") submitComment();
             }}
-            placeholder="Write a comment... (Press Enter)"
+            placeholder={t.postCard.commentPlaceholder}
             className="bg-slate-950 text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 flex-1 focus:outline-none focus:border-cyan-500/50 text-slate-200"
           />
           <button
             onClick={submitComment}
             className="bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold px-3 py-2.5 rounded-xl text-xs shrink-0"
           >
-            Post
+            {t.postCard.post}
           </button>
         </div>
       </div>
@@ -308,9 +310,9 @@ export function PostCard({
 
       {confirmBlockOpen && (
         <ConfirmModal
-          title={`Block ${author.name.split(" ")[0]}?`}
-          message="You won't see their posts or comments, and they won't be able to message you. You can unblock them later."
-          confirmLabel="Block"
+          title={`${t.postCard.blockConfirmTitle} ${author.name.split(" ")[0]}?`}
+          message={t.postCard.blockConfirmMessage}
+          confirmLabel={t.postCard.block}
           confirming={blocking}
           onConfirm={handleConfirmBlock}
           onCancel={() => setConfirmBlockOpen(false)}

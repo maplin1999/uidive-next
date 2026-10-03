@@ -6,6 +6,7 @@ import { Compass, Inbox as InboxIcon, Camera, ShoppingBag, Anchor, User } from "
 import { useAuth } from "@/components/auth/AuthContext";
 import { useInboxBadge } from "@/lib/useInboxBadge";
 import { useVerifiedHost } from "@/lib/useVerifiedHost";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Mobile bottom tab bar (migrated from index.html's #mobile-nav-* buttons /
 // .mobile-nav-btn). Hidden on desktop (md:hidden), where the header's own
@@ -13,7 +14,8 @@ import { useVerifiedHost } from "@/lib/useVerifiedHost";
 // header nav. Only shown once there's actually somewhere for every item to
 // go; Inbox/Host are auth-gated the same way the header's desktop links are.
 export function MobileNav() {
-  const { user, requireAuth } = useAuth();
+  const { user } = useAuth();
+  const { t } = useLocale();
   const inboxBadge = useInboxBadge();
   const isVerifiedHost = useVerifiedHost();
   const pathname = usePathname();
@@ -23,12 +25,12 @@ export function MobileNav() {
       className="chrome-nav-strong md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80 px-2 pt-2 flex items-center justify-around"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
-      <MobileNavLink href="/" icon={<Compass className="w-5 h-5" />} label="Explore" active={pathname === "/"} />
+      <MobileNavLink href="/" icon={<Compass className="w-5 h-5" />} label={t.nav.explore} active={pathname === "/"} />
       {user && (
         <MobileNavLink
           href="/inbox"
           icon={<InboxIcon className="w-5 h-5" />}
-          label="Inbox"
+          label={t.nav.inbox}
           active={pathname?.startsWith("/inbox")}
           badge={inboxBadge}
         />
@@ -36,38 +38,30 @@ export function MobileNav() {
       <MobileNavLink
         href="/community"
         icon={<Camera className="w-5 h-5" />}
-        label="Feed"
+        label={t.nav.community}
         active={pathname?.startsWith("/community")}
       />
       <MobileNavLink
         href="/diveshop"
         icon={<ShoppingBag className="w-5 h-5" />}
-        label="Shop"
+        label={t.nav.diveShop}
         active={pathname?.startsWith("/diveshop")}
       />
       {isVerifiedHost && (
         <MobileNavLink
           href="/host-dashboard"
           icon={<Anchor className="w-5 h-5" />}
-          label="Host"
+          label={t.nav.host}
           active={pathname?.startsWith("/host-dashboard")}
         />
       )}
-      {user ? (
+      {user && (
         <MobileNavLink
           href="/profile"
           icon={<User className="w-5 h-5" />}
-          label="Profile"
+          label={t.nav.profile}
           active={pathname?.startsWith("/profile")}
         />
-      ) : (
-        <button
-          onClick={() => requireAuth()}
-          className="mobile-nav-btn flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-slate-400 transition-colors"
-        >
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-bold">Profile</span>
-        </button>
       )}
     </nav>
   );
@@ -94,7 +88,7 @@ function MobileNavLink({
       }`}
     >
       {icon}
-      <span className="text-[10px] font-bold">{label}</span>
+      <span className="text-[10px] font-bold whitespace-nowrap">{label}</span>
       {!!badge && badge > 0 && (
         <span className="absolute top-0 right-2 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
           {badge > 9 ? "9+" : badge}

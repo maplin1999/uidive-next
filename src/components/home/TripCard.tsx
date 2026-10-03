@@ -1,6 +1,8 @@
 "use client";
 
 import { DiveTrip, ReviewStats, difficultyAccent, formatTripDate } from "@/lib/trips";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import { useCurrency } from "@/components/currency/CurrencyContext";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80";
@@ -19,10 +21,12 @@ export function TripCard({
   rating: ReviewStats;
   onOpen: (trip: DiveTrip) => void;
 }) {
+  const { t } = useLocale();
+  const { formatPrice } = useCurrency();
   const accent = difficultyAccent(trip.difficulty);
   const spotsLeft = trip.capacity - trip.spots_booked;
   const isFull = spotsLeft <= 0;
-  const groupLabel = isFull ? "Fully Booked" : `${trip.spots_booked}/${trip.capacity} Divers`;
+  const groupLabel = isFull ? t.tripCard.fullyBooked : `${trip.spots_booked}/${trip.capacity} ${t.tripCard.divers}`;
 
   return (
     <div
@@ -33,7 +37,7 @@ export function TripCard({
     >
       {isFull && (
         <span className="absolute top-3 right-3 z-10 text-[10px] font-bold uppercase tracking-wide bg-rose-500/90 text-white px-2.5 py-1 rounded-full shadow-md">
-          Fully Booked
+          {t.tripCard.fullyBooked}
         </span>
       )}
       <div className="relative h-32 overflow-hidden bg-slate-800">
@@ -68,25 +72,23 @@ export function TripCard({
               )}
             </div>
             <p className="text-xs text-slate-400">
-              {trip.activity_type === "freediving" ? "Free Diving" : "Scuba"} •{" "}
-              {trip.trip_type === "boat" ? "Boat Charter" : "Shore Dive"} • {formatTripDate(trip)}
+              {trip.activity_type === "freediving" ? t.tripCard.freeDiving : t.tripCard.scuba} •{" "}
+              {trip.trip_type === "boat" ? t.tripCard.boatCharter : t.tripCard.shoreDive} • {formatTripDate(trip)}
             </p>
           </div>
-          <span className="text-xl font-black text-cyan-400 shrink-0">
-            £{Number(trip.price).toLocaleString()}
-          </span>
+          <span className="text-xl font-black text-cyan-400 shrink-0">{formatPrice(trip.price)}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 text-center">
           <div>
-            <span className="text-[10px] text-slate-500 uppercase block">Visibility</span>
+            <span className="text-[10px] text-slate-500 uppercase block">{t.tripCard.visibility}</span>
             <strong className="text-cyan-400">{trip.visibility}</strong>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 uppercase block">Group</span>
+            <span className="text-[10px] text-slate-500 uppercase block">{t.tripCard.group}</span>
             <strong className={spotsLeft <= 0 ? "text-rose-400" : ""}>{groupLabel}</strong>
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 uppercase block">Reward</span>
+            <span className="text-[10px] text-slate-500 uppercase block">{t.tripCard.reward}</span>
             <strong className="text-amber-400">+50 🪸</strong>
           </div>
         </div>
@@ -106,6 +108,8 @@ export function TopPickCard({
   rating: ReviewStats;
   onOpen: (trip: DiveTrip) => void;
 }) {
+  const { formatPrice } = useCurrency();
+
   return (
     <div
       onClick={() => onOpen(trip)}
@@ -134,7 +138,7 @@ export function TopPickCard({
       <div className="p-3">
         <h3 className="font-extrabold text-sm text-slate-100 truncate">{trip.title}</h3>
         <p className="text-[11px] text-slate-400 truncate">
-          {trip.location} • £{Number(trip.price).toLocaleString()}
+          {trip.location} • {formatPrice(trip.price)}
         </p>
       </div>
     </div>

@@ -6,6 +6,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MobileNav } from "@/components/MobileNav";
 import { SocialProvider } from "@/components/social/SocialContext";
+import { LocaleProvider } from "@/components/i18n/LocaleContext";
+import { CurrencyProvider } from "@/components/currency/CurrencyContext";
 import { PublicProfileModal } from "@/components/social/PublicProfileModal";
 import { ReportModal } from "@/components/social/ReportModal";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -62,22 +64,26 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <AuthProvider>
-          <SocialProvider>
-            <Header />
-            {children}
-            <Footer />
-            {/* Spacer so page content (including the footer above) isn't
-                hidden behind the fixed mobile bottom nav -- matches that
-                nav's own height + safe-area pad. */}
-            <div className="h-20 md:hidden" aria-hidden="true" />
-            <MobileNav />
-            <AuthModal />
-            <PublicProfileModal />
-            <ReportModal />
-            <CookieConsentBanner />
-          </SocialProvider>
-        </AuthProvider>
+        <LocaleProvider>
+          <CurrencyProvider>
+            <AuthProvider>
+              <SocialProvider>
+                <Header />
+                {children}
+                <Footer />
+                {/* Spacer so page content (including the footer above) isn't
+                    hidden behind the fixed mobile bottom nav -- matches that
+                    nav's own height + safe-area pad. */}
+                <div className="h-20 md:hidden" aria-hidden="true" />
+                <MobileNav />
+                <AuthModal />
+                <PublicProfileModal />
+                <ReportModal />
+                <CookieConsentBanner />
+              </SocialProvider>
+            </AuthProvider>
+          </CurrencyProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

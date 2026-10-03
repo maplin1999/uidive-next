@@ -14,6 +14,7 @@ import { TripCard, TopPickCard } from "@/components/home/TripCard";
 import { DiveDetailModal } from "@/components/home/DiveDetailModal";
 import { useToast, Toast } from "@/components/Toast";
 import { ConservationBanner } from "@/components/home/ConservationBanner";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 type TripTypeFilter = "all" | "shore" | "boat";
 
@@ -25,6 +26,7 @@ type TripTypeFilter = "all" | "shore" | "boat";
 // page exists. The daily Corals claim that used to live here moved to the
 // Profile page -- see DailyStreakCard.
 export default function HomePage() {
+  const { t } = useLocale();
   const [trips, setTrips] = useState<DiveTrip[]>([]);
   const [reviewStats, setReviewStats] = useState<
     Record<string, { avg_rating: number; review_count: number }>
@@ -101,12 +103,11 @@ export default function HomePage() {
 
           <div className="relative z-10 space-y-5">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs font-bold text-cyan-400 uppercase tracking-wider w-fit">
-              <Sparkles className="w-3.5 h-3.5" /> Scuba Booking &amp; Ocean Social Network
+              <Sparkles className="w-3.5 h-3.5" /> {t.home.badge}
             </span>
 
             <p className="text-base sm:text-lg text-slate-400 max-w-3xl leading-snug tracking-tight whitespace-normal sm:whitespace-nowrap">
-              Find dive trips near you, book your spot, and connect with divers who&apos;ve been
-              there.
+              {t.home.heroTitle}
             </p>
 
             <HeroSearch
@@ -136,9 +137,9 @@ export default function HomePage() {
                 stats, for a consistent feel across the site. */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-1">
               {[
-                ["2,400+", "Dive Trips Booked"],
-                ["180+", "Dive Sites"],
-                ["9,000+", "Divers on UiDive"],
+                ["2,400+", t.home.statsTripsBooked],
+                ["180+", t.home.statsDiveSites],
+                ["9,000+", t.home.statsDivers],
               ].map(([stat, label]) => (
                 <TrustStat key={label} value={stat} label={label} />
               ))}
@@ -153,11 +154,11 @@ export default function HomePage() {
         <div id="trips-section" className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
             <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-              <Compass className="w-5 h-5 text-cyan-400" /> Find &amp; Book Dive Trips
+              <Compass className="w-5 h-5 text-cyan-400" /> {t.home.findAndBook}
             </h2>
             {status === "ready" && filteredTrips.length > 0 && (
               <p className="text-xs text-slate-400">
-                {filteredTrips.length} dive trip{filteredTrips.length === 1 ? "" : "s"}
+                {filteredTrips.length} {filteredTrips.length === 1 ? t.home.tripCountOne : t.home.tripCountOther}
               </p>
             )}
           </div>
@@ -165,9 +166,9 @@ export default function HomePage() {
           <div className="flex items-center gap-2 flex-wrap">
             {(
               [
-                ["all", "All Trips"],
-                ["shore", "Shore Dives"],
-                ["boat", "Boat Charters"],
+                ["all", t.home.allTrips],
+                ["shore", t.home.shoreDives],
+                ["boat", t.home.boatCharters],
               ] as [TripTypeFilter, string][]
             ).map(([key, label]) => (
               <button
@@ -204,13 +205,13 @@ export default function HomePage() {
 
             {status === "error" && (
               <p className="text-sm text-rose-400 col-span-full text-center py-8">
-                Could not load dive trips -- please refresh.
+                {t.home.loadError}
               </p>
             )}
 
             {status === "ready" && filteredTrips.length === 0 && (
               <p className="text-sm text-slate-400 col-span-full text-center py-8">
-                No dive trips match that search.
+                {t.home.noTripsMatch}
               </p>
             )}
 
@@ -230,7 +231,7 @@ export default function HomePage() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border border-amber-500/30 text-[11px] font-bold text-amber-300 uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5" /> This Week&apos;s Top Picks
+              <Flame className="w-3.5 h-3.5" /> {t.home.topPicksTag}
             </span>
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-1">
@@ -250,7 +251,7 @@ export default function HomePage() {
               ))}
 
             {status === "ready" && topPicks.length === 0 && (
-              <p className="text-sm text-slate-400 py-4">No trips to feature yet.</p>
+              <p className="text-sm text-slate-400 py-4">{t.home.noTripsFeature}</p>
             )}
 
             {status === "ready" &&

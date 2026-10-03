@@ -20,6 +20,7 @@ import { useToast, Toast } from "@/components/Toast";
 import { CoralsCelebration } from "@/components/CoralsCelebration";
 import { useAuth } from "@/components/auth/AuthContext";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // The Community tab (#tab-community in the old site): the Diver Feed.
 // Posting, liking, and commenting are all real now (create_post/
@@ -56,6 +57,7 @@ function CommunityFeed() {
 
   const { message, showToast } = useToast();
   const { user, requireAuth } = useAuth();
+  const { t } = useLocale();
 
   const load = useCallback(() => {
     fetchCommunityPosts(user?.id)
@@ -141,7 +143,7 @@ function CommunityFeed() {
       });
     } catch (err) {
       console.error("Could not post comment:", err);
-      showToast("Could not post your comment -- please try again.");
+      showToast(t.community.commentPostError);
     }
   }
 
@@ -154,7 +156,7 @@ function CommunityFeed() {
       setDeletingPost(null);
     } catch (err) {
       console.error("Could not delete post:", err);
-      showToast("Could not delete that post -- please try again.");
+      showToast(t.community.deletePostError);
     } finally {
       setDeletingBusy(false);
     }
@@ -165,10 +167,8 @@ function CommunityFeed() {
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-3xl border border-slate-800">
           <div className="min-w-0">
-            <h1 className="text-2xl font-black text-white">Diver Feed</h1>
-            <p className="text-xs text-slate-400">
-              Photos, videos, and condition logs from local divers
-            </p>
+            <h1 className="text-2xl font-black text-white">{t.community.diverFeed}</h1>
+            <p className="text-xs text-slate-400">{t.community.subtitle}</p>
           </div>
           <button
             onClick={() => {
@@ -179,7 +179,7 @@ function CommunityFeed() {
             className="w-full sm:w-auto shrink-0 whitespace-nowrap bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20"
           >
             <Plus className="w-4 h-4" />
-            <span>Post Log</span>
+            <span>{t.community.postLog}</span>
           </button>
         </div>
 
@@ -205,18 +205,14 @@ function CommunityFeed() {
         )}
 
         {status === "error" && (
-          <p className="text-sm text-rose-400 text-center py-8">
-            Could not load the feed -- please refresh.
-          </p>
+          <p className="text-sm text-rose-400 text-center py-8">{t.community.loadError}</p>
         )}
 
         {status === "ready" && posts.length === 0 && (
           <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
             <div className="text-3xl">🤿</div>
-            <p className="text-sm font-bold text-slate-300">No posts yet</p>
-            <p className="text-xs text-slate-500">
-              Be the first to share a dive log or photo with the community.
-            </p>
+            <p className="text-sm font-bold text-slate-300">{t.community.noPostsTitle}</p>
+            <p className="text-xs text-slate-500">{t.community.noPostsBody}</p>
           </div>
         )}
 
@@ -240,7 +236,7 @@ function CommunityFeed() {
                   onBookTrip={(tripId) => {
                     const trip = trips.find((t) => t.id === tripId);
                     if (trip) setSelectedTrip(trip);
-                    else showToast("Could not find that dive trip -- try refreshing.");
+                    else showToast(t.community.tripNotFound);
                   }}
                   onEdit={() => {
                     setEditingPost(post);
@@ -265,13 +261,13 @@ function CommunityFeed() {
             setFormOpen(false);
             load();
             if (coralsAwarded) setCelebrating(true);
-            else showToast(editingPost ? "✅ Dive log updated!" : "📸 Dive log posted!");
+            else showToast(editingPost ? t.community.diveLogUpdated : t.community.diveLogPosted);
           }}
         />
       )}
 
       {celebrating && (
-        <CoralsCelebration amount={10} title="🎉 Dive Log Posted!" onDone={() => setCelebrating(false)} />
+        <CoralsCelebration amount={10} title={t.community.celebrationTitle} onDone={() => setCelebrating(false)} />
       )}
 
       {selectedTrip && (
@@ -285,9 +281,9 @@ function CommunityFeed() {
 
       {deletingPost && (
         <ConfirmModal
-          title="Delete this dive log?"
-          message="This can't be undone."
-          confirmLabel="Delete"
+          title={t.community.deleteDiveLogTitle}
+          message={t.community.cannotBeUndone}
+          confirmLabel={t.community.delete}
           confirming={deletingBusy}
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingPost(null)}

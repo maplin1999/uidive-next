@@ -14,33 +14,28 @@ import { ChestOpenModal } from "@/components/shop/ChestOpenModal";
 import { BagIcon } from "@/components/icons/BagIcon";
 import { TREASURE_CHEST_COST, ChestResult, openTreasureChest } from "@/lib/cosmetics";
 import Link from "next/link";
+import { useLocale } from "@/components/i18n/LocaleContext";
+import type { Dictionary } from "@/lib/i18n/translations/en";
 
-const OFFERS = [
-  {
-    cost: 500,
-    title: "$10 Tank Rental Voucher",
-    desc: "Redeem for $10 off your next scuba cylinder refill or hire at any partner dive shop.",
-    badge: "-$10",
-    badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
-    codePrefix: "TANK10",
-  },
-  {
-    cost: 800,
-    title: "Nitrox Air Upgrade",
-    desc: "Get a free Enriched Air Nitrox 32% fill upgrade on any booked boat charter trip.",
-    badge: "FREE",
-    badgeClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-    codePrefix: "NITROX32",
-  },
-  {
-    cost: 1200,
-    title: "25% Off Boat Charters",
-    desc: "Save 25% on premium boat dive charters including Magic Point and offshore reefs.",
-    badge: "25%",
-    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-400",
-    codePrefix: "BOAT25",
-  },
+// Static per-offer styling/codePrefix/cost -- the title/desc/badge text
+// itself comes from t.shop.offers.* (built in the component, where `t` is
+// in scope) so each offer stays translated.
+const OFFER_META = [
+  { cost: 500, key: "tank" as const, badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400", codePrefix: "TANK10" },
+  { cost: 800, key: "nitrox" as const, badgeClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400", codePrefix: "NITROX32" },
+  { cost: 1200, key: "boat" as const, badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-400", codePrefix: "BOAT25" },
 ];
+
+function buildOffers(t: Dictionary) {
+  return OFFER_META.map((meta) => ({
+    cost: meta.cost,
+    title: t.shop.offers[`${meta.key}Title`],
+    desc: t.shop.offers[`${meta.key}Desc`],
+    badge: t.shop.offers[`${meta.key}Badge`],
+    badgeClass: meta.badgeClass,
+    codePrefix: meta.codePrefix,
+  }));
+}
 
 // The Dive Shop tab (#tab-diveshop in the old site): Corals balance,
 // claimed vouchers, treasure chests, redeemable offers, and the leaderboard.
@@ -54,6 +49,8 @@ export default function DiveShopPage() {
   const { openProfile } = useSocial();
   const router = useRouter();
   const { message, showToast } = useToast();
+  const { t } = useLocale();
+  const offers = buildOffers(t);
 
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [vouchersLoading, setVouchersLoading] = useState(true);
@@ -92,12 +89,12 @@ export default function DiveShopPage() {
       });
   }, []);
 
-  async function handleRedeem(offer: (typeof OFFERS)[number]) {
+  async function handleRedeem(offer: ReturnType<typeof buildOffers>[number]) {
     if (!requireAuth()) return;
     if (!user) return;
 
     if (user.corals < offer.cost) {
-      showToast(`❌ Not enough 🪸 Corals! Need ${offer.cost - user.corals} more.`);
+      showToast(`${t.shop.notEnoughCoralsPrefix} ${offer.cost - user.corals} ${t.shop.notEnoughCoralsSuffix}`);
       return;
     }
 
@@ -107,10 +104,10 @@ export default function DiveShopPage() {
       await refreshProfile();
       const updated = await fetchVouchers(user.id);
       setVouchers(updated);
-      showToast(`🎁 Claimed ${offer.title}! Code: ${code}`);
+      showToast(`${t.shop.claimedTogglePrefix} ${offer.title}${t.shop.claimedToastMid} ${code}`);
     } catch (err) {
       console.error(err);
-      showToast("❌ Something went wrong redeeming that -- please try again.");
+      showToast(t.shop.redeemError);
     } finally {
       setRedeemingCost(null);
     }
@@ -118,14 +115,14 @@ export default function DiveShopPage() {
 
   function copyCode(code: string) {
     if (navigator.clipboard) navigator.clipboard.writeText(code);
-    showToast(`Code ${code} copied to clipboard!`);
+    showToast(`${t.shop.codeCopiedPrefix} ${code} ${t.shop.codeCopiedSuffix}`);
   }
 
   async function handleOpenChest() {
     if (!requireAuth()) return;
     if (!user) return;
     if (user.corals < TREASURE_CHEST_COST) {
-      showToast(`❌ Not enough 🪸 Corals! Need ${TREASURE_CHEST_COST - user.corals} more.`);
+      showToast(`${t.shop.notEnoughCoralsPrefix} ${TREASURE_CHEST_COST - user.corals} ${t.shop.notEnoughCoralsSuffix}`);
       return;
     }
 
@@ -138,7 +135,7 @@ export default function DiveShopPage() {
       setChestResults(results);
     } catch (err) {
       console.error("Could not open the chest:", err);
-      showToast("❌ Could not open the chest -- please try again.");
+      showToast(t.shop.chestError);
     } finally {
       setOpeningChest(false);
     }
@@ -154,36 +151,34 @@ export default function DiveShopPage() {
         <div className="p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-amber-950/20 to-slate-900 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-2 text-center md:text-left">
             <span className="bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/30">
-              🪸 Corals Marketplace
+              {t.shop.coralsMarketplace}
             </span>
-            <h1 className="text-2xl font-black text-white">The Dive Shop &amp; Rewards</h1>
-            <p className="text-xs text-slate-300">
-              Spend your hard-earned Corals or view your active reward vouchers.
-            </p>
+            <h1 className="text-2xl font-black text-white">{t.shop.title}</h1>
+            <p className="text-xs text-slate-300">{t.shop.subtitle}</p>
           </div>
 
           <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/40 text-center min-w-[160px] shadow-lg">
             <span className="text-2xl">🪸</span>
             <div className="text-2xl font-black text-amber-400 mt-1">{user ? user.corals : 0}</div>
             <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-              Available Balance
+              {t.shop.availableBalance}
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-1 text-xs text-slate-400">
-          <span className="font-bold text-slate-300">Ways to earn Corals:</span>
+          <span className="font-bold text-slate-300">{t.shop.waysToEarn}</span>
           <Link href="/" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
-            <CalendarCheck className="w-3.5 h-3.5" /> Book a dive trip (+50)
+            <CalendarCheck className="w-3.5 h-3.5" /> {t.shop.bookTrip}
           </Link>
           <Link
             href="/community"
             className="hover:text-amber-400 transition-colors flex items-center gap-1.5"
           >
-            <Camera className="w-3.5 h-3.5" /> Log a dive with a photo (+10)
+            <Camera className="w-3.5 h-3.5" /> {t.shop.logDiveWithPhoto}
           </Link>
           <span className="flex items-center gap-1.5">
-            <Gift className="w-3.5 h-3.5" /> Claim your daily reward
+            <Gift className="w-3.5 h-3.5" /> {t.shop.claimDailyReward}
           </span>
         </div>
 
@@ -191,36 +186,32 @@ export default function DiveShopPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-emerald-400" /> My Active Claimed Rewards
+              <Ticket className="w-5 h-5 text-emerald-400" /> {t.shop.myActiveRewards}
             </h2>
             <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-              {vouchers.length} Voucher{vouchers.length === 1 ? "" : "s"}
+              {vouchers.length} {vouchers.length === 1 ? t.shop.voucherSingular : t.shop.voucherPlural}
             </span>
           </div>
 
           {!user && (
             <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
               <div className="text-3xl">🎟️</div>
-              <p className="text-sm font-bold text-slate-300">Sign in to see your vouchers</p>
-              <p className="text-xs text-slate-500">
-                Your claimed rewards are tied to your account.
-              </p>
+              <p className="text-sm font-bold text-slate-300">{t.shop.signInForVouchers}</p>
+              <p className="text-xs text-slate-500">{t.shop.signInForVouchersBody}</p>
             </div>
           )}
 
           {user && vouchersLoading && (
             <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-500">
-              Loading…
+              {t.profile.loading}
             </div>
           )}
 
           {user && !vouchersLoading && vouchers.length === 0 && (
             <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
               <div className="text-3xl">🎟️</div>
-              <p className="text-sm font-bold text-slate-300">No active vouchers yet</p>
-              <p className="text-xs text-slate-500">
-                Redeem any reward offer below using your Corals balance to save it here.
-              </p>
+              <p className="text-sm font-bold text-slate-300">{t.shop.noVouchersTitle}</p>
+              <p className="text-xs text-slate-500">{t.shop.noVouchersBody}</p>
             </div>
           )}
 
@@ -233,18 +224,18 @@ export default function DiveShopPage() {
                 >
                   <div className="space-y-1">
                     <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                      ACTIVE REWARD
+                      {t.shop.activeReward}
                     </span>
                     <h4 className="text-xs sm:text-sm font-extrabold text-white">{v.title}</h4>
                     <p className="text-xs font-mono font-bold text-cyan-400 tracking-wider">
-                      CODE: {v.code}
+                      {t.shop.codeLabel} {v.code}
                     </p>
                   </div>
                   <button
                     onClick={() => copyCode(v.code)}
                     className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs shrink-0 shadow-md"
                   >
-                    Copy
+                    {t.shop.copy}
                   </button>
                 </div>
               ))}
@@ -256,14 +247,14 @@ export default function DiveShopPage() {
         <div className="space-y-4 pt-4 border-t border-slate-800">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Gem className="w-5 h-5 text-purple-400" /> Treasure Chests
+              <Gem className="w-5 h-5 text-purple-400" /> {t.shop.treasureChests}
             </h2>
             {user && (
               <button
                 onClick={() => setLockerOpen(true)}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-300 bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-xl hover:bg-purple-500/20 transition-colors"
               >
-                <BagIcon className="w-3.5 h-3.5 shrink-0" /> My Dive Bag
+                <BagIcon className="w-3.5 h-3.5 shrink-0" /> {t.header.myDiveBag}
               </button>
             )}
           </div>
@@ -272,12 +263,8 @@ export default function DiveShopPage() {
               <Gem className="w-full h-full" />
             </div>
             <div className="flex-1 text-center sm:text-left space-y-1">
-              <h3 className="text-base font-extrabold text-white">Reef Chest</h3>
-              <p className="text-xs text-slate-400">
-                Open for 3 random cosmetic rewards — Avatars &amp; Calling Cards, in Common, Rare
-                &amp; Epic tiers, to equip on your profile. Already own one? You&apos;ll get
-                Corals back instead.
-              </p>
+              <h3 className="text-base font-extrabold text-white">{t.shop.reefChestTitle}</h3>
+              <p className="text-xs text-slate-400">{t.shop.reefChestDesc}</p>
             </div>
             <button
               id="open-chest-btn"
@@ -286,10 +273,10 @@ export default function DiveShopPage() {
               className="shrink-0 py-2.5 px-5 bg-purple-500 hover:bg-purple-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md"
             >
               {openingChest ? (
-                <span>Opening…</span>
+                <span>{t.shop.opening}</span>
               ) : (
                 <>
-                  <span>Open for 150</span>
+                  <span>{t.shop.openForPrefix} {TREASURE_CHEST_COST}</span>
                   <span>🪸</span>
                 </>
               )}
@@ -300,10 +287,10 @@ export default function DiveShopPage() {
         {/* OFFERS */}
         <div className="space-y-4 pt-4 border-t border-slate-800">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-amber-400" /> Redeemable Coral Offers
+            <ShoppingBag className="w-5 h-5 text-amber-400" /> {t.shop.redeemableOffers}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {OFFERS.map((offer) => (
+            {offers.map((offer) => (
               <div
                 key={offer.title}
                 className="p-6 rounded-3xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 transition-all flex flex-col justify-between space-y-4 shadow-lg"
@@ -323,7 +310,7 @@ export default function DiveShopPage() {
                   className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center space-x-1 shadow-md"
                 >
                   <span>
-                    {redeemingCost === offer.cost ? "Redeeming…" : `Redeem for ${offer.cost}`}
+                    {redeemingCost === offer.cost ? t.shop.redeeming : `${t.shop.redeemForPrefix} ${offer.cost}`}
                   </span>
                   <span>🪸</span>
                 </button>
@@ -337,9 +324,9 @@ export default function DiveShopPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-400" /> Friends Dive Leaderboard
+                <Trophy className="w-5 h-5 text-amber-400" /> {t.shop.friendsLeaderboard}
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Ranked by total Corals balance</p>
+              <p className="text-xs text-slate-400 mt-0.5">{t.shop.rankedByCorals}</p>
             </div>
             <button
               onClick={() => {
@@ -349,17 +336,15 @@ export default function DiveShopPage() {
               className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-2 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Add Dive Buddy</span>
+              <span>{t.shop.addDiveBuddy}</span>
             </button>
           </div>
 
           {leaderboardStatus === "loading" && (
-            <p className="text-xs text-slate-500 text-center py-8">Loading leaderboard…</p>
+            <p className="text-xs text-slate-500 text-center py-8">{t.shop.loadingLeaderboard}</p>
           )}
           {leaderboardStatus === "error" && (
-            <p className="text-xs text-rose-400 text-center py-8">
-              Could not load the leaderboard -- please refresh.
-            </p>
+            <p className="text-xs text-rose-400 text-center py-8">{t.shop.leaderboardLoadError}</p>
           )}
 
           {leaderboardStatus === "ready" && podiumOrder.length > 0 && (
@@ -386,7 +371,7 @@ export default function DiveShopPage() {
                           : "bg-slate-800 text-slate-300 border-slate-700"
                       }`}
                     >
-                      {isFirst && user?.id === entry.id ? "You" : `#${rank}`}
+                      {isFirst && user?.id === entry.id ? t.shop.youBadge : `#${rank}`}
                     </span>
                     <div className="relative inline-block">
                       <DiverAvatar
@@ -403,7 +388,7 @@ export default function DiveShopPage() {
                     <div>
                       <h3 className={isFirst ? "text-base font-black text-white" : "text-sm font-extrabold text-white"}>
                         {entry.name}
-                        {user?.id === entry.id ? " (You)" : ""}
+                        {user?.id === entry.id ? t.shop.youSuffixParen : ""}
                       </h3>
                       <p className={isFirst ? "text-xs text-amber-400 font-bold" : "text-[11px] text-cyan-400 font-semibold"}>
                         {entry.cert}
@@ -415,11 +400,11 @@ export default function DiveShopPage() {
                       }`}
                     >
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase block">Dives</span>
+                        <span className="text-[10px] text-slate-500 uppercase block">{t.profile.statsDives}</span>
                         <strong className="text-slate-200">{entry.dives}</strong>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase block">Max Depth</span>
+                        <span className="text-[10px] text-slate-500 uppercase block">{t.shop.maxDepth}</span>
                         <strong className="text-purple-400">{entry.max_depth}</strong>
                       </div>
                     </div>
@@ -430,7 +415,7 @@ export default function DiveShopPage() {
                           : "font-bold text-amber-400 bg-amber-500/10 border-amber-500/20 py-1.5"
                       }`}
                     >
-                      <span>🪸</span> <span>{Number(entry.corals).toLocaleString()}</span> <span>Corals</span>
+                      <span>🪸</span> <span>{Number(entry.corals).toLocaleString()}</span> <span>{t.header.corals}</span>
                     </div>
                   </div>
                 );
@@ -439,7 +424,7 @@ export default function DiveShopPage() {
           )}
 
           {leaderboardStatus === "ready" && leaderboard.length === 0 && (
-            <p className="text-sm text-slate-400 text-center py-8">No divers on the leaderboard yet.</p>
+            <p className="text-sm text-slate-400 text-center py-8">{t.shop.noLeaderboardYet}</p>
           )}
 
           {leaderboardStatus === "ready" && leaderboard.length > 0 && (
@@ -448,12 +433,12 @@ export default function DiveShopPage() {
                 <table className="w-full text-left text-xs text-slate-300">
                   <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-800">
                     <tr>
-                      <th className="py-3.5 px-4 text-center">Rank</th>
-                      <th className="py-3.5 px-4">Diver</th>
-                      <th className="py-3.5 px-4">Certification</th>
-                      <th className="py-3.5 px-4 text-center">Total Dives</th>
-                      <th className="py-3.5 px-4 text-center">Deepest Dive</th>
-                      <th className="py-3.5 px-4 text-right">Corals Balance</th>
+                      <th className="py-3.5 px-4 text-center">{t.shop.tableRank}</th>
+                      <th className="py-3.5 px-4">{t.shop.tableDiver}</th>
+                      <th className="py-3.5 px-4">{t.shop.tableCertification}</th>
+                      <th className="py-3.5 px-4 text-center">{t.shop.tableTotalDives}</th>
+                      <th className="py-3.5 px-4 text-center">{t.shop.tableDeepestDive}</th>
+                      <th className="py-3.5 px-4 text-right">{t.shop.tableCoralsBalance}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-medium">
@@ -481,7 +466,7 @@ export default function DiveShopPage() {
                             />
                             <span className={`font-bold hover:underline ${isUser ? "text-amber-300" : "text-slate-100"}`}>
                               {entry.name}
-                              {isUser ? " (You)" : ""}
+                              {isUser ? t.shop.youSuffixParen : ""}
                             </span>
                           </button>
                         </td>
