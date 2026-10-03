@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { isoDate } from "@/lib/trips";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -32,6 +33,7 @@ export function DatePickerCalendar({
   onSelect: (isoDateStr: string, label: string) => void;
   maxDate?: string;
 }) {
+  const { t } = useLocale();
   const today = startOfDay(new Date());
   const initialMonth = selectedDate ? new Date(selectedDate + "T00:00:00") : today;
   const [viewYear, setViewYear] = useState(initialMonth.getFullYear());
@@ -90,7 +92,7 @@ export function DatePickerCalendar({
         <button
           type="button"
           onClick={() => goToMonth(-1)}
-          aria-label="Previous month"
+          aria-label={t.datePickerCalendar.previousMonth}
           className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -99,7 +101,7 @@ export function DatePickerCalendar({
         <button
           type="button"
           onClick={() => goToMonth(1)}
-          aria-label="Next month"
+          aria-label={t.datePickerCalendar.nextMonth}
           className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
         >
           <ChevronRight className="w-4 h-4" />

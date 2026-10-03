@@ -626,6 +626,22 @@ const es = {
     ctaBody: "Únete a una comunidad creciente de personas que quieren pasar más tiempo explorando bajo la superficie.",
     ctaButton: "Únete a DiveBuddy",
   },
+  cookieConsentBanner: {
+    body: "Usamos cookies para mantenerte conectado, recordar tus preferencias y entender cómo se usa UiDive.",
+    learnMore: "Más información",
+    decline: "Rechazar",
+    accept: "Aceptar",
+  },
+  coralsCelebration: {
+    addedToBalanceSuffix: "añadidos a tu saldo",
+  },
+  datePickerCalendar: {
+    previousMonth: "Mes anterior",
+    nextMonth: "Mes siguiente",
+  },
+  themedTimeSelect: {
+    selectTime: "Selecciona la hora",
+  },
   faq: {
     back: "Atrás",
     heading: "Preguntas frecuentes",

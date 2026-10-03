@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Migrated from the old site's celebrateCoralsEarned(): a compact,
 // count-up celebration card shown after earning Corals (booking a trip,
@@ -14,6 +15,7 @@ export function CoralsCelebration({
   title: string;
   onDone: () => void;
 }) {
+  const { t } = useLocale();
   const [displayed, setDisplayed] = useState(0);
   const [visible, setVisible] = useState(false);
 
@@ -60,7 +62,7 @@ export function CoralsCelebration({
         </div>
         <div className="text-left min-w-0">
           <p className="text-sm font-bold text-white truncate">{title}</p>
-          <p className="text-xs text-slate-400 mt-0.5">+{displayed} added to your balance</p>
+          <p className="text-xs text-slate-400 mt-0.5">+{displayed} {t.coralsCelebration.addedToBalanceSuffix}</p>
         </div>
       </div>
     </div>

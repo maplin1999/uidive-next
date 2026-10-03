@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react";
 import { useClickOutside } from "@/lib/useClickOutside";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 // Themed stand-in for native <input type="time">, same reasoning as
 // ThemedSelect: the native control's own dropdown/spinner is OS-drawn and
@@ -41,12 +42,13 @@ const TIME_OPTIONS = buildTimeOptions(30);
 export function ThemedTimeSelect({
   value,
   onChange,
-  placeholder = "Select time",
+  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
@@ -69,7 +71,7 @@ export function ThemedTimeSelect({
         onClick={() => setOpen((v) => !v)}
         className="bg-slate-950 w-full px-4 py-3 rounded-xl border border-slate-800 hover:border-slate-700 text-sm text-left flex items-center justify-between gap-2 transition-colors focus:outline-none focus:border-cyan-500"
       >
-        <span className={label ? "text-slate-200" : "text-slate-500"}>{label ?? placeholder}</span>
+        <span className={label ? "text-slate-200" : "text-slate-500"}>{label ?? (placeholder ?? t.themedTimeSelect.selectTime)}</span>
         <Clock className="w-4 h-4 text-slate-500 shrink-0" />
       </button>
       {open && (

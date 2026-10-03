@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Cookie } from "lucide-react";
+import { useLocale } from "@/components/i18n/LocaleContext";
 
 const STORAGE_KEY = "uidive_cookie_consent";
 
@@ -12,6 +13,7 @@ const STORAGE_KEY = "uidive_cookie_consent";
 // before falling back to localStorage -- here localStorage alone is enough
 // since there's no server-side code that needs to read the choice.
 export function CookieConsentBanner() {
+  const { t } = useLocale();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -42,10 +44,9 @@ export function CookieConsentBanner() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs text-slate-300 leading-relaxed">
-            We use cookies to keep you signed in, remember your preferences, and understand how
-            UiDive is used.{" "}
+            {t.cookieConsentBanner.body}{" "}
             <Link href="/legal" className="text-cyan-400 hover:underline font-semibold">
-              Learn more
+              {t.cookieConsentBanner.learnMore}
             </Link>
           </p>
           <div className="flex items-center gap-2 mt-3">
@@ -54,14 +55,14 @@ export function CookieConsentBanner() {
               onClick={() => choose("declined")}
               className="text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-colors"
             >
-              Decline
+              {t.cookieConsentBanner.decline}
             </button>
             <button
               type="button"
               onClick={() => choose("accepted")}
               className="text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-3.5 py-1.5 rounded-xl transition-colors"
             >
-              Accept
+              {t.cookieConsentBanner.accept}
             </button>
           </div>
         </div>
