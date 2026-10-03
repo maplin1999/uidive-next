@@ -34,11 +34,13 @@ export const metadata: Metadata = {
         alt: "UiDive",
       },
     ],
-    siteName: "UiDive",
+    url: "/about",
     type: "website",
+    siteName: "UiDive",
+    locale: "en_UK",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "UiDive",
     description: "Find and book scuba dive trips, then share them with a community of divers.",
     images: [
@@ -49,6 +51,7 @@ export const metadata: Metadata = {
         alt: "UiDive",
       },
     ],
+    site: "UiDive",
   },
 };
 
