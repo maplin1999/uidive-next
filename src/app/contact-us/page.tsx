@@ -24,7 +24,7 @@ export default function ContactUsPage() {
           <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
             <div className="max-w-3xl">
               <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
-                {t.aboutUs.eyebrow}
+                {t.contactUsPage.eyebrow}
               </p>
               <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
                 {t.contactUsPage.heading}

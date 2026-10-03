@@ -15,31 +15,12 @@ import { useAuth } from "@/components/auth/AuthContext";
 // previews rather than rendered for a logged-in visitor's chosen locale,
 // and generateMetadata would need its own server-side locale detection to
 // vary them, which this app doesn't do.
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "UiDive",
-  url: "https://www.uidive.com",
-  logo: "https://www.uidive.com/assets/images/uidive-logo.svg",
-  description:
-    "UiDive is a platform helping divers find dives, connect with dive buddies, discover diving experiences and explore the underwater world together.",
-  sameAs: ["https://www.instagram.com/uidive", "https://www.facebook.com/uidive"],
-};
 
 export default function AboutPage() {
   const { t } = useLocale();
   const { user, openAuthModal } = useAuth();
 
   return (
-    <>
-      {/* Schema.org Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationSchema),
-        }}
-      />
-
       <main className="bg-slate-950 text-white">
 
         {/* Hero */}
@@ -299,6 +280,5 @@ export default function AboutPage() {
         </section>
 
       </main>
-    </>
   );
 }
