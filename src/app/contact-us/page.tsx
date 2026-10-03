@@ -88,6 +88,13 @@ export default function ContactUsPage() {
                 >
                   <Facebook className="w-4 h-4" /> Facebook
                 </a>
+                <a href="https://www.facebook.com/uidive" target="_blank" rel="noopener noreferrer" aria-label="UiDive on Facebook" className="text-body hover:text-heading">
+                  <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 8h3V5h-3c-2.76 0-5 2.24-5 5v2H6v3h3v6h3v-6h3l1-3h-4v-2c0-.55.45-1 1-1Z" />
+                  </svg>
+                  <span className="sr-only">Facebook</span>
+                </a>
+                
               </div>
             </article>
           </div>
