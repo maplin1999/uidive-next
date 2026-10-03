@@ -21,7 +21,7 @@ import { SITE_URL } from "@/lib/site";
 // template and these OG defaults unless it says otherwise.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "UiDive", template: "%s | UiDive" },
+  title: { default: "UiDive | Helping divers find dives", template: "%s | UiDive" },
   description: "Scuba dive and freediving trip booking and community",
   openGraph: {
     title: "UiDive",
