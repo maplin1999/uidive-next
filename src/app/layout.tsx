@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "UiDive",
     description: "Find and book scuba dive trips, then share them with a community of divers.",
+    images: [
+      {
+        url: "/images/og/card-rare-wingspan.jpg",
+        width: 1200,
+        height: 630,
+        alt: "UiDive",
+      },
+    ],
     siteName: "UiDive",
     type: "website",
   },
@@ -33,6 +41,14 @@ export const metadata: Metadata = {
     card: "summary",
     title: "UiDive",
     description: "Find and book scuba dive trips, then share them with a community of divers.",
+    images: [
+      {
+        url: "/images/og/card-rare-wingspan.jpg",
+        width: 1200,
+        height: 630,
+        alt: "UiDive",
+      },
+    ],
   },
 };
 

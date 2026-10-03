@@ -7,6 +7,10 @@ export const metadata: Metadata = {
     title: "About UiDive",
     description: "We bring real trips, real hosts, and a real community of divers together in one place.",
   },
+  twitter: {
+    title: "About UiDive",
+    description: "We bring real trips, real hosts, and a real community of divers together in one place.",
+  },
 };
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
