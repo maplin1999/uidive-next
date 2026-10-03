@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us | DiveBuddy",
+  title: "About Us | UiDive",
   description:
-    "Discover DiveBuddy, a platform built to help divers find dive buddies, discover experiences, and connect with the diving community.",
+    "Discover UiDive, a platform built to help divers find dives, buddies, discover experiences, and connect with the diving community.",
   keywords: [
     "scuba diving",
     "dive buddies",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "diving platform",
   ],
   openGraph: {
-    title: "About Us | DiveBuddy",
+    title: "About Us | UiDive",
     description:
       "A better way for divers to connect, discover and dive together.",
     type: "website",
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "DiveBuddy",
+  name: "UiDive",
   url: "https://www.divebuddy.com",
   logo: "https://www.divebuddy.com/logo.png",
   description:
-    "DiveBuddy is a platform helping divers connect with dive buddies, discover diving experiences and explore the underwater world together.",
+    "UiDive is a platform helping divers find dives, connect with dive buddies, discover diving experiences and explore the underwater world together.",
   sameAs: [
-    "https://www.instagram.com/divebuddy",
-    "https://www.facebook.com/divebuddy",
+    "https://www.instagram.com/uidive",
+    "https://www.facebook.com/uidive",
   ],
 };
 
@@ -54,7 +54,7 @@ export default function AboutPage() {
           <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
             <div className="max-w-3xl">
               <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-400">
-                About DiveBuddy
+                About UiDive
               </p>
 
               <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
@@ -62,9 +62,10 @@ export default function AboutPage() {
               </h1>
 
               <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
-                DiveBuddy is built to make it easier for divers to find
-                people to dive with, discover new experiences and connect
-                with the global diving community.
+                UiDive is a scuba &amp; freediving booking platform 
+                built around one idea: finding your next dive
+                We bring real trips, real hosts, and a real community of divers
+                together in one place.
               </p>
             </div>
           </div>
