@@ -61,7 +61,7 @@ export function Footer() {
           <p className="text-[11px] text-slate-500">
             © {year} UiDive. All rights reserved.
           </p>
-          <p className="text-[11px] text-slate-500">Made for divers, by divers. 🪸</p>
+          <p className="text-[11px] text-slate-500">Made for divers, by divers. ♥</p>
         </div>
       </div>
     </footer>
