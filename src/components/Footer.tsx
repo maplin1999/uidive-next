@@ -45,8 +45,8 @@ export function Footer() {
 
           {/* LEGAL */}
           <FooterColumn title="Legal">
-            <FooterLink href="/legal?tab=privacy">Privacy Policy</FooterLink>
-            <FooterLink href="/legal?tab=terms">Terms of Service</FooterLink>
+            <FooterLink href="/terms-of-service">Terms of Service</FooterLink>
+            <FooterLink href="/privacy-polcy">Privacy Policy</FooterLink>
           </FooterColumn>
         </div>
 
