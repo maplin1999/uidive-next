@@ -63,6 +63,11 @@ export default function ProfilePage() {
 
   const [bookings, setBookings] = useState<MyBooking[]>([]);
   const [bookingsStatus, setBookingsStatus] = useState<"loading" | "ready" | "error">("loading");
+  // Cancelled bookings shouldn't clutter this list -- unlike Refunded (which
+  // still means something happened worth seeing), a cancelled booking has no
+  // ongoing relevance to the diver once it's cancelled, so it's dropped
+  // entirely rather than shown with a "Cancelled" badge.
+  const visibleBookings = bookings.filter((b) => b.status !== "cancelled");
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [postsStatus, setPostsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selectedBooking, setSelectedBooking] = useState<MyBooking | null>(null);
@@ -431,7 +436,7 @@ export default function ProfilePage() {
               Could not load your bookings -- please refresh.
             </p>
           )}
-          {bookingsStatus === "ready" && bookings.length === 0 && (
+          {bookingsStatus === "ready" && visibleBookings.length === 0 && (
             <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
               <div className="text-3xl">🤿</div>
               <p className="text-sm font-bold text-slate-300">No bookings yet</p>
@@ -440,9 +445,9 @@ export default function ProfilePage() {
               </p>
             </div>
           )}
-          {bookingsStatus === "ready" && bookings.length > 0 && (
+          {bookingsStatus === "ready" && visibleBookings.length > 0 && (
             <div className="space-y-3">
-              {bookings.map((b) => {
+              {visibleBookings.map((b) => {
                 const trip = b.dive_trips || {
                   title: "Dive trip",
                   location: "",
