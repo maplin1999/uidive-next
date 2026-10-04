@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { X, Waves, Eye, EyeOff, Zap } from "lucide-react";
 import { useEscapeClose } from "@/lib/useEscapeClose";
@@ -165,9 +166,13 @@ export function AuthModal() {
           <>
             <div className="flex justify-between items-start">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                  <Waves className="w-4 h-4 text-cyan-400" />
-                </div>
+                <Image
+                  src="/assets/images/uidive-logo.svg"
+                  alt="UiDive"
+                  width={48}
+                  height={48}
+                  priority
+                />
                 <div>
                   <h3 className="font-black text-white text-base leading-none">
                     {t.authModal.welcomeHeading}
@@ -417,9 +422,13 @@ function ConfirmEmailView({
 }) {
   return (
     <div className="space-y-4 text-center py-4">
-      <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto">
-        <Waves className="w-6 h-6 text-cyan-400" />
-      </div>
+      <Image
+        src="/assets/images/uidive-logo.svg"
+        alt="UiDive"
+        width={48}
+        height={48}
+        priority
+      />
       <div>
         <h3 className="font-black text-white text-base">{t.authModal.checkYourEmail}</h3>
         <p className="text-xs text-slate-400 mt-2 leading-relaxed">

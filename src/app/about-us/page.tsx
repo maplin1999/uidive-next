@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Handshake, Compass, Waves as WavesIcon, Users, Anchor, Sparkles } from "lucide-react";
 import { useLocale } from "@/components/i18n/LocaleContext";
 import { useAuth } from "@/components/auth/AuthContext";
@@ -114,9 +115,13 @@ export default function AboutPage() {
               </article>
 
               <article className="rounded-2xl bg-slate-900 border border-slate-800 p-8 shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-                  <WavesIcon className="w-5 h-5 text-emerald-400" />
-                </div>
+                    <Image
+                      src="/assets/images/uidive-logo.svg"
+                      alt="UiDive"
+                      width={48}
+                      height={48}
+                      priority
+                    />
 
                 <h3 className="mt-6 text-xl font-bold text-white">
                   {t.aboutUs.discoverTitle}

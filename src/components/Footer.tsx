@@ -23,12 +23,12 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-1 space-y-3">
             <Link href="/" className="flex items-center space-x-2.5 group w-fit">
               <Image
-                            src="/assets/images/uidive-logo.svg"
-                            alt="UiDive"
-                            width={48}
-                            height={48}
-                            priority
-                          />
+                src="/assets/images/uidive-logo.svg"
+                alt="UiDive"
+                width={48}
+                height={48}
+                priority
+              />
               <span className="font-black text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
                 UiDive
               </span>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Waves } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthContext";
@@ -72,9 +73,13 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
   return (
     <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-cyan-950/50 via-slate-900 to-emerald-950/40 border border-cyan-500/20 shadow-xl space-y-4">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
-          <Waves className="w-5 h-5 text-cyan-400" />
-        </div>
+        <Image
+          src="/assets/images/uidive-logo.svg"
+          alt="UiDive"
+          width={48}
+          height={48}
+          priority
+        />
         <div className="space-y-1 min-w-0">
           <h3 className="text-sm font-bold text-white">{t.conservationBanner.heading}</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
