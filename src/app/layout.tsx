@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     description: "Find and book scuba dive and freediving trips, then share them with a community of divers.",
     images: [
       {
-        url: "/images/og/card-rare-wingspan.jpg",
-        type: "image/jpeg",
+        url: "/images/og/summary-card.png",
+        type: "image/png",
         width: 1200,
         height: 630,
         alt: "UiDive",
