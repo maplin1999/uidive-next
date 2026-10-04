@@ -150,7 +150,7 @@ const en = {
   profile: {
     signInTitle: "Sign in to view your profile",
     signInBody: "Track your dives, Corals, and bookings once you're signed in.",
-    signIn: "Sign In",
+    signIn: "Log In",
     editProfilePhoto: "Edit profile photo",
     yourProfilePhoto: "Your profile photo",
     editProfile: "Edit profile",
@@ -810,8 +810,8 @@ const en = {
   },
   authModal: {
     welcomeHeading: "Welcome to UiDive",
-    welcomeSubtitle: "Sign in to book, post, and earn Corals",
-    signIn: "Sign In",
+    welcomeSubtitle: "Log in to book, post, and earn Corals",
+    signIn: "Log In",
     signUp: "Sign Up",
     email: "Email",
     emailPlaceholder: "you@example.com",
