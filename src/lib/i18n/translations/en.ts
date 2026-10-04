@@ -23,7 +23,7 @@ const en = {
   header: {
     tagline: "Scuba & Ocean Travel",
     corals: "Corals",
-    logIn: "Log in",
+    logIn: "Log In",
     account: "Account",
     editProfile: "Edit profile",
     myBookings: "My Bookings",
