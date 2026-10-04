@@ -173,7 +173,7 @@ export function ChestOpenModal({
                   </span>
                   {r.is_duplicate ? (
                     <p className="text-[9px] text-amber-300 font-bold mt-1">
-                      {t.chestOpenModal.duplicatePrefix}{r.corals_refunded} 🐚
+                      {t.chestOpenModal.duplicatePrefix}{r.corals_refunded}  
                     </p>
                   ) : (
                     <p className="text-[9px] text-emerald-400 font-bold mt-1">{t.chestOpenModal.newItem}</p>

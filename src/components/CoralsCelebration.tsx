@@ -58,7 +58,7 @@ export function CoralsCelebration({
         }`}
       >
         <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl shrink-0">
-          🐚
+           
         </div>
         <div className="text-left min-w-0">
           <p className="text-sm font-bold text-white truncate">{title}</p>

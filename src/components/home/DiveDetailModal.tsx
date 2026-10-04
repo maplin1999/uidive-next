@@ -196,7 +196,7 @@ export function DiveDetailModal({
             }`}
           >
             <div className="flex items-center space-x-3">
-              <span className="text-2xl">🐚</span>
+              <span className="text-2xl"> </span>
               <div>
                 <p className="text-sm font-bold text-amber-400">
                   {isFull ? t.diveDetail.tripFullNoRewards : t.diveDetail.earnCorals}

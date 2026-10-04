@@ -393,7 +393,7 @@ export function PublicProfileModal() {
                                 <span className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-200/35 via-cyan-300/10 to-amber-300/25" />
                                 <span className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-white/50 to-transparent" />
                                 <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">+10</span>
-                                <span>🐚</span>
+                                <span> </span>
                               </span>
                             </div>
                           )}
@@ -424,7 +424,7 @@ export function PublicProfileModal() {
                             <p className="text-[10px] text-slate-500">{t.publicProfileModal.loggedPrefix} {when}</p>
                             {post.corals_awarded && (
                               <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 shrink-0">
-                                +10 🐚
+                                +10  
                               </span>
                             )}
                           </div>

@@ -42,7 +42,7 @@ export function DailyStreakCard({ onToast }: { onToast: (message: string) => voi
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900 border border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-4 min-w-0">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-2xl shrink-0">
-            🐚
+             
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -68,7 +68,7 @@ export function DailyStreakCard({ onToast }: { onToast: (message: string) => voi
                 ? t.dailyStreakCard.claiming
                 : t.dailyStreakCard.claim50Corals}
           </span>
-          {!alreadyClaimedToday && <span>🐚</span>}
+          {!alreadyClaimedToday && <span> </span>}
         </button>
       </div>
 
