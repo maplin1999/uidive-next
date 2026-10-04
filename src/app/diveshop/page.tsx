@@ -158,7 +158,7 @@ export default function DiveShopPage() {
           </div>
 
           <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/40 text-center min-w-[160px] shadow-lg">
-            <span className="text-2xl">🪸</span>
+            <span className="text-2xl">🐚</span>
             <div className="text-2xl font-black text-amber-400 mt-1">{user ? user.corals : 0}</div>
             <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
               {t.shop.availableBalance}
@@ -277,7 +277,7 @@ export default function DiveShopPage() {
               ) : (
                 <>
                   <span>{t.shop.openForPrefix} {TREASURE_CHEST_COST}</span>
-                  <span>🪸</span>
+                  <span>🐚</span>
                 </>
               )}
             </button>
@@ -312,7 +312,7 @@ export default function DiveShopPage() {
                   <span>
                     {redeemingCost === offer.cost ? t.shop.redeeming : `${t.shop.redeemForPrefix} ${offer.cost}`}
                   </span>
-                  <span>🪸</span>
+                  <span>🐚</span>
                 </button>
               </div>
             ))}
@@ -415,7 +415,7 @@ export default function DiveShopPage() {
                           : "font-bold text-amber-400 bg-amber-500/10 border-amber-500/20 py-1.5"
                       }`}
                     >
-                      <span>🪸</span> <span>{Number(entry.corals).toLocaleString()}</span> <span>{t.header.corals}</span>
+                      <span>🐚</span> <span>{Number(entry.corals).toLocaleString()}</span> <span>{t.header.corals}</span>
                     </div>
                   </div>
                 );
@@ -474,7 +474,7 @@ export default function DiveShopPage() {
                         <td className="py-3 px-4 text-center">{entry.dives}</td>
                         <td className="py-3 px-4 text-center text-purple-400">{entry.max_depth}</td>
                         <td className="py-3 px-4 text-right text-amber-400 font-bold">
-                          🪸 {Number(entry.corals).toLocaleString()}
+                          🐚 {Number(entry.corals).toLocaleString()}
                         </td>
                       </tr>
                       );

@@ -154,7 +154,7 @@ export function Header() {
                 href="/diveshop"
                 className="shrink-0 flex items-center space-x-1.5 sm:space-x-2 bg-amber-500/10 border border-amber-500/30 px-2.5 sm:px-3.5 py-2.5 rounded-full hover:bg-amber-500/20 transition-all min-h-[44px]"
               >
-                <span className="text-base">🪸</span>
+                <span className="text-base">🐚</span>
                 <span className="text-sm font-bold text-amber-400">{Number(user.corals).toLocaleString()}</span>
                 <span className="hidden sm:inline text-xs font-bold text-amber-400">{t.header.corals}</span>
               </Link>

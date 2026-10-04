@@ -115,7 +115,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
           onClick={() => (requireAuth() ? setPledgeOpen(true) : undefined)}
           className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors shadow-lg flex items-center justify-center gap-1.5"
         >
-          <span>🪸</span> <span>{t.conservationBanner.pledgeCorals}</span>
+          <span>🐚</span> <span>{t.conservationBanner.pledgeCorals}</span>
         </button>
       ) : (
         <div className="p-3 sm:p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
@@ -128,7 +128,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
                 disabled={pledging}
                 className="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 border border-slate-800 text-slate-200 hover:bg-slate-800 hover:border-cyan-500/40 disabled:opacity-50 transition-colors"
               >
-                🪸 {amount}
+                🐚 {amount}
               </button>
             ))}
             <div className="flex items-center gap-1.5">
@@ -152,7 +152,7 @@ export function ConservationBanner({ onToast }: { onToast: (message: string) => 
           </div>
           <div className="flex items-center justify-between">
             <p className="text-[11px] text-slate-500">
-              {t.conservationBanner.yourBalance} <span className="text-amber-400 font-bold">{user ? user.corals : 0}</span> 🪸
+              {t.conservationBanner.yourBalance} <span className="text-amber-400 font-bold">{user ? user.corals : 0}</span> 🐚
             </p>
             <button
               type="button"

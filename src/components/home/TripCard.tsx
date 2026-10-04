@@ -89,7 +89,7 @@ export function TripCard({
           </div>
           <div>
             <span className="text-[10px] text-slate-500 uppercase block">{t.tripCard.reward}</span>
-            <strong className="text-amber-400">+50 🪸</strong>
+            <strong className="text-amber-400">+50 🐚</strong>
           </div>
         </div>
       </div>
